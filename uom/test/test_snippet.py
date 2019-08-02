@@ -1,9 +1,11 @@
 import unittest
+from src.prefix import Prefix
 
-class TestStringMethods(unittest.TestCase):
+class TestPrefix(unittest.TestCase):
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
+    def test(self):
+        yotta = Prefix.yotta()
+        print (yotta.name)
 
     def test_isupper(self):
         self.assertTrue('FOO'.isupper())
