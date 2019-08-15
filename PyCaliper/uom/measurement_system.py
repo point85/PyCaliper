@@ -26,16 +26,16 @@ class MeasurementSystem:
     
     # single instance
     __unifiedSystem = None
+    
+    def __init__(self):
+        MeasurementSystem.__unifiedSystem = self
+        self.__unitTypeRegistry = {}
 
     @staticmethod
     def instance():
         if MeasurementSystem.__unifiedSystem == None:
             MeasurementSystem()
         return MeasurementSystem.__unifiedSystem 
-
-    def __init__(self):
-            MeasurementSystem.__unifiedSystem = self
-            self.__unitTypeRegistry = {}
             
     @staticmethod
     def getMessage(msgId: str) -> str :
@@ -77,7 +77,7 @@ class MeasurementSystem:
         uom = self.cacheManager.getUOM(unit)
 
         if (uom is None):
-            uom = createUOMForUnit(unit)
+            uom = self.createUOMForUnit(unit)
         return uom
         
 

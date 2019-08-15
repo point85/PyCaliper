@@ -2,137 +2,10 @@ from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.unit_type import UnitType
 from PyCaliper.uom.measurement_type import MeasurementType
-from math import isclose
+import math
+from builtins import staticmethod
+import time
 
-class UnitOfMeasure(Symbolic):
-    __MAX_SYMBOL_LENGTH = 16
-       
-    # operators    
-    __MULT = '\xB7'
-    __DIV = '/'
-    __POW = '^'
-    __SQ = '\xB2'
-    __CUBED ='\xB3'
-    __LP = '('
-    __RP = ')'
-    __ONE_CHAR = '1'
-    
-    def initialize(self):
-        self.__conversionRegistry = {}
-        self.category = MeasurementSystem.getUnitString("default.category.text")
-        self.unit = None
-        self.unitType = UnitType.UNCLASSIFIED     
-        self.abscissaUnit = self
-        self.scalingFactor = 1.0
-        self.offset = 0.0
-        self.uom1 = None
-        self.uom2 = None
-        self.exponent1 = None
-        self.exponent2 = None
-        self.bridgeScalingFactor = None
-        self.bridgeOffset = None
-        self.bridgeAbscissaUnit = None
-       
-    def __init__(self, unitType: UnitType, name: str, symbol: str, description: str):
-        super(name, symbol, description)
-        self.initialize()
-        self.unitType = unitType
-    
-    def __hash__(self):
-        return hash(self.args)
-    """
-    """
-    
-    def __eq__(self, other):
-        # same type
-        if (other == None or self.unitType != other.unitType):
-            return False
-        
-        # same unit enumeration
-        if (self.unit != None and other.unit != None and self.unit != other.unit):
-            return False
-        
-        # same abscissa unit symbols            
-        if (self.abscissaUnit.symbol != other.abscissaUnit.symbol):
-            return False
-        
-        # similar factors
-        if (not isclose(self.scalingFactor, other.scalingFactor)):
-            return False
-        
-        # similar offsets
-        if (not isclose(self.offset, other.offset)):
-            return False
-
-        return True;
-    
-    def __lt__ (self, other):
-        return self.__symbol < other.__symbol
-
-    def __gt__ (self, other):
-        return self.__symbol > other.__symbol
-    
-    def __ne__ (self, other):
-        return not self.__eq__(other)
-    
-    def setBaseSymbol(self, symbol: str):
-            self.baseSymbol = symbol
-    
-    def setPowerProduct(self, uom: UnitOfMeasure, exponent: int):
-        self.uom1 = uom
-        self.exponent1 = exponent
-        
-    def setPowerProduct2(self, uom1: UnitOfMeasure, exponent1: int, uom2: UnitOfMeasure, exponent2: int):
-        self.setPowerProduct(uom1, exponent1)
-        self.uom2 = uom2
-        self.exponent2 = exponent2
-        
-    def getMeasurementType(self) -> "MeasurementType":
-        measurementType = MeasurementType.SCALAR
-        
-        if (self.exponent2 is not None and self.exponent2 < 0):
-            measurementType = MeasurementType.QUOTIENT
-        elif (self.exponent2 is not None and self.exponent2 > 0):
-            measurementType = MeasurementType.PRODUCT
-        elif (self.uom1 is not None and self.exponent1 is not None):
-            measurementType = MeasurementType.POWER
-            
-        return measurementType
-    
-    def isTerminal(self):
-        return True if self == self.abscissaUnit else False
-    
-    def setBridgeConversion(self, scalingFactor: float, abscissaUnit: UnitOfMeasure, offset: float):
-        self.bridgeScalingFactor = scalingFactor
-        self.bridgeAbscissaUnit = abscissaUnit
-        self.bridgeOffset = offset
-
-"""
-    public void setConversion(double scalingFactor, UnitOfMeasure abscissaUnit, double offset) throws Exception {
-        if (abscissaUnit == null) {
-            throw new Exception(MeasurementSystem.getMessage("unit.cannot.be.null"));
-        }
-
-        // self conversion is special
-        if (this.equals(abscissaUnit)) {
-            if (Double.valueOf(scalingFactor).compareTo(1.0d) != 0 || Double.valueOf(offset).compareTo(0.0d) != 0) {
-                throw new Exception(MeasurementSystem.getMessage("conversion.not.allowed"));
-            }
-        }
-
-        // unit has been previously cached, so first remove it, then cache again
-        MeasurementSystem.getSystem().unregisterUnit(this);
-        baseSymbol = null;
-
-        this.scalingFactor = scalingFactor;
-        this.abscissaUnit = abscissaUnit;
-        this.offset = offset;
-
-        // re-cache
-        MeasurementSystem.getSystem().registerUnit(this);
-    }
-"""        
-        
 class PathParameters:
     # UOM, scaling factor and power cumulative along a conversion path
     def __init__(self, pathUOM: UnitOfMeasure, pathFactor: float):
@@ -315,11 +188,277 @@ class Reducer:
                 else:
                     result = numerator + UnitOfMeasure.__DIV + UnitOfMeasure.__LP + denominator + UnitOfMeasure.__RP
 
-            return result
-                
-"""
+            return result       
 
-"""        
+class UnitOfMeasure(Symbolic):
+    ## maximum number of characters in the symbol
+    __MAX_SYMBOL_LENGTH = 16
+       
+    # operators    
+    __MULT = '\xB7'
+    __DIV = '/'
+    __POW = '^'
+    __SQ = '\xB2'
+    __CUBED ='\xB3'
+    __LP = '('
+    __RP = ')'
+    __ONE_CHAR = '1'
+    
+    def __init__(self, unitType: UnitType, name: str, symbol: str, description: str):
+        super(name, symbol, description)
+        self.initialize()
+        self.unitType = unitType
+            
+    def initialize(self):
+        self.conversionRegistry = {}
+        self.category = MeasurementSystem.getUnitString("default.category.text")
+        self.unit = None
+        self.unitType = UnitType.UNCLASSIFIED     
+        self.abscissaUnit = self
+        self.scalingFactor = 1.0
+        self.offset = 0.0
+        self.uom1 = None
+        self.uom2 = None
+        self.exponent1 = None
+        self.exponent2 = None
+        self.bridgeScalingFactor = None
+        self.bridgeOffset = None
+        self.bridgeAbscissaUnit = None
         
+    @staticmethod
+    def isValidExponent(exponent: int) -> bool:
+        return False if exponent is None else True
+ 
+    def __hash__(self):
+        return hash(self.args)
+        
+    def __eq__(self, other):
+        # same type
+        if (other == None or self.unitType != other.unitType):
+            return False
+        
+        # same unit enumeration
+        if (self.unit != None and other.unit != None and self.unit != other.unit):
+            return False
+        
+        # same abscissa unit symbols            
+        if (self.abscissaUnit.symbol != other.abscissaUnit.symbol):
+            return False
+        
+        # similar factors
+        if (not math.isclose(self.scalingFactor, other.scalingFactor)):
+            return False
+        
+        # similar offsets
+        if (not math.isclose(self.offset, other.offset)):
+            return False
+
+        return True;
+    
+    def __lt__ (self, other):
+        return self.__symbol < other.__symbol
+
+    def __gt__ (self, other):
+        return self.__symbol > other.__symbol
+    
+    def __ne__ (self, other):
+        return not self.__eq__(other)
+    
+    def setBaseSymbol(self, symbol: str):
+            self.baseSymbol = symbol
+        
+    def setPowerProduct(self, uom1: UnitOfMeasure, exponent1: int, uom2: UnitOfMeasure, exponent2: int):
+        self.setPowerProduct(uom1, exponent1)
+        self.uom2 = uom2
+        self.exponent2 = exponent2
+        
+    def setProductUnits(self, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure):
+        if (multiplier is None):
+            args = self.symbol
+            msg = MeasurementSystem.getMessage("multiplier.cannot.be.null").format(*args)
+            raise Exception(msg)
+
+        if (multiplicand is None):
+            args = self.symbol
+            msg = MeasurementSystem.getMessage("multiplicand.cannot.be.null").format(*args)
+            raise Exception(msg)            
+
+        self.setPowerProduct(multiplier, 1, multiplicand, 1)
+        
+    def setQuotientUnits(self, dividend: UnitOfMeasure, divisor: UnitOfMeasure):
+        if (dividend is None):
+            args = self.symbol
+            msg = MeasurementSystem.getMessage("dividend.cannot.be.null").format(*args)
+            raise Exception(msg)
+
+        if (divisor is None):
+            args = self.symbol
+            msg = MeasurementSystem.getMessage("divisor.cannot.be.null").format(*args)
+            raise Exception(msg)
+
+        self.setPowerProduct(dividend, 1, divisor, -1)
+        
+    def getMeasurementType(self) -> MeasurementType:
+        measurementType = MeasurementType.SCALAR
+        
+        if (self.exponent2 is not None and self.exponent2 < 0):
+            measurementType = MeasurementType.QUOTIENT
+        elif (self.exponent2 is not None and self.exponent2 > 0):
+            measurementType = MeasurementType.PRODUCT
+        elif (self.uom1 is not None and self.exponent1 is not None):
+            measurementType = MeasurementType.POWER
+            
+        return measurementType
+    
+    def getReducer(self) -> Reducer:
+        reducer = Reducer()
+        reducer.explode(self)
+        return reducer
+    
+    def getBaseUnitsOfMeasure(self):
+        return self.getReducer().terms
+    
+    def power(self, exponent: int) -> UnitOfMeasure:
+        return MeasurementSystem.instance().createPowerUOM(self, exponent)
+    
+    def isTerminal(self):
+        return True if self == self.abscissaUnit else False
+    
+    def setBridgeConversion(self, scalingFactor: float, abscissaUnit: UnitOfMeasure, offset: float):
+        self.bridgeScalingFactor = scalingFactor
+        self.bridgeAbscissaUnit = abscissaUnit
+        self.bridgeOffset = offset
 
 
+    def setConversion(self, scalingFactor: float, abscissaUnit: UnitOfMeasure, offset: float):
+        if (abscissaUnit is None):
+            msg = MeasurementSystem.getMessage("unit.cannot.be.null")
+            raise Exception(msg)
+
+        # self conversion is special
+        if (self == abscissaUnit):
+            if (scalingFactor != 1.0 or offset != 0.0):
+                msg = MeasurementSystem.getMessage("conversion.not.allowed")
+                raise Exception(msg)
+
+        # unit has been previously cached, so first remove it, then cache again
+        MeasurementSystem.instance().unregisterUnit(self)
+        
+        self.baseSymbol = None
+        self.scalingFactor = scalingFactor
+        self.abscissaUnit = abscissaUnit
+        self.offset = offset
+
+        # re-cache
+        MeasurementSystem.instance().registerUnit(self)
+        
+    def getPowerExponent(self) -> int:
+        return self.exponent1
+    
+    def getDividend(self) -> UnitOfMeasure:
+        return self.uom1;
+    
+    def getDivisor(self) -> UnitOfMeasure:
+        return self.uom2; 
+    
+    def getMultiplier(self) -> UnitOfMeasure:
+        return self.uom1; 
+    
+    def getMultiplicand(self) -> UnitOfMeasure:
+        return self.uom2; 
+    
+    def setPowerUnit(self, base: UnitOfMeasure, exponent: int):
+        if (base is None):
+            args = self.symbol
+            msg = MeasurementSystem.getMessage("base.cannot.be.null").format(*args)
+            raise Exception(msg)
+
+        # special cases
+        if (exponent == -1):
+            self.setPowerProduct(MeasurementSystem.instance().getOne(), 1, base, -1)
+        else:
+            self.setPowerProduct(base, exponent, None, None)
+    
+    @staticmethod    
+    def generateIntermediateSymbol() -> str:
+        ms = time.time_ns() // 1000000 
+        return str(ms)
+
+    @staticmethod 
+    def generatePowerSymbol(base: UnitOfMeasure, exponent: int) -> str:
+        return base.symbol + UnitOfMeasure.__POW + str(exponent)
+
+    @staticmethod
+    def generateProductSymbol(multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure) -> str:
+        symbol = None
+        if (multiplier == multiplicand):
+            symbol = multiplier.symbol + UnitOfMeasure.__SQ
+        else:
+            symbol = multiplier.symbol + UnitOfMeasure.__MULT + multiplicand.symbol
+        return symbol
+
+    @staticmethod
+    def generateQuotientSymbol(dividend: UnitOfMeasure, divisor: UnitOfMeasure) -> str:
+        return dividend.symbol + UnitOfMeasure.__DIV + divisor.symbol   
+    
+    def clonePower(self, uom: UnitOfMeasure) -> UnitOfMeasure:
+        newUOM = UnitOfMeasure()
+        newUOM.setUnitType(self.unitType);
+
+        # check if quotient
+        exponent = 1
+        if (UnitOfMeasure.isValidExponent(self.getPowerExponent())):
+            exponent = self.getPowerExponent()
+
+        one = MeasurementSystem.instance().getOne()
+        if (self.getMeasurementType() == MeasurementType.QUOTIENT):
+            if (self.getDividend() == one):
+                exponent = self.exponent2
+            elif (self.getDivisor() == one):
+                exponent = self.exponent1
+               
+        newUOM.setPowerUnit(uom, exponent)
+        symbol = UnitOfMeasure.generatePowerSymbol(uom, exponent)
+        newUOM.symbol = symbol
+        newUOM.name = symbol
+
+        return newUOM
+   
+    def classify(self):
+        if (self.unitType != UnitType.UNCLASSIFIED):
+            # already classified
+            return self
+
+        # base unit map
+        uomBaseMap = self.getReducer().terms
+
+        # try to find this map in the unit types
+        matchedType = UnitType.UNCLASSIFIED
+
+        for unitType in UnitType:
+            unitTypeMap = MeasurementSystem.instance().getTypeMap(unitType)
+
+            if (len(unitTypeMap) != len(uomBaseMap)):
+                # not a match
+                continue
+
+            match = True
+
+            # same size, now check base unit types and exponents
+            for uomBaseEntry in uomBaseMap.items():
+                uomBaseType = uomBaseEntry[0].unitType;
+                unitValue = unitTypeMap[uomBaseType]
+
+                if (unitValue is None or unitValue != uomBaseEntry[1]):
+                    # not a match
+                    match = False
+                    break
+
+            if (match):
+                matchedType = unitType
+                break
+
+        if (matchedType != UnitType.UNCLASSIFIED):
+            self.unitType = matchedType
+
+        return self

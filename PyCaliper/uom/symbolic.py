@@ -16,13 +16,13 @@ class Symbolic(ABC):
         value = ""
         
         if (self.symbol is not None):
-            value += " (" + self.symbol
+            value = value + " (" + self.symbol
             
         if (self.name is not None):
-            value += ", " + self.name
+            value = value + ", " + self.name
             
         if (self.description is not None):
-            value += ", " + self.description + ')'
+            value = value + ", " + self.description + ')'
                    
         return value
     
