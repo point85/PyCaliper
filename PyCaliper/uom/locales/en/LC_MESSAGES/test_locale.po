@@ -1,0 +1,33 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2019-08-01 15:16-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp1252\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: test_locale.py:5
+msgid "Hello world"
+msgstr "English - Hello world"
+
+#: test_locale.py:6
+msgid "This is a translatable string"
+msgstr "English - This is a translatable string"
+
+#: messages.py:1
+msgid "must.be.same.as"
+msgstr "The unit of measure {0} of type {1} must be the same as {2} of type {3}."
+
+#: messages.py:2
+msgid "amount.cannot.be.null"
+msgstr "The amount cannot be null."
+

@@ -16,7 +16,7 @@ class Prefix:
         cls.ZETTA = cls("zetta", "Z", 1.0E+21)
         return cls.ZETTA
     
-    def __init__(self, name : str, symbol : str, factor : float): 
+    def __init__(self, name: str, symbol: str, factor: float): 
         """
         Construct a prefix
          
@@ -45,6 +45,16 @@ class Prefix:
      
         for p in cls.__prefixes:
             if p.name == name:
+                prefix = p
+                break
+
+        return prefix
+    
+    @classmethod
+    def fromFactor(cls, factor: float):
+        
+        for p in cls.__prefixes:
+            if p.factor == factor:
                 prefix = p
                 break
 

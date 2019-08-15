@@ -2,10 +2,11 @@ import unittest
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.constant import Constant
 from PyCaliper.uom.measurement_system import MeasurementSystem
+from PyCaliper.uom.resource_bundle import ResourceBundle
 
 class TestPrefix(unittest.TestCase):
 
-    def test(self):
+    def test_prefix(self):
         yotta = Prefix.yotta()
         print (yotta.name)
         print (Constant.AVAGADRO_CONSTANT)
@@ -21,12 +22,9 @@ class TestPrefix(unittest.TestCase):
         
         self.assertEqual(first, second)
 
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+    def test_bundle(self):
+        messages = ResourceBundle("messages")
+        print (messages.getString("must.be.same.as"))
 
 if __name__ == '__main__':
     unittest.main()

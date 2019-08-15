@@ -1,0 +1,1 @@
+py -3.7 C:\Users\Kent\AppData\Local\Programs\Python\Python37\Tools\i18n\pygettext.py -d domain -o locales/domain.pot test_local.py

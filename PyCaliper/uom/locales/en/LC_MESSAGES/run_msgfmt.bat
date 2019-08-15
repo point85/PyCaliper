@@ -1,0 +1,1 @@
+py -3.7 C:\Users\Kent\AppData\Local\Programs\Python\Python37\Tools\i18n\msgfmt.py -o test_locale.mo test_locale
