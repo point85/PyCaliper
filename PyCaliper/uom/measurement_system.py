@@ -13,76 +13,12 @@ messages = gettext.translation('messages', localedir='locales', languages=[langC
 messages.install()
 _M = messages.gettext
 
-"""
 # translated user-visible text for this locale
 units = gettext.translation('units', localedir='locales', languages=[langCC[0:2]])
 units.install()
 _U = units.gettext
-"""
-
-class MeasurementSystem:
-    # name of resource bundle with translatable strings for exception messages
-    __MESSAGE_BUNDLE_NAME = "Message"
-    
-    # single instance
-    __unifiedSystem = None
-    
-    def __init__(self):
-        MeasurementSystem.__unifiedSystem = self
-        self.__unitTypeRegistry = {}
-
-    @staticmethod
-    def instance():
-        if MeasurementSystem.__unifiedSystem == None:
-            MeasurementSystem()
-        return MeasurementSystem.__unifiedSystem 
-            
-    @staticmethod
-    def getMessage(msgId: str) -> str :
-        """ Get an error message by its id """
-        return messages.gettext(msgId)
-    
-    @staticmethod
-    def getUnitString(msgId: str) -> str :
-        """ Get a unit name, symbol or description by its id """
-        #return units.gettext(msgId)
-        pass
-    
-    def area(self, cachedMap):
-        cachedMap[UnitType.LENGTH] = 2
-    
-    def getTypeMap(self, unitType: UnitType):            
-        if (self.__unitTypeRegistry.get(unitType) is not None):
-            return self.__unitTypeRegistry[unitType]
-        
-        cachedMap = {}
-        self.__unitTypeRegistry[unitType] = cachedMap
-        
-        if (unitType == UnitType.AREA):
-            cachedMap[UnitType.LENGTH] = 2
-        elif (unitType == UnitType.VOLUME):
-            cachedMap[UnitType.LENGTH] = 3;
-        elif (unitType ==  UnitType.DENSITY):
-            cachedMap[UnitType.MASS] = 1;
-            cachedMap[UnitType.LENGTH] = -3;
-        elif (unitType ==  UnitType.VELOCITY):
-            cachedMap[UnitType.LENGTH] = 1;
-            cachedMap[UnitType.TIME] = -1;
-        else:
-            pass
-        
-        return cachedMap;
-    
-    def getUOM(self, unit: Unit) -> UnitOfMeasure:
-        uom = self.cacheManager.getUOM(unit)
-
-        if (uom is None):
-            uom = self.createUOMForUnit(unit)
-        return uom
-        
 
 class CacheManager:
-
     def __init__(self):
         self.symbolRegistry = {}
         self.baseRegistry = {}
@@ -122,6 +58,87 @@ class CacheManager:
         # remove by symbol and base symbol
         del self.symbolRegistry[uom.symbol]
         del self.baseRegistry[uom.getBaseSymbol()]
+        
+    def registerUnit(self, uom: UnitOfMeasure):
+        # get first by symbol
+        current = self.symbolRegistry[uom.symbol]
+
+        if (current is not None):
+            # already cached
+            return
+
+        # cache it by symbol
+        self.symbolRegistry[uom.symbol] = uom
+
+        # next by unit enumeration
+        if (uom.unit is not None):
+            self.unitRegistry[uom.unit] = uom
+
+        # finally cache by base symbol
+        key = uom.getBaseSymbol()
+
+        if (self.baseRegistry[key] is None):
+            self.baseRegistry[key] = uom
+
+class MeasurementSystem:
+    # name of resource bundle with translatable strings for exception messages
+    __MESSAGE_BUNDLE_NAME = "Message"
+    
+    # single instance
+    unifiedSystem = None
+    
+    def __init__(self):
+        MeasurementSystem.unifiedSystem = self
+        self.unitTypeRegistry = {}
+        self.cacheManager = CacheManager()
+
+    @staticmethod
+    def instance():
+        if MeasurementSystem.unifiedSystem == None:
+            MeasurementSystem()
+        return MeasurementSystem.unifiedSystem 
+            
+    @staticmethod
+    def getMessage(msgId: str) -> str :
+        """ Get an error message by its id """
+        return messages.gettext(msgId)
+    
+    @staticmethod
+    def getUnitString(msgId: str) -> str :
+        """ Get a unit name, symbol or description by its id """
+        return units.gettext(msgId)
+    
+    def area(self, cachedMap):
+        cachedMap[UnitType.LENGTH] = 2
+    
+    def getTypeMap(self, unitType: UnitType):            
+        if (self.unitTypeRegistry.get(unitType) is not None):
+            return self.unitTypeRegistry[unitType]
+        
+        cachedMap = {}
+        self.unitTypeRegistry[unitType] = cachedMap
+        
+        if (unitType == UnitType.AREA):
+            cachedMap[UnitType.LENGTH] = 2
+        elif (unitType == UnitType.VOLUME):
+            cachedMap[UnitType.LENGTH] = 3;
+        elif (unitType ==  UnitType.DENSITY):
+            cachedMap[UnitType.MASS] = 1;
+            cachedMap[UnitType.LENGTH] = -3;
+        elif (unitType ==  UnitType.VELOCITY):
+            cachedMap[UnitType.LENGTH] = 1;
+            cachedMap[UnitType.TIME] = -1;
+        else:
+            pass
+        
+        return cachedMap;
+    
+    def getUOM(self, unit: Unit) -> UnitOfMeasure:
+        uom = self.cacheManager.getUOM(unit)
+
+        if (uom is None):
+            uom = self.createUOMForUnit(unit)
+        return uom
         
     def getOne(self):
         return self.getUOMByUnit(Unit.ONE)
@@ -230,6 +247,3 @@ class CacheManager:
             return uom
         
         return self.createFinancialUnit(unit)
-"""
-
-"""

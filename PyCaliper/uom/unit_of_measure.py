@@ -206,10 +206,7 @@ class UnitOfMeasure(Symbolic):
     
     def __init__(self, unitType: UnitType, name: str, symbol: str, description: str):
         super(name, symbol, description)
-        self.initialize()
-        self.unitType = unitType
-            
-    def initialize(self):
+        
         self.conversionRegistry = {}
         self.category = MeasurementSystem.getUnitString("default.category.text")
         self.unit = None
@@ -224,6 +221,7 @@ class UnitOfMeasure(Symbolic):
         self.bridgeScalingFactor = None
         self.bridgeOffset = None
         self.bridgeAbscissaUnit = None
+        self.unitType = unitType
         
     @staticmethod
     def isValidExponent(exponent: int) -> bool:
