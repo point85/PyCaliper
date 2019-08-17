@@ -33,7 +33,7 @@ class Quantity(Symbolic):
     @staticmethod
     def createAmount(self, value) -> float:
         if (value is None):
-            msg = MeasurementSystem.getMessage("amount.cannot.be.null")
+            msg = MeasurementSystem.messageStr("amount.cannot.be.null")
             raise Exception(msg) 
 
         return float(value)
@@ -98,7 +98,7 @@ class Quantity(Symbolic):
     
     def divide(self, other: Quantity) -> Quantity:
         if (other.amount == 0.0):
-            msg = MeasurementSystem.getMessage("divisor.cannot.be.zero")
+            msg = MeasurementSystem.messageStr("divisor.cannot.be.zero")
             raise Exception(msg)
 
         amount = self.amount / other.amount

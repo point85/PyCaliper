@@ -28,7 +28,7 @@ class Reducer:
         self.counter = self.counter + 1
         if (self.counter > self.MAX_RECURSIONS):
             args = unit.symbol
-            msg = MeasurementSystem.getMessage("circular.references").format(*args)
+            msg = MeasurementSystem.messageStr("circular.references").format(*args)
             raise Exception(msg)
         
         # down a level
@@ -208,7 +208,7 @@ class UnitOfMeasure(Symbolic):
         super(name, symbol, description)
         
         self.conversionRegistry = {}
-        self.category = MeasurementSystem.getUnitString("default.category.text")
+        self.category = MeasurementSystem.unitStr("default.category.text")
         self.unit = None
         self.unitType = UnitType.UNCLASSIFIED     
         self.abscissaUnit = self
@@ -273,12 +273,12 @@ class UnitOfMeasure(Symbolic):
     def setProductUnits(self, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure):
         if (multiplier is None):
             args = self.symbol
-            msg = MeasurementSystem.getMessage("multiplier.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("multiplier.cannot.be.null").format(*args)
             raise Exception(msg)
 
         if (multiplicand is None):
             args = self.symbol
-            msg = MeasurementSystem.getMessage("multiplicand.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("multiplicand.cannot.be.null").format(*args)
             raise Exception(msg)            
 
         self.setPowerProduct(multiplier, 1, multiplicand, 1)
@@ -286,12 +286,12 @@ class UnitOfMeasure(Symbolic):
     def setQuotientUnits(self, dividend: UnitOfMeasure, divisor: UnitOfMeasure):
         if (dividend is None):
             args = self.symbol
-            msg = MeasurementSystem.getMessage("dividend.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("dividend.cannot.be.null").format(*args)
             raise Exception(msg)
 
         if (divisor is None):
             args = self.symbol
-            msg = MeasurementSystem.getMessage("divisor.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("divisor.cannot.be.null").format(*args)
             raise Exception(msg)
 
         self.setPowerProduct(dividend, 1, divisor, -1)
@@ -330,13 +330,13 @@ class UnitOfMeasure(Symbolic):
 
     def setConversion(self, scalingFactor: float, abscissaUnit: UnitOfMeasure, offset: float):
         if (abscissaUnit is None):
-            msg = MeasurementSystem.getMessage("unit.cannot.be.null")
+            msg = MeasurementSystem.messageStr("unit.cannot.be.null")
             raise Exception(msg)
 
         # self conversion is special
         if (self == abscissaUnit):
             if (scalingFactor != 1.0 or offset != 0.0):
-                msg = MeasurementSystem.getMessage("conversion.not.allowed")
+                msg = MeasurementSystem.messageStr("conversion.not.allowed")
                 raise Exception(msg)
 
         # unit has been previously cached, so first remove it, then cache again
@@ -368,7 +368,7 @@ class UnitOfMeasure(Symbolic):
     def setPowerUnit(self, base: UnitOfMeasure, exponent: int):
         if (base is None):
             args = self.symbol
-            msg = MeasurementSystem.getMessage("base.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("base.cannot.be.null").format(*args)
             raise Exception(msg)
 
         # special cases
