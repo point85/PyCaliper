@@ -27,8 +27,7 @@ class Reducer:
     def explodeRecursively(self, unit: UnitOfMeasure, level: int):
         self.counter = self.counter + 1
         if (self.counter > self.MAX_RECURSIONS):
-            args = unit.symbol
-            msg = MeasurementSystem.messageStr("circular.references").format(*args)
+            msg = MeasurementSystem.messageStr("circular.references").format(unit.symbol)
             raise Exception(msg)
         
         # down a level
@@ -58,9 +57,9 @@ class Reducer:
                 factor = factor * scalingFactor
 
                 if (lastExponent < 0):
-                    self.mapScalingFactor = self.mapScalingFactor / factor;
+                    self.mapScalingFactor = self.mapScalingFactor / factor
                 else:
-                    self.mapScalingFactor = self.mapScalingFactor * factor;
+                    self.mapScalingFactor = self.mapScalingFactor * factor
                 i = i + 1
         else:
             self.mapScalingFactor = scalingFactor    
@@ -89,13 +88,13 @@ class Reducer:
             # explode UOM #1
             self.pathExponents.append(exp1)
             self.explodeRecursively(uom1, level)
-            del self.pathExponents[level];  
+            del self.pathExponents[level]  
             
         if (uom2 is not None):
             # explode UOM #2
             self.pathExponents.append(exp2)
             self.explodeRecursively(uom2, level)
-            del self.pathExponents[level];     
+            del self.pathExponents[level]     
             
         # up a level
         level = level - 1    
@@ -222,6 +221,7 @@ class UnitOfMeasure(Symbolic):
         self.bridgeOffset = None
         self.bridgeAbscissaUnit = None
         self.unitType = unitType
+        self.baseSymbol = None
         
     @staticmethod
     def isValidExponent(exponent: int) -> bool:
@@ -251,7 +251,7 @@ class UnitOfMeasure(Symbolic):
         if (not math.isclose(self.offset, other.offset)):
             return False
 
-        return True;
+        return True
     
     def __lt__ (self, other):
         return self.__symbol < other.__symbol
@@ -261,6 +261,35 @@ class UnitOfMeasure(Symbolic):
     
     def __ne__ (self, other):
         return not self.__eq__(other)
+    
+    def __str__(self):
+        # type
+        value = MeasurementSystem.unitStr("unit.type.text") + " " + str(self.unitType) + ", "
+        
+        # enumeration
+        if (self.unit is not None):
+            value = value + MeasurementSystem.unitStr("enum.text") + " " + str(self.unit) + ", "
+            
+        # symbol
+        value = value + MeasurementSystem.unitStr("symbol.text") + " " + self.symbol + ", "
+        value = value + MeasurementSystem.unitStr("conversion.text") + " "
+        
+        # scaling factor
+        if (not math.isclose(self.scalingFactor, 1.0)):
+            value = value + str(self.scalingFactor) + UnitOfMeasure.__MULT
+            
+        # abscissa unit
+        if (self.abscissaUnit is not None) :
+            value = value + self.abscissaUnit.symbol
+            
+        # offset
+        if (not math.isclose(self.offset, 0.0)):   
+            value = value + " + " + str(self.offset) + ", " + MeasurementSystem.unitStr("base.text") + " "
+            
+        # base symbol
+        value = value + self.getBaseSymbol()
+            
+        return value
     
     def setBaseSymbol(self, symbol: str):
             self.baseSymbol = symbol
@@ -272,26 +301,22 @@ class UnitOfMeasure(Symbolic):
         
     def setProductUnits(self, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure):
         if (multiplier is None):
-            args = self.symbol
-            msg = MeasurementSystem.messageStr("multiplier.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("multiplier.cannot.be.null").format(self.symbol)
             raise Exception(msg)
 
         if (multiplicand is None):
-            args = self.symbol
-            msg = MeasurementSystem.messageStr("multiplicand.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("multiplicand.cannot.be.null").format(self.symbol)
             raise Exception(msg)            
 
         self.setPowerProduct(multiplier, 1, multiplicand, 1)
         
     def setQuotientUnits(self, dividend: UnitOfMeasure, divisor: UnitOfMeasure):
         if (dividend is None):
-            args = self.symbol
-            msg = MeasurementSystem.messageStr("dividend.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("dividend.cannot.be.null").format(self.symbol)
             raise Exception(msg)
 
         if (divisor is None):
-            args = self.symbol
-            msg = MeasurementSystem.messageStr("divisor.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("divisor.cannot.be.null").format(self.symbol)
             raise Exception(msg)
 
         self.setPowerProduct(dividend, 1, divisor, -1)
@@ -309,8 +334,9 @@ class UnitOfMeasure(Symbolic):
         return measurementType
     
     def getReducer(self) -> Reducer:
-        reducer = Reducer()
-        reducer.explode(self)
+        with self.lock:
+            reducer = Reducer()
+            reducer.explode(self)
         return reducer
     
     def getBaseUnitsOfMeasure(self):
@@ -354,21 +380,20 @@ class UnitOfMeasure(Symbolic):
         return self.exponent1
     
     def getDividend(self) -> UnitOfMeasure:
-        return self.uom1;
+        return self.uom1
     
     def getDivisor(self) -> UnitOfMeasure:
-        return self.uom2; 
+        return self.uom2 
     
     def getMultiplier(self) -> UnitOfMeasure:
-        return self.uom1; 
+        return self.uom1 
     
     def getMultiplicand(self) -> UnitOfMeasure:
-        return self.uom2; 
+        return self.uom2 
     
     def setPowerUnit(self, base: UnitOfMeasure, exponent: int):
         if (base is None):
-            args = self.symbol
-            msg = MeasurementSystem.messageStr("base.cannot.be.null").format(*args)
+            msg = MeasurementSystem.messageStr("base.cannot.be.null").format(self.symbol)
             raise Exception(msg)
 
         # special cases
@@ -401,7 +426,7 @@ class UnitOfMeasure(Symbolic):
     
     def clonePower(self, uom: UnitOfMeasure) -> UnitOfMeasure:
         newUOM = UnitOfMeasure()
-        newUOM.setUnitType(self.unitType);
+        newUOM.setUnitType(self.unitType)
 
         # check if quotient
         exponent = 1
@@ -444,7 +469,7 @@ class UnitOfMeasure(Symbolic):
 
             # same size, now check base unit types and exponents
             for uomBaseEntry in uomBaseMap.items():
-                uomBaseType = uomBaseEntry[0].unitType;
+                uomBaseType = uomBaseEntry[0].unitType
                 unitValue = unitTypeMap[uomBaseType]
 
                 if (unitValue is None or unitValue != uomBaseEntry[1]):
@@ -460,3 +485,160 @@ class UnitOfMeasure(Symbolic):
             self.unitType = matchedType
 
         return self
+
+    @staticmethod
+    def checkTypes(uom1: UnitOfMeasure,  uom2: UnitOfMeasure):
+        thisType = uom1.getUnitType()
+        targetType = uom2.getUnitType()
+
+        if (thisType != UnitType.UNCLASSIFIED and targetType != UnitType.UNCLASSIFIED and thisType != UnitType.UNITY \
+            and targetType != UnitType.UNITY and  thisType != targetType):
+            msg = MeasurementSystem.messageStr("must.be.same.as").format(uom1, uom1.getUnitType(), uom2, uom2.getUnitType())
+            raise Exception(msg)
+    
+    def getBaseSymbol(self) -> str:
+        with self.lock:
+            if (self.baseSymbol is None):
+                powerMap = self.getReducer()
+                baseSymbol = powerMap.buildBaseString()
+            
+        return baseSymbol
+    
+    def traversePath(self) -> PathParameters:
+        pathUOM = self
+        pathFactor = 1.0
+        
+        while (True):
+            scalingFactor = pathUOM.getScalingFactor()
+            abscissa = pathUOM.getAbscissaUnit()
+
+            pathFactor = pathFactor * scalingFactor
+
+            if (pathUOM == abscissa):
+                break
+
+            # next UOM on path
+            pathUOM = abscissa
+            
+        return PathParameters(pathUOM, pathFactor)
+    
+    def checkOffset(self, other: UnitOfMeasure):
+        if (math.isclose(other.offset, 0.0)):
+            msg = MeasurementSystem.messageStr("offset.not.supported").format(str(other))
+            raise Exception(msg)
+        
+    def clearCache(self):
+        self.conversionRegistry.clear()
+        
+    def clonePowerProduct(self, uom1: UnitOfMeasure, uom2: UnitOfMeasure) -> UnitOfMeasure:
+        invert = False
+        one = MeasurementSystem.instance().getOne()
+    
+            # check if quotient
+        if (self.getMeasurementType() == MeasurementType.QUOTIENT):
+            if (uom2 == one): 
+                msg = MeasurementSystem.messageStr("incompatible.units").format(self, one)
+                raise Exception(msg)
+            
+            invert = True
+        else: 
+            if (uom1 == one or uom2 == one): 
+                msg = MeasurementSystem.messageStr("incompatible.units").format(self, one)
+                raise Exception(msg)
+
+
+        newUOM = uom1.multiplyOrDivide(uom2, invert)
+        newUOM.unitType = self.unitType
+
+        return newUOM 
+    
+    def multiplyOrDivide(self, other: UnitOfMeasure, invert: bool) -> UnitOfMeasure: 
+        if (other is None):
+            msg = MeasurementSystem.messageStr("unit.cannot.be.null")
+            raise Exception(msg)
+        
+        self.checkOffset(self)
+        self.checkOffset(other)
+        
+        # self base symbol map
+        thisReducer = self.getReducer()
+        thisMap = thisReducer.terms
+        
+        # other base symbol map
+        otherReducer = other.getReducer()
+        otherMap = otherReducer.terms
+        
+        # create a map of the unit of measure powers
+        resultMap = {}
+        
+        # iterate over the multiplier's unit map
+        for thisEntry in thisMap.items():
+            thisUOM = thisEntry[0]
+            thisPower = thisEntry[1]
+            otherPower = otherMap[thisUOM]
+            
+            if (otherPower is not None):
+                if (not invert):
+                    # add to multiplier's power
+                    thisPower = thisPower + otherPower
+                else:
+                    # subtract from dividend's power
+                    thisPower = thisPower - otherPower
+
+                # remove multiplicand or divisor UOM
+                del otherMap[thisUOM]
+
+            if (thisPower != 0):
+                resultMap[thisUOM] = thisPower
+    
+        # add any remaining multiplicand terms and invert any remaining divisor terms
+        for otherEntry in otherMap.items():
+            otherUOM = otherEntry[0]
+            otherPower = otherEntry[1]
+
+            if (not invert):
+                resultMap[otherUOM] = otherPower
+            else:
+                resultMap[otherUOM] = -otherPower
+                
+        # get the base symbol and possibly base UOM
+        resultReducer = Reducer()
+        resultReducer.terms = resultMap
+
+        # product or quotient
+        result = UnitOfMeasure(None, None, None, None)
+
+        if (not invert):
+            result.setProductUnits(self, other)
+            result.symbol = self.generateProductSymbol(result.getMultiplier(), result.getMultiplicand())
+        else:
+            result.setQuotientUnits(self, other)
+            result.symbol = self.generateQuotientSymbol(result.getDividend(), result.getDivisor())
+            
+        # constrain symbol to a maximum length
+        if (len(result.symbol) > UnitOfMeasure.__MAX_SYMBOL_LENGTH):
+            result.symbol = self.generateIntermediateSymbol()
+            
+        baseSymbol = resultReducer.buildBaseString()
+        baseUOM = MeasurementSystem.instance().getBaseUOM(baseSymbol)
+        
+        if (baseUOM is not None):
+            # there is a conversion to the base UOM
+            thisFactor = thisReducer.scalingFactor
+            otherFactor = otherReducer.scalingFactor
+
+            resultFactor = 0.0
+            if (not invert):
+                resultFactor = thisFactor * otherFactor
+            else:
+                resultFactor = thisFactor / otherFactor
+            
+            result.scalingFactor = resultFactor
+            result.abscissaUnit = baseUOM
+            result.unitType = baseUOM.unitType
+
+        return result
+
+    """
+
+    """
