@@ -404,7 +404,7 @@ class UnitOfMeasure(Symbolic):
     
     @staticmethod    
     def generateIntermediateSymbol() -> str:
-        ms = time.time_ns() // 1000000 
+        ms = time.time_ns() # 1000000 
         return str(ms)
 
     @staticmethod 
@@ -638,7 +638,141 @@ class UnitOfMeasure(Symbolic):
             result.unitType = baseUOM.unitType
 
         return result
+    
+    def convertScalarToScalar(self, targetUOM: UnitOfMeasure) -> float:
+        scalingFactor = 0.0
+        
+        if (self.abscissaUnit == targetUOM):
+            # direct conversion
+            scalingFactor = self.scalingFactor
+        else:
+            # indirect conversion
+            scalingFactor = self.convertUnit(targetUOM)
+        
+        return scalingFactor
+    
+    def getBridgeFactor(self, uom: UnitOfMeasure) -> float:
+        factor = 0.0
+        
+        # check for our bridge
+        if (self.bridgeAbscissaUnit is not None):
+            factor = self.bridgeScalingFactor
+        else:
+            # try other side
+            if (uom.bridgeAbscissaUnit is not None):
+                toUOM = uom.bridgeAbscissaUnit
 
+                if (toUOM == self):
+                    factor = 1.0 / uom.bridgeScalingFactor
+        
+        return factor
+    
+    def divide(self, divisor: UnitOfMeasure) -> UnitOfMeasure:
+        return self.multiplyOrDivide(divisor, True)
+    
+    def getBaseUOM(self) -> UnitOfMeasure:
+        baseSymbol = self.getBaseSymbol()
+        return MeasurementSystem.instance().getBaseUOM(baseSymbol)
+    
+    def convertUnit(self, targetUOM: UnitOfMeasure) -> float:
+        # get path factors in each system
+        thisParameters = self.traversePath()
+        targetParameters = targetUOM.traversePath()
+
+        thisPathFactor = thisParameters.pathFactor
+        thisBase = thisParameters.pathUOM
+
+        targetPathFactor = targetParameters.pathFactor
+        targetBase = targetParameters.pathUOM
+
+        # check for a base conversion unit bridge
+        bridgeFactor = thisBase.getBridgeFactor(targetBase)
+
+        if (bridgeFactor != 0.0):
+            thisPathFactor = thisPathFactor * bridgeFactor
+
+        # new path amount
+        scalingFactor = thisPathFactor / targetPathFactor
+
+        return scalingFactor
+    
+    def getConversionFactor(self, targetUOM: UnitOfMeasure) -> float:
+        if (targetUOM is None):
+            msg = MeasurementSystem.messageStr("unit.cannot.be.null")
+            raise Exception(msg)
+        
+        # first check the cache
+        cachedFactor = self.conversionRegistry[targetUOM]
+
+        if (cachedFactor is not None):
+            return cachedFactor
+        
+        UnitOfMeasure.checkTypes(self, targetUOM)
+        
+        fromReducer = self.getReducer()
+        toReducer = targetUOM.getReducer()
+
+        fromMap = fromReducer.terms
+        toMap = toReducer.terms
+
+        if (len(fromMap) != len(toMap)):
+            msg = MeasurementSystem.messageStr("incompatible.units").format(self, targetUOM)
+            raise Exception(msg)
+        
+        fromFactor = fromReducer.mapScalingFactor
+        toFactor = toReducer.mapScalingFactor
+
+        factor = 1.0
+
+        # compute map factor
+        matchCount = 0
+        
+        for fromEntry in fromMap.items:
+            fromUOM = fromEntry[0]
+            fromType = fromUOM.unitType
+            fromPower = fromEntry[1]
+
+            for toEntry in toMap.items:
+                toType = toEntry[0].unitType
+
+                if (fromType == toType):
+                    matchCount = matchCount + 1
+                    toUOM = toEntry[0]
+                    bd = fromUOM.convertScalarToScalar(toUOM)
+                    bd = math.pow(bd, fromPower)
+                    factor = factor * bd
+                    break
+
+        if (matchCount != len(fromMap)):
+            msg = MeasurementSystem.messageStr("incompatible.units").format(self, targetUOM)
+            raise Exception(msg)
+
+        scaling = fromFactor / toFactor
+        cachedFactor = factor * scaling
+
+        # cache it
+        self.conversionRegistry[targetUOM] = cachedFactor
+
+        return cachedFactor
+    
+    def getPowerBase(self) -> UnitOfMeasure:
+        return self.uom1
+
+    def invert(self) -> UnitOfMeasure:
+        inverted = None
+
+        if (UnitOfMeasure.isValidExponent(self.exponent2) and self.exponent2 < 0):
+            inverted = self.getDivisor().divide(self.getDividend())
+        else:
+            inverted = MeasurementSystem.instance().getOne().divide(self)
+
+        return inverted
+    
+    def multiply(self, multiplicand: UnitOfMeasure) -> UnitOfMeasure:
+        return self.multiplyOrDivide(multiplicand, False)
+    
+    def setAbscissaUnit(self, abscissaUnit: UnitOfMeasure):
+        self.abscissaUnit = abscissaUnit
     """
 
     """
