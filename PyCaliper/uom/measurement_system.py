@@ -151,9 +151,7 @@ class MeasurementSystem:
     
     def createScalarUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description:str) -> UnitOfMeasure:
         uom = self.createUOM(unitType, unit, name, symbol, description)
-        uom.setEnumeration(unit)
         self.registerUnit(uom)
-
         return uom;
     
     def createSIUnit(self, unit: Unit) -> UnitOfMeasure:
@@ -1105,27 +1103,73 @@ class MeasurementSystem:
     def createPowerUOM(self, unitType: UnitType, unit: Unit, name: str, symbol:str, description:str, base: UnitOfMeasure, exponent: int) -> UnitOfMeasure:
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setPowerUnit(base, exponent)
-        uom.setEnumeration(id)
         self.registerUnit(uom)
         return uom
     
-    def createUnclassifiedPowerUOM(self, base: UnitOfMeasure, exponent: int) -> UnitOfMeasure:            
-        msg = MeasurementSystem.messageStr("base.cannot.be.null")
-        raise Exception(msg)
+    def createUnclassifiedPowerUOM(self, base: UnitOfMeasure, exponent: int) -> UnitOfMeasure:  
+        if (base is None):          
+            msg = MeasurementSystem.messageStr("base.cannot.be.null")
+            raise Exception(msg)
     
         # create symbol
         symbol = UnitOfMeasure.generatePowerSymbol(base, exponent)
         return self.createPowerUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, base, exponent)
     
+    def createProductUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description: str, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure) -> UnitOfMeasure:
+        uom = self.createUOM(unitType, unit, name, symbol, description)
+        uom.setProductUnits(multiplier, multiplicand)
+        self.registerUnit(uom)
+        return uom
+    
+    def createUnclassifiedProductUOM(self, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure) -> UnitOfMeasure:
+        if (multiplier is None):          
+            msg = MeasurementSystem.messageStr("multiplier.cannot.be.null")
+            raise Exception(msg)
+        
+        if (multiplicand is None):          
+            msg = MeasurementSystem.messageStr("multiplicand.cannot.be.null")
+            raise Exception(msg)
+        
+        symbol = UnitOfMeasure.generateProductSymbol(multiplier, multiplicand)
+        return self.createProductUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, multiplier, multiplicand)
+    
+    def createUnclassifiedQuotientUOM(self, dividend: UnitOfMeasure, divisor: UnitOfMeasure) -> UnitOfMeasure:
+        if (dividend is None):
+            msg = MeasurementSystem.messageStr("dividend.cannot.be.null")
+            raise Exception(msg)
+        
+        if (divisor is None):
+            msg = MeasurementSystem.messageStr("divisor.cannot.be.null")
+            raise Exception(msg)
+        
+        symbol = UnitOfMeasure.generateQuotientSymbol(dividend, divisor)
+        return self.createQuotientUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, dividend, divisor)
+    
+    def createQuotientUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description: str, dividend: UnitOfMeasure, divisor: UnitOfMeasure) -> UnitOfMeasure:
+        uom = self.createUOM(unitType, unit, name, symbol, description)
+        uom.setQuotientUnits(dividend, divisor)
+        self.registerUnit(uom)
+        return uom
+
+    def createUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description: str) -> UnitOfMeasure:
+        if (symbol is None or len(symbol) == 0):
+            msg = MeasurementSystem.messageStr("symbol.cannot.be.null")
+            raise Exception(msg)
+        
+        if (unitType is None):
+            msg = MeasurementSystem.messageStr("unit.type.cannot.be.null")
+            raise Exception(msg)
+        
+        uom = self.cacheManager.getUOM(symbol)
+        
+        if (uom is None):
+            # create a new one
+            uom = UnitOfMeasure(unitType, name, symbol, description)
+            uom.setAbscissaUnit(uom)
+            uom.setEnumeration(unit)
+            
+        return uom
     
     """
-    public UnitOfMeasure createProductUOM(UnitType type, Unit id, String name, String symbol, String description,
-            UnitOfMeasure multiplier, UnitOfMeasure multiplicand) throws Exception {
 
-        UnitOfMeasure uom = createUOM(type, id, name, symbol, description);
-        uom.setProductUnits(multiplier, multiplicand);
-        uom.setEnumeration(id);
-        registerUnit(uom);
-        return uom;
-    }
     """
