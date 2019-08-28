@@ -127,20 +127,20 @@ class MeasurementSystem:
         if (unitType == UnitType.AREA):
             cachedMap[UnitType.LENGTH] = 2
         elif (unitType == UnitType.VOLUME):
-            cachedMap[UnitType.LENGTH] = 3;
+            cachedMap[UnitType.LENGTH] = 3
         elif (unitType ==  UnitType.DENSITY):
-            cachedMap[UnitType.MASS] = 1;
-            cachedMap[UnitType.LENGTH] = -3;
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = -3
         elif (unitType ==  UnitType.VELOCITY):
-            cachedMap[UnitType.LENGTH] = 1;
-            cachedMap[UnitType.TIME] = -1;
+            cachedMap[UnitType.LENGTH] = 1
+            cachedMap[UnitType.TIME] = -1
         else:
             pass
         
-        return cachedMap;
+        return cachedMap
     
     def getUOM(self, unit: Unit) -> UnitOfMeasure:
-        uom = self.cacheManager.self.getUOM(unit)
+        uom = self.cacheManager.getUOM(unit)
 
         if (uom is None):
             uom = self.createUOMForUnit(unit)
@@ -152,7 +152,7 @@ class MeasurementSystem:
     def createScalarUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description:str) -> UnitOfMeasure:
         uom = self.createUOM(unitType, unit, name, symbol, description)
         self.registerUnit(uom)
-        return uom;
+        return uom
     
     def createSIUnit(self, unit: Unit) -> UnitOfMeasure:
         uom = None
@@ -1160,7 +1160,7 @@ class MeasurementSystem:
             msg = MeasurementSystem.messageStr("unit.type.cannot.be.null")
             raise Exception(msg)
         
-        uom = self.cacheManager.getUOM(symbol)
+        uom = self.cacheManager.self.getUOM(symbol)
         
         if (uom is None):
             # create a new one
@@ -1170,6 +1170,310 @@ class MeasurementSystem:
             
         return uom
     
-    """
+    def getSecond(self) -> UnitOfMeasure:
+        return self.getUOMByUnit(Unit.SECOND)
+    
+    def getMinute(self) -> UnitOfMeasure:
+        return self.getUOMByUnit(Unit.MINUTE)
+    
+    def getHour(self) -> UnitOfMeasure:
+        return self.getUOMByUnit(Unit.HOUR)
+    
+    def getDay(self) -> UnitOfMeasure:
+        return self.getUOMByUnit(Unit.DAY)
+    
+    def getRegisteredUnits(self) -> [UnitOfMeasure]:
+        units = self.cacheManager.getCachedUnits()
+        return units.sort()
+    
+    def getUnitsOfMeasure(self, unitType: UnitType) -> [UnitOfMeasure]:
+        units = []
+        
+        if (unitType == UnitType.LENGTH):
+            # SI
+            units.append(self.getUOM(Unit.METRE))
+            units.append(self.getUOM(Unit.ANGSTROM))
+            units.append(self.getUOM(Unit.PARSEC))
+            units.append(self.getUOM(Unit.ASTRONOMICAL_UNIT))
 
-    """
+            # customary
+            units.append(self.getUOM(Unit.FOOT))
+            units.append(self.getUOM(Unit.INCH))
+            units.append(self.getUOM(Unit.MIL))
+            units.append(self.getUOM(Unit.POINT))
+            units.append(self.getUOM(Unit.YARD))
+            units.append(self.getUOM(Unit.MILE))
+            units.append(self.getUOM(Unit.NAUTICAL_MILE))
+            units.append(self.getUOM(Unit.FATHOM))
+                
+        elif (unitType == UnitType.MASS):
+            units.append(self.getUOM(Unit.KILOGRAM))
+            units.append(self.getUOM(Unit.TONNE))
+            units.append(self.getUOM(Unit.CARAT))
+
+            # customary
+            units.append(self.getUOM(Unit.POUND_MASS))
+            units.append(self.getUOM(Unit.OUNCE))
+            units.append(self.getUOM(Unit.TROY_OUNCE))
+            units.append(self.getUOM(Unit.SLUG))
+            units.append(self.getUOM(Unit.GRAIN))
+
+            # US
+            units.append(self.getUOM(Unit.US_TON))
+
+            # British
+            units.append(self.getUOM(Unit.BR_TON))
+            
+        elif (unitType == UnitType.TIME):
+            units.append(self.getUOM(Unit.SECOND))
+            units.append(self.getUOM(Unit.MINUTE))
+            units.append(self.getUOM(Unit.HOUR))
+            units.append(self.getUOM(Unit.DAY))
+            units.append(self.getUOM(Unit.WEEK))
+            units.append(self.getUOM(Unit.JULIAN_YEAR))    
+            
+        elif (unitType == UnitType.ACCELERATION):
+            units.append(self.getUOM(Unit.METRE_PER_SEC_SQUARED))
+            units.append(self.getUOM(Unit.FEET_PER_SEC_SQUARED))
+            
+        elif (unitType == UnitType.AREA):
+            # customary
+            units.append(self.getUOM(Unit.SQUARE_INCH))
+            units.append(self.getUOM(Unit.SQUARE_FOOT))
+            units.append(self.getUOM(Unit.SQUARE_YARD))
+            units.append(self.getUOM(Unit.ACRE))
+
+            # SI
+            units.append(self.getUOM(Unit.SQUARE_METRE))
+            units.append(self.getUOM(Unit.HECTARE))            
+
+        elif (unitType == UnitType.CATALYTIC_ACTIVITY):
+            units.append(self.getUOM(Unit.KATAL))
+            units.append(self.getUOM(Unit.UNIT))
+
+        elif (unitType == UnitType.COMPUTER_SCIENCE):
+            units.append(self.getUOM(Unit.BIT))
+            units.append(self.getUOM(Unit.BYTE))
+
+        elif (unitType == UnitType.DENSITY):
+            units.append(self.getUOM(Unit.KILOGRAM_PER_CU_METRE))
+
+        elif (unitType == UnitType.DYNAMIC_VISCOSITY):
+            units.append(self.getUOM(Unit.PASCAL_SECOND))
+
+        elif (unitType == UnitType.ELECTRIC_CAPACITANCE):
+            units.append(self.getUOM(Unit.FARAD))
+
+        elif (unitType == UnitType.ELECTRIC_CHARGE):
+            units.append(self.getUOM(Unit.COULOMB))
+
+        elif (unitType == UnitType.ELECTRIC_CONDUCTANCE):
+            units.append(self.getUOM(Unit.SIEMENS))
+
+        elif (unitType == UnitType.ELECTRIC_CURRENT):
+            units.append(self.getUOM(Unit.AMPERE))
+
+        elif (unitType == UnitType.ELECTRIC_FIELD_STRENGTH):
+            units.append(self.getUOM(Unit.AMPERE_PER_METRE))
+
+        elif (unitType == UnitType.ELECTRIC_INDUCTANCE):
+            units.append(self.getUOM(Unit.HENRY))
+
+        elif (unitType == UnitType.ELECTRIC_PERMITTIVITY):
+            units.append(self.getUOM(Unit.FARAD_PER_METRE))
+
+        elif (unitType == UnitType.ELECTRIC_RESISTANCE):
+            units.append(self.getUOM(Unit.OHM))
+
+        elif (unitType == UnitType.ELECTROMOTIVE_FORCE):
+            units.append(self.getUOM(Unit.VOLT))
+
+        elif (unitType == UnitType.ENERGY):
+            # customary
+            units.append(self.getUOM(Unit.BTU))
+            units.append(self.getUOM(Unit.FOOT_POUND_FORCE))
+
+            # SI
+            units.append(self.getUOM(Unit.CALORIE))
+            units.append(self.getUOM(Unit.NEWTON_METRE))
+            units.append(self.getUOM(Unit.JOULE))
+            units.append(self.getUOM(Unit.WATT_HOUR))
+            units.append(self.getUOM(Unit.ELECTRON_VOLT))
+
+
+        elif (unitType == UnitType.CURRENCY):
+            units.append(self.getUOM(Unit.US_DOLLAR))
+            units.append(self.getUOM(Unit.EURO))
+            units.append(self.getUOM(Unit.YUAN))
+
+        elif (unitType == UnitType.FORCE):
+            # customary
+            units.append(self.getUOM(Unit.POUND_FORCE))
+
+            # SI
+            units.append(self.getUOM(Unit.NEWTON))
+
+        elif (unitType == UnitType.FREQUENCY):
+            units.append(self.getUOM(Unit.REV_PER_MIN))
+            units.append(self.getUOM(Unit.HERTZ))
+            units.append(self.getUOM(Unit.RAD_PER_SEC))
+
+        elif (unitType == UnitType.ILLUMINANCE):
+            units.append(self.getUOM(Unit.LUX))
+
+        elif (unitType == UnitType.INTENSITY):
+            units.append(self.getUOM(Unit.DECIBEL))
+
+        elif (unitType == UnitType.IRRADIANCE):
+            units.append(self.getUOM(Unit.WATTS_PER_SQ_METRE))
+
+        elif (unitType == UnitType.KINEMATIC_VISCOSITY):
+            units.append(self.getUOM(Unit.SQUARE_METRE_PER_SEC))
+
+        elif (unitType == UnitType.LUMINOSITY):
+            units.append(self.getUOM(Unit.CANDELA))
+
+        elif (unitType == UnitType.LUMINOUS_FLUX):
+            units.append(self.getUOM(Unit.LUMEN))
+
+        elif (unitType == UnitType.MAGNETIC_FLUX):
+            units.append(self.getUOM(Unit.WEBER))
+
+        elif (unitType == UnitType.MAGNETIC_FLUX_DENSITY):
+            units.append(self.getUOM(Unit.TESLA))
+
+        elif (unitType == UnitType.MASS_FLOW):
+            units.append(self.getUOM(Unit.KILOGRAM_PER_SEC))
+
+        elif (unitType == UnitType.MOLAR_CONCENTRATION):
+            units.append(self.getUOM(Unit.MOLARITY))
+
+        elif (unitType == UnitType.PLANE_ANGLE):
+            units.append(self.getUOM(Unit.DEGREE))
+            units.append(self.getUOM(Unit.RADIAN))
+            units.append(self.getUOM(Unit.ARC_SECOND))
+
+        elif (unitType == UnitType.POWER):
+            units.append(self.getUOM(Unit.HP))
+            units.append(self.getUOM(Unit.WATT))
+
+        elif (unitType == UnitType.PRESSURE):
+            # customary
+            units.append(self.getUOM(Unit.PSI))
+            units.append(self.getUOM(Unit.IN_HG))
+
+            # SI
+            units.append(self.getUOM(Unit.PASCAL))
+            units.append(self.getUOM(Unit.ATMOSPHERE))
+            units.append(self.getUOM(Unit.BAR))
+
+        elif (unitType == UnitType.RADIATION_DOSE_ABSORBED):
+            units.append(self.getUOM(Unit.GRAY))
+
+        elif (unitType == UnitType.RADIATION_DOSE_EFFECTIVE):
+            units.append(self.getUOM(Unit.SIEVERT))
+
+        elif (unitType == UnitType.RADIATION_DOSE_RATE):
+            units.append(self.getUOM(Unit.SIEVERTS_PER_HOUR))
+
+        elif (unitType == UnitType.RADIOACTIVITY):
+            units.append(self.getUOM(Unit.BECQUEREL))
+
+        elif (unitType == UnitType.RECIPROCAL_LENGTH):
+            units.append(self.getUOM(Unit.DIOPTER))
+
+        elif (unitType == UnitType.SOLID_ANGLE):
+            units.append(self.getUOM(Unit.STERADIAN))
+
+        elif (unitType == UnitType.SUBSTANCE_AMOUNT):
+            units.append(self.getUOM(Unit.MOLE))
+            units.append(self.getUOM(Unit.EQUIVALENT))
+            units.append(self.getUOM(Unit.INTERNATIONAL_UNIT))
+
+        elif (unitType == UnitType.TEMPERATURE):
+            # customary
+            units.append(self.getUOM(Unit.RANKINE))
+            units.append(self.getUOM(Unit.FAHRENHEIT))
+
+            # SI
+            units.append(self.getUOM(Unit.KELVIN))
+            units.append(self.getUOM(Unit.CELSIUS))
+
+        elif (unitType == UnitType.TIME_SQUARED):
+            units.append(self.getUOM(Unit.SQUARE_SECOND))
+
+        elif (unitType == UnitType.UNITY):
+            units.append(self.getUOM(Unit.ONE))
+            units.append(self.getUOM(Unit.PERCENT))
+
+        elif (unitType == UnitType.VELOCITY):
+            # customary
+            units.append(self.getUOM(Unit.FEET_PER_SEC))
+            units.append(self.getUOM(Unit.MILES_PER_HOUR))
+            units.append(self.getUOM(Unit.KNOT))
+
+            # SI
+            units.append(self.getUOM(Unit.METRE_PER_SEC))
+
+        elif (unitType == UnitType.VOLUME):
+            # British
+            units.append(self.getUOM(Unit.BR_BUSHEL))
+            units.append(self.getUOM(Unit.BR_CUP))
+            units.append(self.getUOM(Unit.BR_FLUID_OUNCE))
+            units.append(self.getUOM(Unit.BR_GALLON))
+            units.append(self.getUOM(Unit.BR_PINT))
+            units.append(self.getUOM(Unit.BR_QUART))
+            units.append(self.getUOM(Unit.BR_TABLESPOON))
+            units.append(self.getUOM(Unit.BR_TEASPOON))
+
+            # customary
+            units.append(self.getUOM(Unit.CUBIC_FOOT))
+            units.append(self.getUOM(Unit.CUBIC_YARD))
+            units.append(self.getUOM(Unit.CUBIC_INCH))
+            units.append(self.getUOM(Unit.CORD))
+
+            # SI
+            units.append(self.getUOM(Unit.CUBIC_METRE))
+            units.append(self.getUOM(Unit.LITRE))
+
+            # US
+            units.append(self.getUOM(Unit.US_BARREL))
+            units.append(self.getUOM(Unit.US_BUSHEL))
+            units.append(self.getUOM(Unit.US_CUP))
+            units.append(self.getUOM(Unit.US_FLUID_OUNCE))
+            units.append(self.getUOM(Unit.US_GALLON))
+            units.append(self.getUOM(Unit.US_PINT))
+            units.append(self.getUOM(Unit.US_QUART))
+            units.append(self.getUOM(Unit.US_TABLESPOON))
+            units.append(self.getUOM(Unit.US_TEASPOON))
+
+        elif (unitType == UnitType.VOLUMETRIC_FLOW):
+            units.append(self.getUOM(Unit.CUBIC_METRE_PER_SEC))
+            units.append(self.getUOM(Unit.CUBIC_FEET_PER_SEC))
+            
+    def getUOMBySymbol(self, symbol: str) -> UnitOfMeasure:
+        return self.cacheManager.getUOMBySymbol(symbol)
+            
+    def getUOMForUnit(self, prefix: Prefix, unit: Unit) -> UnitOfMeasure:
+        return self.getUOMWithPrefix(prefix, MeasurementSystem.instance().getUOM(unit))
+    
+    def getUOMWithPrefix(self, prefix: Prefix, targetUOM: UnitOfMeasure) -> UnitOfMeasure:
+        symbol = prefix.symbol+ targetUOM.symbol
+        scaled = self.getUOMBySymbol(symbol)
+
+        # if not found, create it
+        if (scaled is None):
+            # generate a name and description
+            name = prefix.name + targetUOM.name
+            description = str(prefix.factor) + " " + str(targetUOM.name)
+
+            # scaling factor
+            scalingFactor = targetUOM.scalingFactor * prefix.factor
+
+            # create the unit of measure and set conversion
+            scaled = self.createScalarUOM(targetUOM.unitType, None, name, symbol, description)
+            scaled.setConversion(scalingFactor, targetUOM.abscissaUnit)
+
+        return scaled
+    
+    
