@@ -1,4 +1,4 @@
-# SOME DESCRIPTIVE TITLE.
+# Translatable strings for units of measure and constant quantities
 # Copyright (C) YEAR ORGANIZATION
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -19,3 +19,18 @@ msgstr ""
 
 msgid "default.category.text" 
 msgstr "System"
+
+msgid "unit.type.text"
+msgstr "Type:"
+
+msgid "enum.text"
+msgstr "Enumeration:"
+
+msgid "symbol.text"
+msgstr "Symbol:"
+
+msgid "conversion.text"
+msgstr "Conversion:"
+
+msgid "base.text"
+msgstr "Base Symbol:"

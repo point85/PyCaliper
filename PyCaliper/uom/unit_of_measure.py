@@ -1,11 +1,14 @@
 from PyCaliper.uom.symbolic import Symbolic
-#from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.unit_type import UnitType
 from PyCaliper.uom.measurement_type import MeasurementType
 from PyCaliper.uom.localizer import Localizer
+from PyCaliper.uom.reducer import Reducer
 import math
 from builtins import staticmethod
 import time
+from PyCaliper.uom.operands import Operands
+from PyCaliper.uom.cache_manager import CacheManager
+from PyCaliper.uom.unit import Unit
 
 class PathParameters:
     # UOM, scaling factor and power cumulative along a conversion path
@@ -13,188 +16,9 @@ class PathParameters:
         self.pathUOM = pathUOM
         self.pathFactor = pathFactor
           
-class Reducer:
-    def __init__(self):
-        self.MAX_RECURSIONS = 100
-        self.STARTING_LEVEL = -1
-        self.terms = {}
-        self.mapScalingFactor = 1
-        self.pathExponents = []
-        self.counter = 0
-    
-    def explode(self, unit):
-        self.explodeRecursively(unit, self.STARTING_LEVEL)
-        
-    def explodeRecursively(self, unit, level):
-        self.counter = self.counter + 1
-        if (self.counter > self.MAX_RECURSIONS):
-            msg = Localizer.messageStr("circular.references").format(unit.symbol)
-            raise Exception(msg)
-        
-        # down a level
-        level = level + 1
-        
-        # scaling factor to abscissa unit
-        scalingFactor = unit.scalingFactor
-        
-        # explode the abscissa unit
-        abscissaUnit = unit.abscissaUnit
-        
-        uom1 = abscissaUnit.uom1
-        uom2 = abscissaUnit.uom2
-        
-        exp1 = abscissaUnit.exponent1
-        exp2 = abscissaUnit.exponent2
-        
-        # scaling
-        if (len(self.pathExponents) > 0):
-            lastExponent = self.pathExponents[len(self.pathExponents) - 1]
-
-            # compute the overall scaling factor
-            factor = 1
-            
-            i = 0
-            while (i < abs(lastExponent)):
-                factor = factor * scalingFactor
-
-                if (lastExponent < 0):
-                    self.mapScalingFactor = self.mapScalingFactor / factor
-                else:
-                    self.mapScalingFactor = self.mapScalingFactor * factor
-                i = i + 1
-        else:
-            self.mapScalingFactor = scalingFactor    
-            
-        if (uom1 is None):
-            if (abscissaUnit.isTerminal() == False):
-                # keep exploding down the conversion path
-                currentMapFactor = self.mapScalingFactor
-                self.mapScalingFactor = 1
-                self.explodeRecursively(abscissaUnit, self.STARTING_LEVEL)
-                self.mapScalingFactor = self.mapScalingFactor * currentMapFactor
-            else:
-                # multiply out all of the exponents down the path
-                pathExponent = 1
-                
-                for exp in self.pathExponents:
-                    pathExponent = pathExponent * exp
-                
-                # variable = 1 if something == 1 else 0
-                invert = True if pathExponent < 0 else False
-                
-                i = 0
-                while (i < abs(pathExponent)):
-                    self.addTerm(abscissaUnit, invert)
-        else:
-            # explode UOM #1
-            self.pathExponents.append(exp1)
-            self.explodeRecursively(uom1, level)
-            del self.pathExponents[level]  
-            
-        if (uom2 is not None):
-            # explode UOM #2
-            self.pathExponents.append(exp2)
-            self.explodeRecursively(uom2, level)
-            del self.pathExponents[level]     
-            
-        # up a level
-        level = level - 1    
-        
-              
-    def addTerm(self, uom, invert):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
-        
-        # add a UOM and exponent pair to the map of reduced Terms
-        unitPower = 1
-        power = 0
-
-        if (not invert):
-            # get existing power
-            if (uom not in self.terms):
-                # add first time
-                power = unitPower
-            else:
-                # increment existing power                    
-                if (uom != MeasurementSystem.instance().getOne()):
-                    power = self.terms[uom] + unitPower
-        else:
-            # denominator with negative powers
-            if (uom not in self.terms):
-                # add first time
-                power = -unitPower
-            else:
-                # decrement existing power
-                if (uom != MeasurementSystem.instance().getOne()):
-                    power = self.terms[uom] - unitPower
-
-        if (power == 0):
-            del self.terms[uom]
-        else:
-            if (uom != MeasurementSystem.instance().getOne()):
-                self.terms[uom] = power
-                
-    def buildBaseString(self):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
-        
-        numerator = ""
-        denominator = ""
-        
-        numeratorCount = 0
-        denominatorCount = 0
-        
-        # sort units by symbol (ascending)
-        for unit in sorted(self.terms.keys()):
-            power = self.terms[unit]
-        
-            if (power < 0):
-                # negative, put in denominator
-                if (len(denominator) > 0):
-                        denominator = denominator + UnitOfMeasure.__MULT
-                        
-                if (unit != MeasurementSystem.instance().getOne()):
-                        denominator = denominator + unit.getSymbol()
-                        denominatorCount = denominatorCount + 1
-
-                if (power < -1):
-                    if (power == -2):
-                        denominator = denominator + UnitOfMeasure.__SQ
-                    elif (power == -3):
-                        denominator = denominator + UnitOfMeasure.__CUBED
-                    else:
-                        denominator = denominator + UnitOfMeasure.__POW + abs(power)
-            elif (power >= 1 and unit != MeasurementSystem.instance().getOne()):
-                # positive, put in numerator
-                if (len(numerator) > 0):
-                    numerator = numerator + UnitOfMeasure.__MULT + unit.getSymbol()
-                    numeratorCount = numeratorCount + 1
-
-                if (power > 1):
-                    if (power == 2):
-                        numerator = numerator + UnitOfMeasure.__SQ
-                    elif (power == 3):
-                        numerator = numerator + UnitOfMeasure.__CUBED
-                    else:
-                        numerator = numerator + UnitOfMeasure.__POW + power
-            else:
-                # unary, don't add a '1'
-                pass
-            
-        if (numeratorCount == 0):
-            numerator = numerator + UnitOfMeasure.__ONE_CHAR
-
-            result = None
-
-            if (denominatorCount == 0):
-                result = numerator
-            else:
-                if (denominatorCount == 1):
-                    result = numerator + UnitOfMeasure.__DIV + denominator
-                else:
-                    result = numerator + UnitOfMeasure.__DIV + UnitOfMeasure.__LP + denominator + UnitOfMeasure.__RP
-
-            return result       
-
-class UnitOfMeasure(Symbolic):           
+class UnitOfMeasure(Symbolic):  
+    __MAX_SYMBOL_LENGTH = 16
+             
     def __init__(self, unitType, name, symbol, description):
         super().__init__(name, symbol, description)
         
@@ -214,38 +38,6 @@ class UnitOfMeasure(Symbolic):
         self.bridgeAbscissaUnit = None
         self.unitType = unitType
         self.baseSymbol = None
-        
-    @staticmethod
-    def mult():    
-        return '\xB7'
- 
-    @staticmethod
-    def div():    
-        return '/'
- 
-    @staticmethod
-    def pow():    
-        return '^'
- 
-    @staticmethod
-    def sq():    
-        return '\xB2'
- 
-    @staticmethod
-    def cubed():    
-        return '\xB3'
- 
-    @staticmethod
-    def lp():    
-        return '('
- 
-    @staticmethod
-    def rp():    
-        return ')'
- 
-    @staticmethod
-    def oneChar():    
-        return '1'
         
     @staticmethod
     def isValidExponent(exponent):
@@ -300,7 +92,7 @@ class UnitOfMeasure(Symbolic):
         
         # scaling factor
         if (not math.isclose(self.scalingFactor, 1.0)):
-            value = value + str(self.scalingFactor) + UnitOfMeasure.__MULT
+            value = value + str(self.scalingFactor) + Operands.mult()
             
         # abscissa unit
         if (self.abscissaUnit is not None) :
@@ -365,10 +157,6 @@ class UnitOfMeasure(Symbolic):
     def getBaseUnitsOfMeasure(self):
         return self.getReducer().terms
     
-    def power(self, exponent):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
-        return MeasurementSystem.instance().createPowerUOM(self, exponent)
-    
     def isTerminal(self):
         return True if self == self.abscissaUnit else False
     
@@ -377,9 +165,7 @@ class UnitOfMeasure(Symbolic):
         self.bridgeAbscissaUnit = abscissaUnit
         self.bridgeOffset = offset
 
-
     def setConversion(self, scalingFactor, abscissaUnit, offset):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
         if (abscissaUnit is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
             raise Exception(msg)
@@ -391,7 +177,7 @@ class UnitOfMeasure(Symbolic):
                 raise Exception(msg)
 
         # unit has been previously cached, so first remove it, then cache again
-        MeasurementSystem.instance().unregisterUnit(self)
+        CacheManager.instance().unregisterUnit(self)
         
         self.baseSymbol = None
         self.scalingFactor = scalingFactor
@@ -399,7 +185,7 @@ class UnitOfMeasure(Symbolic):
         self.offset = offset
 
         # re-cache
-        MeasurementSystem.instance().registerUnit(self)
+        CacheManager.instance().registerUnit(self)
         
     def getPowerExponent(self):
         return self.exponent1
@@ -417,14 +203,13 @@ class UnitOfMeasure(Symbolic):
         return self.uom2 
     
     def setPowerUnit(self, base, exponent):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
         if (base is None):
             msg = Localizer.instance().messageStr("base.cannot.be.null").format(self.symbol)
             raise Exception(msg)
 
         # special cases
         if (exponent == -1):
-            self.setPowerProduct(MeasurementSystem.instance().getOne(), 1, base, -1)
+            self.setPowerProduct(CacheManager.instance().getUOMByUnit(Unit.ONE), 1, base, -1)
         else:
             self.setPowerProduct(base, exponent, None, None)
     
@@ -435,23 +220,22 @@ class UnitOfMeasure(Symbolic):
 
     @staticmethod 
     def generatePowerSymbol(base, exponent):
-        return base.symbol + UnitOfMeasure.pow() + str(exponent)
+        return base.symbol + Operands.pow() + str(exponent)
 
     @staticmethod
     def generateProductSymbol(multiplier, multiplicand):
         symbol = None
         if (multiplier == multiplicand):
-            symbol = multiplier.symbol + UnitOfMeasure.sq()
+            symbol = multiplier.symbol + Operands.sq()
         else:
-            symbol = multiplier.symbol + UnitOfMeasure.mult() + multiplicand.symbol
+            symbol = multiplier.symbol + Operands.mult() + multiplicand.symbol
         return symbol
 
     @staticmethod
     def generateQuotientSymbol(dividend, divisor):
-        return dividend.symbol + UnitOfMeasure.div() + divisor.symbol   
+        return dividend.symbol + Operands.div() + divisor.symbol   
     
     def clonePower(self, uom):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
         newUOM = UnitOfMeasure()
         newUOM.setUnitType(self.unitType)
 
@@ -460,7 +244,7 @@ class UnitOfMeasure(Symbolic):
         if (UnitOfMeasure.isValidExponent(self.getPowerExponent())):
             exponent = self.getPowerExponent()
 
-        one = MeasurementSystem.instance().getOne()
+        one = CacheManager.instance().getUOMByUnit(Unit.ONE)
         if (self.getMeasurementType() == MeasurementType.QUOTIENT):
             if (self.getDividend() == one):
                 exponent = self.exponent2
@@ -474,9 +258,7 @@ class UnitOfMeasure(Symbolic):
 
         return newUOM
    
-    def classify(self):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
-        
+    def classify(self):        
         if (self.unitType != UnitType.UNCLASSIFIED):
             # already classified
             return self
@@ -488,7 +270,7 @@ class UnitOfMeasure(Symbolic):
         matchedType = UnitType.UNCLASSIFIED
 
         for unitType in UnitType:
-            unitTypeMap = MeasurementSystem.instance().getTypeMap(unitType)
+            unitTypeMap = CacheManager.instance().getTypeMap(unitType)
 
             if (len(unitTypeMap) != len(uomBaseMap)):
                 # not a match
@@ -558,11 +340,9 @@ class UnitOfMeasure(Symbolic):
     def clearCache(self):
         self.conversionRegistry.clear()
         
-    def clonePowerProduct(self, uom1, uom2):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
-        
+    def clonePowerProduct(self, uom1, uom2):        
         invert = False
-        one = MeasurementSystem.instance().getOne()
+        one = CacheManager.instance().getUOMByUnit(Unit.ONE)
     
             # check if quotient
         if (self.getMeasurementType() == MeasurementType.QUOTIENT):
@@ -583,7 +363,6 @@ class UnitOfMeasure(Symbolic):
         return newUOM 
     
     def multiplyOrDivide(self, other, invert): 
-        from PyCaliper.uom.measurement_system import MeasurementSystem
         if (other is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
             raise Exception(msg)
@@ -651,7 +430,7 @@ class UnitOfMeasure(Symbolic):
             result.symbol = self.generateIntermediateSymbol()
             
         baseSymbol = resultReducer.buildBaseString()
-        baseUOM = MeasurementSystem.instance().getBaseUOM(baseSymbol)
+        baseUOM = CacheManager.instance().getBaseUOM(baseSymbol)
         
         if (baseUOM is not None):
             # there is a conversion to the base UOM
@@ -702,9 +481,8 @@ class UnitOfMeasure(Symbolic):
         return self.multiplyOrDivide(divisor, True)
     
     def getBaseUOM(self):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
         baseSymbol = self.getBaseSymbol()
-        return MeasurementSystem.instance().getBaseUOM(baseSymbol)
+        return CacheManager.instance().getBaseUOM(baseSymbol)
     
     def convertUnit(self, targetUOM):
         # get path factors in each system
@@ -791,13 +569,12 @@ class UnitOfMeasure(Symbolic):
         return self.uom1
 
     def invert(self):
-        from PyCaliper.uom.measurement_system import MeasurementSystem
         inverted = None
 
         if (UnitOfMeasure.isValidExponent(self.exponent2) and self.exponent2 < 0):
             inverted = self.getDivisor().divide(self.getDividend())
         else:
-            inverted = MeasurementSystem.instance().getOne().divide(self)
+            inverted = CacheManager.instance().getOne().divide(self)
 
         return inverted
     

@@ -6,7 +6,7 @@ from builtins import staticmethod
 
 class Quantity(Symbolic):
     def __init__(self, amount, uom):
-        super(None, None, None)
+        super().__init__(None, None, None)
         
         self.amount = amount
         self.uom = uom
@@ -24,7 +24,7 @@ class Quantity(Symbolic):
         return answer
         
     def __str__(self):
-        return self.amount + ", [" + str(self.uom) + "] " + str(super)
+        return str(self.amount) + ", [" + str(self.uom) + "] " + super().__str__()
    
     @staticmethod
     def createAmountFromString(value):

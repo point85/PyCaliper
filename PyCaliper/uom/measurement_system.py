@@ -1,74 +1,13 @@
 import math
 
+from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.constant import Constant
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.unit import Unit
-#from PyCaliper.uom.unit_of_measure import UnitOfMeasure
+from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.unit_type import UnitType
 from builtins import staticmethod
-
-class CacheManager:
-    def __init__(self):
-        self.symbolRegistry = {}
-        self.baseRegistry = {}
-        self.unitRegistry = {}
-    
-    def getUOMBySymbol(self, symbol):
-        return self.symbolRegistry[symbol]
-        
-    def getUOMByUnit(self, unit):
-        return self.unitRegistry[unit]
-    
-    def getBaseUOM(self, baseSymbol):
-        return self.baseRegistry[baseSymbol]
-        
-    def clearCache(self):
-        self.symbolRegistry.clear()
-        self.baseRegistry.clear()
-        self.unitRegistry.clear()
-          
-    def getCachedUnits(self):
-        return self.symbolRegistry.values()
-    
-    def getSymbolCache(self):
-        return self.symbolRegistry
-        
-    def getBaseSymbolCache(self):
-        return self.baseRegistry
-    
-    def getEnumerationCache(self):
-        return self.unitRegistry  
-    
-    def unregisterUnit(self, uom):
-        # remove by enumeration
-        if (uom.unitType is not None):
-            del self.unitRegistry[uom.unit] 
-            
-        # remove by symbol and base symbol
-        del self.symbolRegistry[uom.symbol]
-        del self.baseRegistry[uom.getBaseSymbol()]
-        
-    def registerUnit(self, uom):
-        # get first by symbol
-        current = self.symbolRegistry[uom.symbol]
-
-        if (current is not None):
-            # already cached
-            return
-
-        # cache it by symbol
-        self.symbolRegistry[uom.symbol] = uom
-
-        # next by unit enumeration
-        if (uom.unit is not None):
-            self.unitRegistry[uom.unit] = uom
-
-        # finally cache by base symbol
-        key = uom.getBaseSymbol()
-
-        if (self.baseRegistry[key] is None):
-            self.baseRegistry[key] = uom
 
 class MeasurementSystem:    
     # single instance
@@ -76,36 +15,12 @@ class MeasurementSystem:
     
     def __init__(self):
         MeasurementSystem.unifiedSystem = self
-        self.unitTypeRegistry = {}
-        self.cacheManager = CacheManager()
 
     @staticmethod
     def instance():
         if (MeasurementSystem.unifiedSystem is None):
             MeasurementSystem()
         return MeasurementSystem.unifiedSystem 
-    
-    def getTypeMap(self, unitType):            
-        if (self.unitTypeRegistry.get(unitType) is not None):
-            return self.unitTypeRegistry[unitType]
-        
-        cachedMap = {}
-        self.unitTypeRegistry[unitType] = cachedMap
-        
-        if (unitType == UnitType.AREA):
-            cachedMap[UnitType.LENGTH] = 2
-        elif (unitType == UnitType.VOLUME):
-            cachedMap[UnitType.LENGTH] = 3
-        elif (unitType ==  UnitType.DENSITY):
-            cachedMap[UnitType.MASS] = 1
-            cachedMap[UnitType.LENGTH] = -3
-        elif (unitType ==  UnitType.VELOCITY):
-            cachedMap[UnitType.LENGTH] = 1
-            cachedMap[UnitType.TIME] = -1
-        else:
-            pass
-        
-        return cachedMap
     
     def getUOM(self, unit):
         uom = self.cacheManager.getUOM(unit)
@@ -115,7 +30,7 @@ class MeasurementSystem:
         return uom
         
     def getOne(self):
-        return self.getUOMByUnit(Unit.ONE)
+        return CacheManager.instance().getUOMByUnit(Unit.ONE)
     
     def createScalarUOM(self, unitType, unit, name, symbol, description):
         uom = self.createUOM(unitType, unit, name, symbol, description)
@@ -1075,7 +990,6 @@ class MeasurementSystem:
         return uom
     
     def createUnclassifiedPowerUOM(self, base, exponent): 
-        from PyCaliper.uom.unit_of_measure import UnitOfMeasure 
         if (base is None):          
             msg = MeasurementSystem.messageStr("base.cannot.be.null")
             raise Exception(msg)
@@ -1091,7 +1005,6 @@ class MeasurementSystem:
         return uom
     
     def createUnclassifiedProductUOM(self, multiplier, multiplicand):
-        from PyCaliper.uom.unit_of_measure import UnitOfMeasure
         if (multiplier is None):          
             msg = MeasurementSystem.messageStr("multiplier.cannot.be.null")
             raise Exception(msg)
@@ -1104,7 +1017,6 @@ class MeasurementSystem:
         return self.createProductUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, multiplier, multiplicand)
     
     def createUnclassifiedQuotientUOM(self, dividend, divisor):
-        from PyCaliper.uom.unit_of_measure import UnitOfMeasure
         if (dividend is None):
             msg = MeasurementSystem.messageStr("dividend.cannot.be.null")
             raise Exception(msg)
@@ -1123,7 +1035,6 @@ class MeasurementSystem:
         return uom
 
     def createUOM(self, unitType, unit, name, symbol, description):
-        from PyCaliper.uom.unit_of_measure import UnitOfMeasure
         if (symbol is None or len(symbol) == 0):
             msg = MeasurementSystem.messageStr("symbol.cannot.be.null")
             raise Exception(msg)
@@ -1143,16 +1054,16 @@ class MeasurementSystem:
         return uom
     
     def getSecond(self):
-        return self.getUOMByUnit(Unit.SECOND)
+        return self.cacheManager.getUOMByUnit(Unit.SECOND)
     
     def getMinute(self):
-        return self.getUOMByUnit(Unit.MINUTE)
+        return self.cacheManager.getUOMByUnit(Unit.MINUTE)
     
     def getHour(self):
-        return self.getUOMByUnit(Unit.HOUR)
+        return self.cacheManager.getUOMByUnit(Unit.HOUR)
     
     def getDay(self):
-        return self.getUOMByUnit(Unit.DAY)
+        return self.cacheManager.getUOMByUnit(Unit.DAY)
     
     def getRegisteredUnits(self):
         units = self.cacheManager.getCachedUnits()
