@@ -7,6 +7,8 @@ from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.unit import Unit
 from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.unit_type import UnitType
+from PyCaliper.uom.operands import Operands
+from PyCaliper.uom.localizer import Localizer
 from builtins import staticmethod
 
 class MeasurementSystem:    
@@ -34,7 +36,7 @@ class MeasurementSystem:
     
     def createScalarUOM(self, unitType, unit, name, symbol, description):
         uom = self.createUOM(unitType, unit, name, symbol, description)
-        self.registerUnit(uom)
+        CacheManager.instance().registerUnit(uom)
         return uom
     
     def createSIUnit(self, unit):
@@ -43,421 +45,421 @@ class MeasurementSystem:
         if (unit == Unit.ONE):
             # unity
             uom = self.createScalarUOM(UnitType.UNITY, unit, \
-                MeasurementSystem.unitStr("one.name"), MeasurementSystem.unitStr("one.symbol"), MeasurementSystem.unitStr("one.desc"))
+                Localizer.instance().langStr("one.name"), Localizer.instance().langStr("one.symbol"), Localizer.instance().langStr("one.desc"))
         
         elif (unit == Unit.PERCENT):
-            uom = self.createScalarUOM(UnitType.UNITY, unit, MeasurementSystem.unitStr("percent.name"), \
-                    MeasurementSystem.unitStr("percent.symbol"), MeasurementSystem.unitStr("percent.desc"))
+            uom = self.createScalarUOM(UnitType.UNITY, unit, Localizer.instance().langStr("percent.name"), \
+                    Localizer.instance().langStr("percent.symbol"), Localizer.instance().langStr("percent.desc"))
             uom.setConversion(0.01, self.getOne())
 
         elif (unit == Unit.SECOND):
             # second
-            uom = self.createScalarUOM(UnitType.TIME, unit, MeasurementSystem.unitStr("sec.name"), \
-                    MeasurementSystem.unitStr("sec.symbol"), MeasurementSystem.unitStr("sec.desc"))
+            uom = self.createScalarUOM(UnitType.TIME, unit, Localizer.instance().langStr("sec.name"), \
+                    Localizer.instance().langStr("sec.symbol"), Localizer.instance().langStr("sec.desc"))
 
         elif (unit == Unit.MINUTE):
             # minute
-            uom = self.createScalarUOM(UnitType.TIME, unit, MeasurementSystem.unitStr("min.name"), \
-                    MeasurementSystem.unitStr("min.symbol"), MeasurementSystem.unitStr("min.desc"))
+            uom = self.createScalarUOM(UnitType.TIME, unit, Localizer.instance().langStr("min.name"), \
+                    Localizer.instance().langStr("min.symbol"), Localizer.instance().langStr("min.desc"))
             uom.setConversion(60.0, self.getUOM(Unit.SECOND))
 
         elif (unit == Unit.HOUR):
             # hour
-            uom = self.createScalarUOM(UnitType.TIME, unit, MeasurementSystem.unitStr("hr.name"), MeasurementSystem.unitStr("hr.symbol"), \
-                    MeasurementSystem.unitStr("hr.desc"))
+            uom = self.createScalarUOM(UnitType.TIME, unit, Localizer.instance().langStr("hr.name"), Localizer.instance().langStr("hr.symbol"), \
+                    Localizer.instance().langStr("hr.desc"))
             uom.setConversion(3600.0, self.getUOM(Unit.SECOND))
         
         elif (unit == Unit.DAY):
             # day
-            uom = self.createScalarUOM(UnitType.TIME, unit, MeasurementSystem.unitStr("day.name"), MeasurementSystem.unitStr("day.symbol"), \
-                    MeasurementSystem.unitStr("day.desc"))
+            uom = self.createScalarUOM(UnitType.TIME, unit, Localizer.instance().langStr("day.name"), Localizer.instance().langStr("day.symbol"), \
+                    Localizer.instance().langStr("day.desc"))
             uom.setConversion(86400.0, self.getUOM(Unit.SECOND))
 
         elif (unit == Unit.WEEK):
             # week
-            uom = self.createScalarUOM(UnitType.TIME, unit, MeasurementSystem.unitStr("week.name"), \
-                    MeasurementSystem.unitStr("week.symbol"), MeasurementSystem.unitStr("week.desc"))
+            uom = self.createScalarUOM(UnitType.TIME, unit, Localizer.instance().langStr("week.name"), \
+                    Localizer.instance().langStr("week.symbol"), Localizer.instance().langStr("week.desc"))
             uom.setConversion(604800.0, self.getUOM(Unit.SECOND))
 
         elif (unit == Unit.JULIAN_YEAR):
             # Julian year
-            uom = self.createScalarUOM(UnitType.TIME, unit, MeasurementSystem.unitStr("jyear.name"), \
-                    MeasurementSystem.unitStr("jyear.symbol"), MeasurementSystem.unitStr("jyear.desc"))
+            uom = self.createScalarUOM(UnitType.TIME, unit, Localizer.instance().langStr("jyear.name"), \
+                    Localizer.instance().langStr("jyear.symbol"), Localizer.instance().langStr("jyear.desc"))
             uom.setConversion(3.1557600E+07, self.getUOM(Unit.SECOND))
 
         elif (unit == Unit.SQUARE_SECOND):
             # square second
-            uom = self.createPowerUOM(UnitType.TIME_SQUARED, unit, MeasurementSystem.unitStr("s2.name"), \
-                    MeasurementSystem.unitStr("s2.symbol"), MeasurementSystem.unitStr("s2.desc"), self.getUOM(Unit.SECOND), 2)
+            uom = self.createPowerUOM(UnitType.TIME_SQUARED, unit, Localizer.instance().langStr("s2.name"), \
+                    Localizer.instance().langStr("s2.symbol"), Localizer.instance().langStr("s2.desc"), self.getUOM(Unit.SECOND), 2)
 
         elif (unit == Unit.MOLE):
             # substance amount
-            uom = self.createScalarUOM(UnitType.SUBSTANCE_AMOUNT, unit, MeasurementSystem.unitStr("mole.name"), \
-                    MeasurementSystem.unitStr("mole.symbol"), MeasurementSystem.unitStr("mole.desc"))
+            uom = self.createScalarUOM(UnitType.SUBSTANCE_AMOUNT, unit, Localizer.instance().langStr("mole.name"), \
+                    Localizer.instance().langStr("mole.symbol"), Localizer.instance().langStr("mole.desc"))
 
         elif (unit == Unit.EQUIVALENT):
             # substance amount
-            uom = self.createScalarUOM(UnitType.SUBSTANCE_AMOUNT, unit, MeasurementSystem.unitStr("equivalent.name"), \
-                    MeasurementSystem.unitStr("equivalent.symbol"), MeasurementSystem.unitStr("equivalent.desc"))
+            uom = self.createScalarUOM(UnitType.SUBSTANCE_AMOUNT, unit, Localizer.instance().langStr("equivalent.name"), \
+                    Localizer.instance().langStr("equivalent.symbol"), Localizer.instance().langStr("equivalent.desc"))
 
         elif (unit == Unit.DECIBEL):
             # decibel
-            uom = self.createScalarUOM(UnitType.INTENSITY, unit, MeasurementSystem.unitStr("db.name"), \
-                    MeasurementSystem.unitStr("db.symbol"), MeasurementSystem.unitStr("db.desc"))
+            uom = self.createScalarUOM(UnitType.INTENSITY, unit, Localizer.instance().langStr("db.name"), \
+                    Localizer.instance().langStr("db.symbol"), Localizer.instance().langStr("db.desc"))
 
         elif (unit == Unit.RADIAN):
             # plane angle radian (rad)
-            uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, MeasurementSystem.unitStr("radian.name"), \
-                    MeasurementSystem.unitStr("radian.symbol"), MeasurementSystem.unitStr("radian.desc"))
+            uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, Localizer.instance().langStr("radian.name"), \
+                    Localizer.instance().langStr("radian.symbol"), Localizer.instance().langStr("radian.desc"))
             uom.setConversion(self.getOne())
 
         elif (unit == Unit.STERADIAN):
             # solid angle steradian (sr)
-            uom = self.createScalarUOM(UnitType.SOLID_ANGLE, unit, MeasurementSystem.unitStr("steradian.name"), \
-                    MeasurementSystem.unitStr("steradian.symbol"), MeasurementSystem.unitStr("steradian.desc"))
+            uom = self.createScalarUOM(UnitType.SOLID_ANGLE, unit, Localizer.instance().langStr("steradian.name"), \
+                    Localizer.instance().langStr("steradian.symbol"), Localizer.instance().langStr("steradian.desc"))
             uom.setConversion(self.getOne())
 
         elif (unit == Unit.DEGREE):
             # degree of arc
-            uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, MeasurementSystem.unitStr("degree.name"), \
-                    MeasurementSystem.unitStr("degree.symbol"), MeasurementSystem.unitStr("degree.desc"))
+            uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, Localizer.instance().langStr("degree.name"), \
+                    Localizer.instance().langStr("degree.symbol"), Localizer.instance().langStr("degree.desc"))
             uom.setConversion(math.pi / 180.0, self.getUOM(Unit.RADIAN))
 
         elif (unit == Unit.ARC_SECOND):
             # degree of arc
-            uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, MeasurementSystem.unitStr("arcsec.name"), \
-                    MeasurementSystem.unitStr("arcsec.symbol"), MeasurementSystem.unitStr("arcsec.desc"))
+            uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, Localizer.instance().langStr("arcsec.name"), \
+                    Localizer.instance().langStr("arcsec.symbol"), Localizer.instance().langStr("arcsec.desc"))
             uom.setConversion(math.pi / 648000.0, self.getUOM(Unit.RADIAN))
 
         elif (unit == Unit.METRE):
             # fundamental length
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("m.name"), MeasurementSystem.unitStr("m.symbol"), \
-                    MeasurementSystem.unitStr("m.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("m.name"), Localizer.instance().langStr("m.symbol"), \
+                    Localizer.instance().langStr("m.desc"))
 
         elif (unit == Unit.DIOPTER):
             # per metre
-            uom = self.createQuotientUOM(UnitType.RECIPROCAL_LENGTH, unit, MeasurementSystem.unitStr("diopter.name"), \
-                    MeasurementSystem.unitStr("diopter.symbol"), MeasurementSystem.unitStr("diopter.desc"), self.getOne(), self.getUOM(Unit.METRE))
+            uom = self.createQuotientUOM(UnitType.RECIPROCAL_LENGTH, unit, Localizer.instance().langStr("diopter.name"), \
+                    Localizer.instance().langStr("diopter.symbol"), Localizer.instance().langStr("diopter.desc"), self.getOne(), self.getUOM(Unit.METRE))
 
         elif (unit == Unit.KILOGRAM):
             # fundamental mass
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("kg.name"), \
-                    MeasurementSystem.unitStr("kg.symbol"), MeasurementSystem.unitStr("kg.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("kg.name"), \
+                    Localizer.instance().langStr("kg.symbol"), Localizer.instance().langStr("kg.desc"))
 
         elif (unit == Unit.TONNE):
             # mass
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("tonne.name"), \
-                    MeasurementSystem.unitStr("tonne.symbol"), MeasurementSystem.unitStr("tonne.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("tonne.name"), \
+                    Localizer.instance().langStr("tonne.symbol"), Localizer.instance().langStr("tonne.desc"))
             uom.setConversion(Prefix.kilo().factor, self.getUOM(Unit.KILOGRAM))
 
         elif (unit == Unit.KELVIN):
             # fundamental temperature
-            uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, MeasurementSystem.unitStr("kelvin.name"), \
-                    MeasurementSystem.unitStr("kelvin.symbol"), MeasurementSystem.unitStr("kelvin.desc"))
+            uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, Localizer.instance().langStr("kelvin.name"), \
+                    Localizer.instance().langStr("kelvin.symbol"), Localizer.instance().langStr("kelvin.desc"))
 
         elif (unit == Unit.AMPERE):
             # electric current
-            uom = self.createScalarUOM(UnitType.ELECTRIC_CURRENT, unit, MeasurementSystem.unitStr("amp.name"), \
-                    MeasurementSystem.unitStr("amp.symbol"), MeasurementSystem.unitStr("amp.desc"))
+            uom = self.createScalarUOM(UnitType.ELECTRIC_CURRENT, unit, Localizer.instance().langStr("amp.name"), \
+                    Localizer.instance().langStr("amp.symbol"), Localizer.instance().langStr("amp.desc"))
 
         elif (unit == Unit.CANDELA):
             # luminosity
-            uom = self.createScalarUOM(UnitType.LUMINOSITY, unit, MeasurementSystem.unitStr("cd.name"), \
-                    MeasurementSystem.unitStr("cd.symbol"), MeasurementSystem.unitStr("cd.desc"))
+            uom = self.createScalarUOM(UnitType.LUMINOSITY, unit, Localizer.instance().langStr("cd.name"), \
+                    Localizer.instance().langStr("cd.symbol"), Localizer.instance().langStr("cd.desc"))
 
         elif (unit == Unit.MOLARITY):
             # molar concentration
-            uom = self.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, unit, MeasurementSystem.unitStr("molarity.name"), \
-                    MeasurementSystem.unitStr("molarity.symbol"), MeasurementSystem.unitStr("molarity.desc"), self.getUOM(Unit.MOLE), \
+            uom = self.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, unit, Localizer.instance().langStr("molarity.name"), \
+                    Localizer.instance().langStr("molarity.symbol"), Localizer.instance().langStr("molarity.desc"), self.getUOM(Unit.MOLE), \
                     self.getUOM(Unit.LITRE))
 
         elif (unit == Unit.GRAM): # gram
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("gram.name"), \
-                    MeasurementSystem.unitStr("gram.symbol"), MeasurementSystem.unitStr("gram.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("gram.name"), \
+                    Localizer.instance().langStr("gram.symbol"), Localizer.instance().langStr("gram.desc"))
             uom.setConversion(Prefix.milli().factor, self.getUOM(Unit.KILOGRAM))
 
         elif (unit == Unit.CARAT):
             # carat
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("carat.name"), \
-                    MeasurementSystem.unitStr("carat.symbol"), MeasurementSystem.unitStr("carat.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("carat.name"), \
+                    Localizer.instance().langStr("carat.symbol"), Localizer.instance().langStr("carat.desc"))
             uom.setConversion(0.2, self.getUOM(Unit.GRAM))
 
         elif (unit == Unit.SQUARE_METRE):
             # square metre
-            uom = self.createPowerUOM(UnitType.AREA, unit, MeasurementSystem.unitStr("m2.name"), \
-                    MeasurementSystem.unitStr("m2.symbol"), MeasurementSystem.unitStr("m2.desc"), self.getUOM(Unit.METRE), 2)
+            uom = self.createPowerUOM(UnitType.AREA, unit, Localizer.instance().langStr("m2.name"), \
+                    Localizer.instance().langStr("m2.symbol"), Localizer.instance().langStr("m2.desc"), self.getUOM(Unit.METRE), 2)
 
         elif (unit == Unit.HECTARE):
             # hectare
-            uom = self.createScalarUOM(UnitType.AREA, unit, MeasurementSystem.unitStr("hectare.name"), \
-                    MeasurementSystem.unitStr("hectare.symbol"), MeasurementSystem.unitStr("hectare.desc"))
+            uom = self.createScalarUOM(UnitType.AREA, unit, Localizer.instance().langStr("hectare.name"), \
+                    Localizer.instance().langStr("hectare.symbol"), Localizer.instance().langStr("hectare.desc"))
             uom.setConversion(10000.0, self.getUOM(Unit.SQUARE_METRE))
 
         elif (unit == Unit.METRE_PER_SEC):
             # velocity
-            uom = self.createQuotientUOM(UnitType.VELOCITY, unit, MeasurementSystem.unitStr("mps.name"), \
-                    MeasurementSystem.unitStr("mps.symbol"), MeasurementSystem.unitStr("mps.desc"), self.getUOM(Unit.METRE), self.getSecond())
+            uom = self.createQuotientUOM(UnitType.VELOCITY, unit, Localizer.instance().langStr("mps.name"), \
+                    Localizer.instance().langStr("mps.symbol"), Localizer.instance().langStr("mps.desc"), self.getUOM(Unit.METRE), self.getSecond())
 
         elif (unit == Unit.METRE_PER_SEC_SQUARED):
             # acceleration
-            uom = self.createQuotientUOM(UnitType.ACCELERATION, unit, MeasurementSystem.unitStr("mps2.name"), \
-                    MeasurementSystem.unitStr("mps2.symbol"), MeasurementSystem.unitStr("mps2.desc"), self.getUOM(Unit.METRE), \
+            uom = self.createQuotientUOM(UnitType.ACCELERATION, unit, Localizer.instance().langStr("mps2.name"), \
+                    Localizer.instance().langStr("mps2.symbol"), Localizer.instance().langStr("mps2.desc"), self.getUOM(Unit.METRE), \
                     self.getUOM(Unit.SQUARE_SECOND))
 
         elif (unit == Unit.CUBIC_METRE):
             # cubic metre
-            uom = self.createPowerUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("m3.name"), \
-                    MeasurementSystem.unitStr("m3.symbol"), MeasurementSystem.unitStr("m3.desc"), self.getUOM(Unit.METRE), 3)
+            uom = self.createPowerUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("m3.name"), \
+                    Localizer.instance().langStr("m3.symbol"), Localizer.instance().langStr("m3.desc"), self.getUOM(Unit.METRE), 3)
 
         elif (unit == Unit.LITRE):
             # litre
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("litre.name"), \
-                    MeasurementSystem.unitStr("litre.symbol"), MeasurementSystem.unitStr("litre.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("litre.name"), \
+                    Localizer.instance().langStr("litre.symbol"), Localizer.instance().langStr("litre.desc"))
             uom.setConversion(Prefix.milli().factor, self.getUOM(Unit.CUBIC_METRE))
 
         elif (unit == Unit.CUBIC_METRE_PER_SEC):
             # flow (volume)
             uom = self.createQuotientUOM(UnitType.VOLUMETRIC_FLOW, unit,
-                    MeasurementSystem.unitStr("m3PerSec.name"), MeasurementSystem.unitStr("m3PerSec.symbol"), \
-                    MeasurementSystem.unitStr("m3PerSec.desc"), self.getUOM(Unit.CUBIC_METRE), self.getSecond())
+                    Localizer.instance().langStr("m3PerSec.name"), Localizer.instance().langStr("m3PerSec.symbol"), \
+                    Localizer.instance().langStr("m3PerSec.desc"), self.getUOM(Unit.CUBIC_METRE), self.getSecond())
 
         elif (unit == Unit.KILOGRAM_PER_SEC):
             # flow (mass)
-            uom = self.createQuotientUOM(UnitType.MASS_FLOW, unit, MeasurementSystem.unitStr("kgPerSec.name"), \
-                    MeasurementSystem.unitStr("kgPerSec.symbol"), MeasurementSystem.unitStr("kgPerSec.desc"), self.getUOM(Unit.KILOGRAM), \
+            uom = self.createQuotientUOM(UnitType.MASS_FLOW, unit, Localizer.instance().langStr("kgPerSec.name"), \
+                    Localizer.instance().langStr("kgPerSec.symbol"), Localizer.instance().langStr("kgPerSec.desc"), self.getUOM(Unit.KILOGRAM), \
                     self.getSecond())
 
         elif (unit == Unit.KILOGRAM_PER_CU_METRE):
             # kg/m^3
-            uom = self.createQuotientUOM(UnitType.DENSITY, unit, MeasurementSystem.unitStr("kg_m3.name"), \
-                    MeasurementSystem.unitStr("kg_m3.symbol"), MeasurementSystem.unitStr("kg_m3.desc"), self.getUOM(Unit.KILOGRAM), \
+            uom = self.createQuotientUOM(UnitType.DENSITY, unit, Localizer.instance().langStr("kg_m3.name"), \
+                    Localizer.instance().langStr("kg_m3.symbol"), Localizer.instance().langStr("kg_m3.desc"), self.getUOM(Unit.KILOGRAM), \
                     self.getUOM(Unit.CUBIC_METRE))
 
         elif (unit == Unit.PASCAL_SECOND):
             # dynamic viscosity
-            uom = self.createProductUOM(UnitType.DYNAMIC_VISCOSITY, unit, MeasurementSystem.unitStr("pascal_sec.name"), \
-                    MeasurementSystem.unitStr("pascal_sec.symbol"), MeasurementSystem.unitStr("pascal_sec.desc"), self.getUOM(Unit.PASCAL), \
+            uom = self.createProductUOM(UnitType.DYNAMIC_VISCOSITY, unit, Localizer.instance().langStr("pascal_sec.name"), \
+                    Localizer.instance().langStr("pascal_sec.symbol"), Localizer.instance().langStr("pascal_sec.desc"), self.getUOM(Unit.PASCAL), \
                     self.getSecond())
 
         elif (unit == Unit.SQUARE_METRE_PER_SEC):
             # kinematic viscosity
             uom = self.createQuotientUOM(UnitType.KINEMATIC_VISCOSITY, unit, \
-                    MeasurementSystem.unitStr("m2PerSec.name"), MeasurementSystem.unitStr("m2PerSec.symbol"), \
-                    MeasurementSystem.unitStr("m2PerSec.desc"), self.getUOM(Unit.SQUARE_METRE), self.getSecond())
+                    Localizer.instance().langStr("m2PerSec.name"), Localizer.instance().langStr("m2PerSec.symbol"), \
+                    Localizer.instance().langStr("m2PerSec.desc"), self.getUOM(Unit.SQUARE_METRE), self.getSecond())
 
         elif (unit == Unit.CALORIE):
             # thermodynamic calorie
-            uom = self.createScalarUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("calorie.name"), \
-                    MeasurementSystem.unitStr("calorie.symbol"), MeasurementSystem.unitStr("calorie.desc"))
+            uom = self.createScalarUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("calorie.name"), \
+                    Localizer.instance().langStr("calorie.symbol"), Localizer.instance().langStr("calorie.desc"))
             uom.setConversion(4.184, self.getUOM(Unit.JOULE))
 
         elif (unit == Unit.NEWTON):
             # force F = m·A (newton)
-            uom = self.createProductUOM(UnitType.FORCE, unit, MeasurementSystem.unitStr("newton.name"), \
-                    MeasurementSystem.unitStr("newton.symbol"), MeasurementSystem.unitStr("newton.desc"), self.getUOM(Unit.KILOGRAM), \
+            uom = self.createProductUOM(UnitType.FORCE, unit, Localizer.instance().langStr("newton.name"), \
+                    Localizer.instance().langStr("newton.symbol"), Localizer.instance().langStr("newton.desc"), self.getUOM(Unit.KILOGRAM), \
                     self.getUOM(Unit.METRE_PER_SEC_SQUARED))
 
         elif (unit == Unit.NEWTON_METRE):
             # newton-metre
-            uom = self.createProductUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("n_m.name"), \
-                    MeasurementSystem.unitStr("n_m.symbol"), MeasurementSystem.unitStr("n_m.desc"), self.getUOM(Unit.NEWTON), \
+            uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("n_m.name"), \
+                    Localizer.instance().langStr("n_m.symbol"), Localizer.instance().langStr("n_m.desc"), self.getUOM(Unit.NEWTON), \
                     self.getUOM(Unit.METRE))
 
         elif (unit == Unit.JOULE):
             # energy (joule)
-            uom = self.createProductUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("joule.name"), \
-                    MeasurementSystem.unitStr("joule.symbol"), MeasurementSystem.unitStr("joule.desc"), self.getUOM(Unit.NEWTON), \
+            uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("joule.name"), \
+                    Localizer.instance().langStr("joule.symbol"), Localizer.instance().langStr("joule.desc"), self.getUOM(Unit.NEWTON), \
                     self.getUOM(Unit.METRE))
 
         elif (unit == Unit.ELECTRON_VOLT):
             # ev
             e = self.getQuantity(Constant.ELEMENTARY_CHARGE)
-            uom = self.createProductUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("ev.name"), \
-                    MeasurementSystem.unitStr("ev.symbol"), MeasurementSystem.unitStr("ev.desc"), e.self.getUOM(), self.getUOM(Unit.VOLT))
+            uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("ev.name"), \
+                    Localizer.instance().langStr("ev.symbol"), Localizer.instance().langStr("ev.desc"), e.self.getUOM(), self.getUOM(Unit.VOLT))
             uom.setScalingFactor(e.getAmount())
 
         elif (unit == Unit.WATT_HOUR):
             # watt-hour
-            uom = self.createProductUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("wh.name"), \
-                    MeasurementSystem.unitStr("wh.symbol"), MeasurementSystem.unitStr("wh.desc"), self.getUOM(Unit.WATT), self.getHour())
+            uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("wh.name"), \
+                    Localizer.instance().langStr("wh.symbol"), Localizer.instance().langStr("wh.desc"), self.getUOM(Unit.WATT), self.getHour())
 
         elif (unit == Unit.WATT):
             # power (watt)
-            uom = self.createQuotientUOM(UnitType.POWER, unit, MeasurementSystem.unitStr("watt.name"), \
-                    MeasurementSystem.unitStr("watt.symbol"), MeasurementSystem.unitStr("watt.desc"), self.getUOM(Unit.JOULE), self.getSecond())
+            uom = self.createQuotientUOM(UnitType.POWER, unit, Localizer.instance().langStr("watt.name"), \
+                    Localizer.instance().langStr("watt.symbol"), Localizer.instance().langStr("watt.desc"), self.getUOM(Unit.JOULE), self.getSecond())
 
         elif (unit == Unit.HERTZ):
             # frequency (hertz)
-            uom = self.createQuotientUOM(UnitType.FREQUENCY, unit, MeasurementSystem.unitStr("hertz.name"), \
-                    MeasurementSystem.unitStr("hertz.symbol"), MeasurementSystem.unitStr("hertz.desc"), self.getOne(), self.getSecond())
+            uom = self.createQuotientUOM(UnitType.FREQUENCY, unit, Localizer.instance().langStr("hertz.name"), \
+                    Localizer.instance().langStr("hertz.symbol"), Localizer.instance().langStr("hertz.desc"), self.getOne(), self.getSecond())
 
         elif (unit == Unit.RAD_PER_SEC):
             # angular frequency
-            uom = self.createQuotientUOM(UnitType.FREQUENCY, unit, MeasurementSystem.unitStr("radpers.name"), \
-                    MeasurementSystem.unitStr("radpers.symbol"), MeasurementSystem.unitStr("radpers.desc"), self.getUOM(Unit.RADIAN),
+            uom = self.createQuotientUOM(UnitType.FREQUENCY, unit, Localizer.instance().langStr("radpers.name"), \
+                    Localizer.instance().langStr("radpers.symbol"), Localizer.instance().langStr("radpers.desc"), self.getUOM(Unit.RADIAN),
                     self.getSecond())
             uom.setConversion(1.0 / (2.0 * math.pi), self.getUOM(Unit.HERTZ))
 
         elif (unit == Unit.PASCAL):
             # pressure
-            uom = self.createQuotientUOM(UnitType.PRESSURE, unit, MeasurementSystem.unitStr("pascal.name"), \
-                    MeasurementSystem.unitStr("pascal.symbol"), MeasurementSystem.unitStr("pascal.desc"), self.getUOM(Unit.NEWTON),
+            uom = self.createQuotientUOM(UnitType.PRESSURE, unit, Localizer.instance().langStr("pascal.name"), \
+                    Localizer.instance().langStr("pascal.symbol"), Localizer.instance().langStr("pascal.desc"), self.getUOM(Unit.NEWTON),
                     self.getUOM(Unit.SQUARE_METRE))
 
         elif (unit == Unit.ATMOSPHERE):
             # pressure
-            uom = self.createScalarUOM(UnitType.PRESSURE, unit, MeasurementSystem.unitStr("atm.name"), \
-                    MeasurementSystem.unitStr("atm.symbol"), MeasurementSystem.unitStr("atm.desc"))
+            uom = self.createScalarUOM(UnitType.PRESSURE, unit, Localizer.instance().langStr("atm.name"), \
+                    Localizer.instance().langStr("atm.symbol"), Localizer.instance().langStr("atm.desc"))
             uom.setConversion(101325.0, self.getUOM(Unit.PASCAL))
 
         elif (unit == Unit.BAR):
             # pressure
-            uom = self.createScalarUOM(UnitType.PRESSURE, unit, MeasurementSystem.unitStr("bar.name"), \
-                    MeasurementSystem.unitStr("bar.symbol"), MeasurementSystem.unitStr("bar.desc"))
+            uom = self.createScalarUOM(UnitType.PRESSURE, unit, Localizer.instance().langStr("bar.name"), \
+                    Localizer.instance().langStr("bar.symbol"), Localizer.instance().langStr("bar.desc"))
             uom.setConversion(1.0, self.getUOM(Unit.PASCAL), 1.0E+05)
 
         elif (unit == Unit.COULOMB):
             # charge (coulomb)
-            uom = self.createProductUOM(UnitType.ELECTRIC_CHARGE, unit, MeasurementSystem.unitStr("coulomb.name"), \
-                    MeasurementSystem.unitStr("coulomb.symbol"), MeasurementSystem.unitStr("coulomb.desc"), self.getUOM(Unit.AMPERE), \
+            uom = self.createProductUOM(UnitType.ELECTRIC_CHARGE, unit, Localizer.instance().langStr("coulomb.name"), \
+                    Localizer.instance().langStr("coulomb.symbol"), Localizer.instance().langStr("coulomb.desc"), self.getUOM(Unit.AMPERE), \
                     self.getSecond())
 
         elif (unit == Unit.VOLT):
             # voltage (volt)
-            uom = self.createQuotientUOM(UnitType.ELECTROMOTIVE_FORCE, unit, MeasurementSystem.unitStr("volt.name"), \
-                    MeasurementSystem.unitStr("volt.symbol"), MeasurementSystem.unitStr("volt.desc"), self.getUOM(Unit.WATT), \
+            uom = self.createQuotientUOM(UnitType.ELECTROMOTIVE_FORCE, unit, Localizer.instance().langStr("volt.name"), \
+                    Localizer.instance().langStr("volt.symbol"), Localizer.instance().langStr("volt.desc"), self.getUOM(Unit.WATT), \
                     self.getUOM(Unit.AMPERE))
 
         elif (unit == Unit.OHM):
             # resistance (ohm)
-            uom = self.createQuotientUOM(UnitType.ELECTRIC_RESISTANCE, unit, MeasurementSystem.unitStr("ohm.name"), \
-                    MeasurementSystem.unitStr("ohm.symbol"), MeasurementSystem.unitStr("ohm.desc"), self.getUOM(Unit.VOLT), self.getUOM(Unit.AMPERE))
+            uom = self.createQuotientUOM(UnitType.ELECTRIC_RESISTANCE, unit, Localizer.instance().langStr("ohm.name"), \
+                    Localizer.instance().langStr("ohm.symbol"), Localizer.instance().langStr("ohm.desc"), self.getUOM(Unit.VOLT), self.getUOM(Unit.AMPERE))
 
         elif (unit == Unit.FARAD):
             # capacitance (farad)
-            uom = self.createQuotientUOM(UnitType.ELECTRIC_CAPACITANCE, unit, MeasurementSystem.unitStr("farad.name"), \
-                    MeasurementSystem.unitStr("farad.symbol"), MeasurementSystem.unitStr("farad.desc"), self.getUOM(Unit.COULOMB), \
+            uom = self.createQuotientUOM(UnitType.ELECTRIC_CAPACITANCE, unit, Localizer.instance().langStr("farad.name"), \
+                    Localizer.instance().langStr("farad.symbol"), Localizer.instance().langStr("farad.desc"), self.getUOM(Unit.COULOMB), \
                     self.getUOM(Unit.VOLT))
 
         elif (unit == Unit.FARAD_PER_METRE):
             # electric permittivity (farad/metre)
-            uom = self.createQuotientUOM(UnitType.ELECTRIC_PERMITTIVITY, unit, MeasurementSystem.unitStr("fperm.name"), \
-                    MeasurementSystem.unitStr("fperm.symbol"), MeasurementSystem.unitStr("fperm.desc"), self.getUOM(Unit.FARAD), \
+            uom = self.createQuotientUOM(UnitType.ELECTRIC_PERMITTIVITY, unit, Localizer.instance().langStr("fperm.name"), \
+                    Localizer.instance().langStr("fperm.symbol"), Localizer.instance().langStr("fperm.desc"), self.getUOM(Unit.FARAD), \
                     self.getUOM(Unit.METRE))
 
         elif (unit == Unit.AMPERE_PER_METRE):
             # electric field strength(ampere/metre)
             uom = self.createQuotientUOM(UnitType.ELECTRIC_FIELD_STRENGTH, unit, \
-                    MeasurementSystem.unitStr("aperm.name"), MeasurementSystem.unitStr("aperm.symbol"), MeasurementSystem.unitStr("aperm.desc"), \
+                    Localizer.instance().langStr("aperm.name"), Localizer.instance().langStr("aperm.symbol"), Localizer.instance().langStr("aperm.desc"), \
                     self.getUOM(Unit.AMPERE), self.getUOM(Unit.METRE))
 
         elif (unit == Unit.WEBER):
             # magnetic flux (weber)
-            uom = self.createProductUOM(UnitType.MAGNETIC_FLUX, unit, MeasurementSystem.unitStr("weber.name"), \
-                    MeasurementSystem.unitStr("weber.symbol"), MeasurementSystem.unitStr("weber.desc"), self.getUOM(Unit.VOLT), self.getSecond())
+            uom = self.createProductUOM(UnitType.MAGNETIC_FLUX, unit, Localizer.instance().langStr("weber.name"), \
+                    Localizer.instance().langStr("weber.symbol"), Localizer.instance().langStr("weber.desc"), self.getUOM(Unit.VOLT), self.getSecond())
 
         elif (unit == Unit.TESLA):
             # magnetic flux density (tesla)
-            uom = self.createQuotientUOM(UnitType.MAGNETIC_FLUX_DENSITY, unit, MeasurementSystem.unitStr("tesla.name"), \
-                    MeasurementSystem.unitStr("tesla.symbol"), MeasurementSystem.unitStr("tesla.desc"), self.getUOM(Unit.WEBER), \
+            uom = self.createQuotientUOM(UnitType.MAGNETIC_FLUX_DENSITY, unit, Localizer.instance().langStr("tesla.name"), \
+                    Localizer.instance().langStr("tesla.symbol"), Localizer.instance().langStr("tesla.desc"), self.getUOM(Unit.WEBER), \
                     self.getUOM(Unit.SQUARE_METRE))
 
         elif (unit == Unit.HENRY):
             # inductance (henry)
-            uom = self.createQuotientUOM(UnitType.ELECTRIC_INDUCTANCE, unit, MeasurementSystem.unitStr("henry.name"), \
-                    MeasurementSystem.unitStr("henry.symbol"), MeasurementSystem.unitStr("henry.desc"), self.getUOM(Unit.WEBER), \
+            uom = self.createQuotientUOM(UnitType.ELECTRIC_INDUCTANCE, unit, Localizer.instance().langStr("henry.name"), \
+                    Localizer.instance().langStr("henry.symbol"), Localizer.instance().langStr("henry.desc"), self.getUOM(Unit.WEBER), \
                     self.getUOM(Unit.AMPERE))
 
         elif (unit == Unit.SIEMENS):
             # electrical conductance (siemens)
-            uom = self.createQuotientUOM(UnitType.ELECTRIC_CONDUCTANCE, unit, MeasurementSystem.unitStr("siemens.name"), \
-                    MeasurementSystem.unitStr("siemens.symbol"), MeasurementSystem.unitStr("siemens.desc"), self.getUOM(Unit.AMPERE), \
+            uom = self.createQuotientUOM(UnitType.ELECTRIC_CONDUCTANCE, unit, Localizer.instance().langStr("siemens.name"), \
+                    Localizer.instance().langStr("siemens.symbol"), Localizer.instance().langStr("siemens.desc"), self.getUOM(Unit.AMPERE), \
                     self.getUOM(Unit.VOLT))
 
         elif (unit == Unit.CELSIUS):
             # °C = °K - 273.15
-            uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, MeasurementSystem.unitStr("celsius.name"), \
-                    MeasurementSystem.unitStr("celsius.symbol"), MeasurementSystem.unitStr("celsius.desc"))
+            uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, Localizer.instance().langStr("celsius.name"), \
+                    Localizer.instance().langStr("celsius.symbol"), Localizer.instance().langStr("celsius.desc"))
             uom.setConversion(1.0, self.getUOM(Unit.KELVIN), 273.15)
 
         elif (unit == Unit.LUMEN):
             # luminous flux (lumen)
-            uom = self.createProductUOM(UnitType.LUMINOUS_FLUX, unit, MeasurementSystem.unitStr("lumen.name"), \
-                    MeasurementSystem.unitStr("lumen.symbol"), MeasurementSystem.unitStr("lumen.desc"), self.getUOM(Unit.CANDELA), \
+            uom = self.createProductUOM(UnitType.LUMINOUS_FLUX, unit, Localizer.instance().langStr("lumen.name"), \
+                    Localizer.instance().langStr("lumen.symbol"), Localizer.instance().langStr("lumen.desc"), self.getUOM(Unit.CANDELA), \
                     self.getUOM(Unit.STERADIAN))
 
         elif (unit == Unit.LUX):
             # illuminance (lux)
-            uom = self.createQuotientUOM(UnitType.ILLUMINANCE, unit, MeasurementSystem.unitStr("lux.name"), \
-                    MeasurementSystem.unitStr("lux.symbol"), MeasurementSystem.unitStr("lux.desc"), self.getUOM(Unit.LUMEN), \
+            uom = self.createQuotientUOM(UnitType.ILLUMINANCE, unit, Localizer.instance().langStr("lux.name"), \
+                    Localizer.instance().langStr("lux.symbol"), Localizer.instance().langStr("lux.desc"), self.getUOM(Unit.LUMEN), \
                     self.getUOM(Unit.SQUARE_METRE))
 
         elif (unit == Unit.BECQUEREL):
             # radioactivity (becquerel). Same definition as Hertz 1/s)
-            uom = self.createQuotientUOM(UnitType.RADIOACTIVITY, unit, MeasurementSystem.unitStr("becquerel.name"), \
-                    MeasurementSystem.unitStr("becquerel.symbol"), MeasurementSystem.unitStr("becquerel.desc"), self.getOne(), self.getSecond())
+            uom = self.createQuotientUOM(UnitType.RADIOACTIVITY, unit, Localizer.instance().langStr("becquerel.name"), \
+                    Localizer.instance().langStr("becquerel.symbol"), Localizer.instance().langStr("becquerel.desc"), self.getOne(), self.getSecond())
 
         elif (unit == Unit.GRAY):
             # gray (Gy)
-            uom = self.createQuotientUOM(UnitType.RADIATION_DOSE_ABSORBED, unit, MeasurementSystem.unitStr("gray.name"), \
-                    MeasurementSystem.unitStr("gray.symbol"), MeasurementSystem.unitStr("gray.desc"), self.getUOM(Unit.JOULE), \
+            uom = self.createQuotientUOM(UnitType.RADIATION_DOSE_ABSORBED, unit, Localizer.instance().langStr("gray.name"), \
+                    Localizer.instance().langStr("gray.symbol"), Localizer.instance().langStr("gray.desc"), self.getUOM(Unit.JOULE), \
                     self.getUOM(Unit.KILOGRAM))
 
         elif (unit == Unit.SIEVERT):
             # sievert (Sv)
-            uom = self.createQuotientUOM(UnitType.RADIATION_DOSE_EFFECTIVE, unit, MeasurementSystem.unitStr("sievert.name"), \
-                    MeasurementSystem.unitStr("sievert.symbol"), MeasurementSystem.unitStr("sievert.desc"), self.getUOM(Unit.JOULE), \
+            uom = self.createQuotientUOM(UnitType.RADIATION_DOSE_EFFECTIVE, unit, Localizer.instance().langStr("sievert.name"), \
+                    Localizer.instance().langStr("sievert.symbol"), Localizer.instance().langStr("sievert.desc"), self.getUOM(Unit.JOULE), \
                     self.getUOM(Unit.KILOGRAM))
 
         elif (unit == Unit.SIEVERTS_PER_HOUR):
-            uom = self.createQuotientUOM(UnitType.RADIATION_DOSE_RATE, unit, MeasurementSystem.unitStr("sph.name"), \
-                    MeasurementSystem.unitStr("sph.symbol"), MeasurementSystem.unitStr("sph.desc"), self.getUOM(Unit.SIEVERT), self.getHour())
+            uom = self.createQuotientUOM(UnitType.RADIATION_DOSE_RATE, unit, Localizer.instance().langStr("sph.name"), \
+                    Localizer.instance().langStr("sph.symbol"), Localizer.instance().langStr("sph.desc"), self.getUOM(Unit.SIEVERT), self.getHour())
 
         elif (unit == Unit.KATAL):
             # katal (kat)
-            uom = self.createQuotientUOM(UnitType.CATALYTIC_ACTIVITY, unit, MeasurementSystem.unitStr("katal.name"), \
-                    MeasurementSystem.unitStr("katal.symbol"), MeasurementSystem.unitStr("katal.desc"), self.getUOM(Unit.MOLE), self.getSecond())
+            uom = self.createQuotientUOM(UnitType.CATALYTIC_ACTIVITY, unit, Localizer.instance().langStr("katal.name"), \
+                    Localizer.instance().langStr("katal.symbol"), Localizer.instance().langStr("katal.desc"), self.getUOM(Unit.MOLE), self.getSecond())
 
         elif (unit == Unit.UNIT):
             # Unit (U)
-            uom = self.createScalarUOM(UnitType.CATALYTIC_ACTIVITY, unit, MeasurementSystem.unitStr("unit.name"), \
-                    MeasurementSystem.unitStr("unit.symbol"), MeasurementSystem.unitStr("unit.desc"))
+            uom = self.createScalarUOM(UnitType.CATALYTIC_ACTIVITY, unit, Localizer.instance().langStr("unit.name"), \
+                    Localizer.instance().langStr("unit.symbol"), Localizer.instance().langStr("unit.desc"))
             uom.setConversion(1.0E-06 / 60.0, self.getUOM(Unit.KATAL))
 
         elif (unit == Unit.INTERNATIONAL_UNIT):
-            uom = self.createScalarUOM(UnitType.SUBSTANCE_AMOUNT, unit, MeasurementSystem.unitStr("iu.name"), \
-                    MeasurementSystem.unitStr("iu.symbol"), MeasurementSystem.unitStr("iu.desc"))
+            uom = self.createScalarUOM(UnitType.SUBSTANCE_AMOUNT, unit, Localizer.instance().langStr("iu.name"), \
+                    Localizer.instance().langStr("iu.symbol"), Localizer.instance().langStr("iu.desc"))
 
         elif (unit == Unit.ANGSTROM):
             # length
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("angstrom.name"), \
-                    MeasurementSystem.unitStr("angstrom.symbol"), MeasurementSystem.unitStr("angstrom.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("angstrom.name"), \
+                    Localizer.instance().langStr("angstrom.symbol"), Localizer.instance().langStr("angstrom.desc"))
             uom.setConversion(0.1, self.getUOM(Prefix.nano(), self.getUOM(Unit.METRE)))
 
         elif (unit == Unit.BIT):
             # computer bit
-            uom = self.createScalarUOM(UnitType.COMPUTER_SCIENCE, unit, MeasurementSystem.unitStr("bit.name"), \
-                    MeasurementSystem.unitStr("bit.symbol"), MeasurementSystem.unitStr("bit.desc"))
+            uom = self.createScalarUOM(UnitType.COMPUTER_SCIENCE, unit, Localizer.instance().langStr("bit.name"), \
+                    Localizer.instance().langStr("bit.symbol"), Localizer.instance().langStr("bit.desc"))
 
         elif (unit == Unit.BYTE):
             # computer byte
-            uom = self.createScalarUOM(UnitType.COMPUTER_SCIENCE, unit, MeasurementSystem.unitStr("byte.name"), \
-                    MeasurementSystem.unitStr("byte.symbol"), MeasurementSystem.unitStr("byte.desc"))
+            uom = self.createScalarUOM(UnitType.COMPUTER_SCIENCE, unit, Localizer.instance().langStr("byte.name"), \
+                    Localizer.instance().langStr("byte.symbol"), Localizer.instance().langStr("byte.desc"))
             uom.setConversion(8.0, self.getUOM(Unit.BIT))
 
         elif (unit == Unit.WATTS_PER_SQ_METRE):
-            uom = self.createQuotientUOM(UnitType.IRRADIANCE, unit, MeasurementSystem.unitStr("wsm.name"), \
-                    MeasurementSystem.unitStr("wsm.symbol"), MeasurementSystem.unitStr("wsm.desc"), self.getUOM(Unit.WATT), \
+            uom = self.createQuotientUOM(UnitType.IRRADIANCE, unit, Localizer.instance().langStr("wsm.name"), \
+                    Localizer.instance().langStr("wsm.symbol"), Localizer.instance().langStr("wsm.desc"), self.getUOM(Unit.WATT), \
                     self.getUOM(Unit.SQUARE_METRE))
 
         elif (unit == Unit.PARSEC):
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("parsec.name"), \
-                    MeasurementSystem.unitStr("parsec.symbol"), MeasurementSystem.unitStr("parsec.desc")) 
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("parsec.name"), \
+                    Localizer.instance().langStr("parsec.symbol"), Localizer.instance().langStr("parsec.desc")) 
             uom.setConversion(3.08567758149137E+16, self.getUOM(Unit.METRE))
 
         elif (unit == Unit.ASTRONOMICAL_UNIT):
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("au.name"), \
-                    MeasurementSystem.unitStr("au.symbol"), MeasurementSystem.unitStr("au.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("au.name"), \
+                    Localizer.instance().langStr("au.symbol"), Localizer.instance().langStr("au.desc"))
             uom.setConversion(1.49597870700E+11, self.getUOM(Unit.METRE))
         
         return uom
@@ -468,198 +470,198 @@ class MeasurementSystem:
         if (unit == Unit.RANKINE):
             # Rankine (base) 
             uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, \
-                MeasurementSystem.unitStr("rankine.name"), MeasurementSystem.unitStr("rankine.symbol"), MeasurementSystem.unitStr("rankine.desc"))
+                Localizer.instance().langStr("rankine.name"), Localizer.instance().langStr("rankine.symbol"), Localizer.instance().langStr("rankine.desc"))
             
             # create bridge to SI
             uom.setBridgeConversion(5.0/9.0, self.getUOM(Unit.KELVIN), 0.0)
             
         elif (unit == Unit.FAHRENHEIT):
             # Fahrenheit
-            uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, MeasurementSystem.unitStr("fahrenheit.name"), \
-                    MeasurementSystem.unitStr("fahrenheit.symbol"), MeasurementSystem.unitStr("fahrenheit.desc"))
+            uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, Localizer.instance().langStr("fahrenheit.name"), \
+                    Localizer.instance().langStr("fahrenheit.symbol"), Localizer.instance().langStr("fahrenheit.desc"))
             uom.setConversion(1.0, self.getUOM(Unit.RANKINE), 459.67)
             
         elif (unit == Unit.POUND_MASS):
             # lb mass (base)
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("lbm.name"), \
-                    MeasurementSystem.unitStr("lbm.symbol"), MeasurementSystem.unitStr("lbm.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("lbm.name"), \
+                    Localizer.instance().langStr("lbm.symbol"), Localizer.instance().langStr("lbm.desc"))
 
             # create bridge to SI
             uom.setBridgeConversion(0.45359237, self.getUOM(Unit.KILOGRAM), 0.0)       
 
         elif (unit == Unit.OUNCE):
             # ounce
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("ounce.name"), \
-                    MeasurementSystem.unitStr("ounce.symbol"), MeasurementSystem.unitStr("ounce.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("ounce.name"), \
+                    Localizer.instance().langStr("ounce.symbol"), Localizer.instance().langStr("ounce.desc"))
             uom.setConversion(0.0625, self.getUOM(Unit.POUND_MASS))
             
         elif (unit == Unit.TROY_OUNCE):
             # troy ounce
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("troy_oz.name"), \
-                    MeasurementSystem.unitStr("troy_oz.symbol"), MeasurementSystem.unitStr("troy_oz.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("troy_oz.name"), \
+                    Localizer.instance().langStr("troy_oz.symbol"), Localizer.instance().langStr("troy_oz.desc"))
             uom.setConversion(31.1034768, self.getUOM(Unit.GRAM))
             
         elif (unit == Unit.SLUG):
             # slug
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("slug.name"), \
-                    MeasurementSystem.unitStr("slug.symbol"), MeasurementSystem.unitStr("slug.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("slug.name"), \
+                    Localizer.instance().langStr("slug.symbol"), Localizer.instance().langStr("slug.desc"))
             g = self.getQuantity(Constant.GRAVITY).convert(self.getUOM(Unit.FEET_PER_SEC_SQUARED))
             uom.setConversion(g.getAmount(), self.getUOM(Unit.POUND_MASS))
             
 
         elif (unit == Unit.FOOT):
             # foot (foot is base conversion unit)
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("foot.name"), \
-                    MeasurementSystem.unitStr("foot.symbol"), MeasurementSystem.unitStr("foot.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("foot.name"), \
+                    Localizer.instance().langStr("foot.symbol"), Localizer.instance().langStr("foot.desc"))
 
             # bridge to SI
             uom.setBridgeConversion(0.3048, self.getUOM(Unit.METRE), 0)
 
         elif (unit == Unit.INCH):
             # inch
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("inch.name"), \
-                    MeasurementSystem.unitStr("inch.symbol"), MeasurementSystem.unitStr("inch.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("inch.name"), \
+                    Localizer.instance().langStr("inch.symbol"), Localizer.instance().langStr("inch.desc"))
             uom.setConversion(1.0 / 12.0, self.getUOM(Unit.FOOT))
             
         elif (unit == Unit.MIL):
             # inch
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("mil.name"), MeasurementSystem.unitStr("mil.symbol"), \
-                    MeasurementSystem.unitStr("mil.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("mil.name"), Localizer.instance().langStr("mil.symbol"), \
+                    Localizer.instance().langStr("mil.desc"))
             uom.setConversion(Prefix.milli().getFactor(), self.getUOM(Unit.INCH))
             
         elif (unit == Unit.POINT):
             # point
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("point.name"), \
-                    MeasurementSystem.unitStr("point.symbol"), MeasurementSystem.unitStr("point.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("point.name"), \
+                    Localizer.instance().langStr("point.symbol"), Localizer.instance().langStr("point.desc"))
             uom.setConversion(1.0 / 72.0, self.getUOM(Unit.INCH))
             
         elif (unit == Unit.YARD):
             # yard
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("yard.name"), \
-                    MeasurementSystem.unitStr("yard.symbol"), MeasurementSystem.unitStr("yard.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("yard.name"), \
+                    Localizer.instance().langStr("yard.symbol"), Localizer.instance().langStr("yard.desc"))
             uom.setConversion(3.0, self.getUOM(Unit.FOOT))
             
         elif (unit == Unit.MILE):
             # mile
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("mile.name"), \
-                    MeasurementSystem.unitStr("mile.symbol"), MeasurementSystem.unitStr("mile.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("mile.name"), \
+                    Localizer.instance().langStr("mile.symbol"), Localizer.instance().langStr("mile.desc"))
             uom.setConversion(5280.0, self.getUOM(Unit.FOOT))
             
         elif (unit == Unit.NAUTICAL_MILE):
             # nautical mile
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("NM.name"), \
-                    MeasurementSystem.unitStr("NM.symbol"), MeasurementSystem.unitStr("NM.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("NM.name"), \
+                    Localizer.instance().langStr("NM.symbol"), Localizer.instance().langStr("NM.desc"))
             uom.setConversion(6080.0, self.getUOM(Unit.FOOT))
             
         elif (unit == Unit.FATHOM):
             # fathom
-            uom = self.createScalarUOM(UnitType.LENGTH, unit, MeasurementSystem.unitStr("fth.name"),
-                    MeasurementSystem.unitStr("fth.symbol"), MeasurementSystem.unitStr("fth.desc"))
+            uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("fth.name"),
+                    Localizer.instance().langStr("fth.symbol"), Localizer.instance().langStr("fth.desc"))
             uom.setConversion(6.0, self.getUOM(Unit.FOOT))
 
             
         elif (unit == Unit.PSI):
             # psi
-            uom = self.createQuotientUOM(UnitType.PRESSURE, unit, MeasurementSystem.unitStr("psi.name"), \
-                    MeasurementSystem.unitStr("psi.symbol"), MeasurementSystem.unitStr("psi.desc"), self.getUOM(Unit.POUND_FORCE), \
+            uom = self.createQuotientUOM(UnitType.PRESSURE, unit, Localizer.instance().langStr("psi.name"), \
+                    Localizer.instance().langStr("psi.symbol"), Localizer.instance().langStr("psi.desc"), self.getUOM(Unit.POUND_FORCE), \
                     self.getUOM(Unit.SQUARE_INCH))
             
         elif (unit == Unit.IN_HG):
             # inches of Mercury
-            uom = self.createScalarUOM(UnitType.PRESSURE, unit, MeasurementSystem.unitStr("inhg.name"), \
-                    MeasurementSystem.unitStr("inhg.symbol"), MeasurementSystem.unitStr("inhg.desc"))
+            uom = self.createScalarUOM(UnitType.PRESSURE, unit, Localizer.instance().langStr("inhg.name"), \
+                    Localizer.instance().langStr("inhg.symbol"), Localizer.instance().langStr("inhg.desc"))
             uom.setConversion(0.4911531047, self.getUOM(Unit.PSI))     
 
         elif (unit == Unit.SQUARE_INCH):
             # square inch
-            uom = self.createPowerUOM(UnitType.AREA, unit, MeasurementSystem.unitStr("in2.name"), \
-                    MeasurementSystem.unitStr("in2.symbol"), MeasurementSystem.unitStr("in2.desc"), self.getUOM(Unit.INCH), 2)
+            uom = self.createPowerUOM(UnitType.AREA, unit, Localizer.instance().langStr("in2.name"), \
+                    Localizer.instance().langStr("in2.symbol"), Localizer.instance().langStr("in2.desc"), self.getUOM(Unit.INCH), 2)
             uom.setConversion(1.0 / 144.0, self.getUOM(Unit.SQUARE_FOOT))
             
         elif (unit == Unit.SQUARE_FOOT):
             # square foot
-            uom = self.createPowerUOM(UnitType.AREA, unit, MeasurementSystem.unitStr("ft2.name"), \
-                    MeasurementSystem.unitStr("ft2.symbol"), MeasurementSystem.unitStr("ft2.desc"), self.getUOM(Unit.FOOT), 2)
+            uom = self.createPowerUOM(UnitType.AREA, unit, Localizer.instance().langStr("ft2.name"), \
+                    Localizer.instance().langStr("ft2.symbol"), Localizer.instance().langStr("ft2.desc"), self.getUOM(Unit.FOOT), 2)
             
         elif (unit == Unit.SQUARE_YARD):
             # square yard
-            uom = self.createPowerUOM(UnitType.AREA, unit, MeasurementSystem.unitStr("yd2.name"), \
-                    MeasurementSystem.unitStr("yd2.symbol"), MeasurementSystem.unitStr("yd2.desc"), self.getUOM(Unit.YARD), 2)    
+            uom = self.createPowerUOM(UnitType.AREA, unit, Localizer.instance().langStr("yd2.name"), \
+                    Localizer.instance().langStr("yd2.symbol"), Localizer.instance().langStr("yd2.desc"), self.getUOM(Unit.YARD), 2)    
         elif (unit == Unit.ACRE):
             # acre
-            uom = self.createScalarUOM(UnitType.AREA, unit, MeasurementSystem.unitStr("acre.name"), \
-                    MeasurementSystem.unitStr("acre.symbol"), MeasurementSystem.unitStr("acre.desc"))
+            uom = self.createScalarUOM(UnitType.AREA, unit, Localizer.instance().langStr("acre.name"), \
+                    Localizer.instance().langStr("acre.symbol"), Localizer.instance().langStr("acre.desc"))
             uom.setConversion(43560.0, self.getUOM(Unit.SQUARE_FOOT))
             
         elif (unit == Unit.CUBIC_INCH):
             # cubic inch
-            uom = self.createPowerUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("in3.name"), \
-                    MeasurementSystem.unitStr("in3.symbol"), MeasurementSystem.unitStr("in3.desc"), self.getUOM(Unit.INCH), 3)
+            uom = self.createPowerUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("in3.name"), \
+                    Localizer.instance().langStr("in3.symbol"), Localizer.instance().langStr("in3.desc"), self.getUOM(Unit.INCH), 3)
             uom.setConversion(1.0 / 1728.0, self.getUOM(Unit.CUBIC_FOOT))
             
         elif (unit == Unit.CUBIC_FOOT):
             # cubic feet
-            uom = self.createPowerUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("ft3.name"), \
-                    MeasurementSystem.unitStr("ft3.symbol"), MeasurementSystem.unitStr("ft3.desc"), self.getUOM(Unit.FOOT), 3)
+            uom = self.createPowerUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("ft3.name"), \
+                    Localizer.instance().langStr("ft3.symbol"), Localizer.instance().langStr("ft3.desc"), self.getUOM(Unit.FOOT), 3)
             
         elif (unit == Unit.CUBIC_FEET_PER_SEC):
             # flow (volume)
             uom = self.createQuotientUOM(UnitType.VOLUMETRIC_FLOW, unit,
-                    MeasurementSystem.unitStr("ft3PerSec.name"), MeasurementSystem.unitStr("ft3PerSec.symbol"), \
-                    MeasurementSystem.unitStr("ft3PerSec.desc"), self.getUOM(Unit.CUBIC_FOOT), self.getSecond())
+                    Localizer.instance().langStr("ft3PerSec.name"), Localizer.instance().langStr("ft3PerSec.symbol"), \
+                    Localizer.instance().langStr("ft3PerSec.desc"), self.getUOM(Unit.CUBIC_FOOT), self.getSecond())
             
         elif (unit == Unit.CORD):
             # cord
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("cord.name"), \
-                    MeasurementSystem.unitStr("cord.symbol"), MeasurementSystem.unitStr("cord.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("cord.name"), \
+                    Localizer.instance().langStr("cord.symbol"), Localizer.instance().langStr("cord.desc"))
             uom.setConversion(128.0, self.getUOM(Unit.CUBIC_FOOT))
             
         elif (unit == Unit.CUBIC_YARD):
             # cubic yard
-            uom = self.createPowerUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("yd3.name"), \
-                    MeasurementSystem.unitStr("yd3.symbol"), MeasurementSystem.unitStr("yd3.desc"), self.getUOM(Unit.YARD), 3)
+            uom = self.createPowerUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("yd3.name"), \
+                    Localizer.instance().langStr("yd3.symbol"), Localizer.instance().langStr("yd3.desc"), self.getUOM(Unit.YARD), 3)
             
         elif (unit == Unit.FEET_PER_SEC):
             # feet/sec
-            uom = self.createQuotientUOM(UnitType.VELOCITY, unit, MeasurementSystem.unitStr("fps.name"), \
-                    MeasurementSystem.unitStr("fps.symbol"), MeasurementSystem.unitStr("fps.desc"), self.getUOM(Unit.FOOT), self.getSecond())
+            uom = self.createQuotientUOM(UnitType.VELOCITY, unit, Localizer.instance().langStr("fps.name"), \
+                    Localizer.instance().langStr("fps.symbol"), Localizer.instance().langStr("fps.desc"), self.getUOM(Unit.FOOT), self.getSecond())
             
 
         elif (unit == Unit.KNOT):
             # knot
-            uom = self.createScalarUOM(UnitType.VELOCITY, unit, MeasurementSystem.unitStr("knot.name"), \
-                    MeasurementSystem.unitStr("knot.symbol"), MeasurementSystem.unitStr("knot.desc"))
+            uom = self.createScalarUOM(UnitType.VELOCITY, unit, Localizer.instance().langStr("knot.name"), \
+                    Localizer.instance().langStr("knot.symbol"), Localizer.instance().langStr("knot.desc"))
             uom.setConversion(6080.0 / 3600.0, self.getUOM(Unit.FEET_PER_SEC))
             
 
         elif (unit == Unit.FEET_PER_SEC_SQUARED):
             # acceleration
-            uom = self.createQuotientUOM(UnitType.ACCELERATION, unit, MeasurementSystem.unitStr("ftps2.name"), \
-                    MeasurementSystem.unitStr("ftps2.symbol"), MeasurementSystem.unitStr("ftps2.desc"), self.getUOM(Unit.FOOT), \
+            uom = self.createQuotientUOM(UnitType.ACCELERATION, unit, Localizer.instance().langStr("ftps2.name"), \
+                    Localizer.instance().langStr("ftps2.symbol"), Localizer.instance().langStr("ftps2.desc"), self.getUOM(Unit.FOOT), \
                     self.getUOM(Unit.SQUARE_SECOND))
 
         elif (unit == Unit.HP):
             # HP (mechanical)
-            uom = self.createProductUOM(UnitType.POWER, unit, MeasurementSystem.unitStr("hp.name"), MeasurementSystem.unitStr("hp.symbol"), \
-                    MeasurementSystem.unitStr("hp.desc"), self.getUOM(Unit.POUND_FORCE), self.getUOM(Unit.FEET_PER_SEC))
+            uom = self.createProductUOM(UnitType.POWER, unit, Localizer.instance().langStr("hp.name"), Localizer.instance().langStr("hp.symbol"), \
+                    Localizer.instance().langStr("hp.desc"), self.getUOM(Unit.POUND_FORCE), self.getUOM(Unit.FEET_PER_SEC))
             uom.setScalingFactor(550.0)
             
         elif (unit == Unit.BTU):
             # BTU = 1055.056 Joules (778.169 ft-lbf)
-            uom = self.createScalarUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("btu.name"), MeasurementSystem.unitStr("btu.symbol"), \
-                    MeasurementSystem.unitStr("btu.desc"))
+            uom = self.createScalarUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("btu.name"), Localizer.instance().langStr("btu.symbol"), \
+                    Localizer.instance().langStr("btu.desc"))
             uom.setConversion(778.1692622659652, self.getUOM(Unit.FOOT_POUND_FORCE))           
 
         elif (unit == Unit.FOOT_POUND_FORCE):
             # ft-lbf
-            uom = self.createProductUOM(UnitType.ENERGY, unit, MeasurementSystem.unitStr("ft_lbf.name"), \
-                    MeasurementSystem.unitStr("ft_lbf.symbol"), MeasurementSystem.unitStr("ft_lbf.desc"), self.getUOM(Unit.FOOT),
+            uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("ft_lbf.name"), \
+                    Localizer.instance().langStr("ft_lbf.symbol"), Localizer.instance().langStr("ft_lbf.desc"), self.getUOM(Unit.FOOT),
                     self.getUOM(Unit.POUND_FORCE))
             
         elif (unit == Unit.POUND_FORCE):
             # force F = m·A (lbf)
-            uom = self.createProductUOM(UnitType.FORCE, unit, MeasurementSystem.unitStr("lbf.name"), \
-                    MeasurementSystem.unitStr("lbf.symbol"), MeasurementSystem.unitStr("lbf.desc"), self.getUOM(Unit.POUND_MASS), \
+            uom = self.createProductUOM(UnitType.FORCE, unit, Localizer.instance().langStr("lbf.name"), \
+                    Localizer.instance().langStr("lbf.symbol"), Localizer.instance().langStr("lbf.desc"), self.getUOM(Unit.POUND_MASS), \
                     self.getUOM(Unit.FEET_PER_SEC_SQUARED))
 
             # factor is acceleration of gravity
@@ -668,20 +670,20 @@ class MeasurementSystem:
             
         elif (unit == Unit.GRAIN):
             # mass
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("grain.name"), \
-                    MeasurementSystem.unitStr("grain.symbol"), MeasurementSystem.unitStr("grain.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("grain.name"), \
+                    Localizer.instance().langStr("grain.symbol"), Localizer.instance().langStr("grain.desc"))
             uom.setConversion(1.0 / 7000.0, self.getUOM(Unit.POUND_MASS))
             
         elif (unit == Unit.MILES_PER_HOUR):
             # velocity
-            uom = self.createScalarUOM(UnitType.VELOCITY, unit, MeasurementSystem.unitStr("mph.name"), \
-                    MeasurementSystem.unitStr("mph.symbol"), MeasurementSystem.unitStr("mph.desc"))
+            uom = self.createScalarUOM(UnitType.VELOCITY, unit, Localizer.instance().langStr("mph.name"), \
+                    Localizer.instance().langStr("mph.symbol"), Localizer.instance().langStr("mph.desc"))
             uom.setConversion(5280.0 / 3600.0, self.getUOM(Unit.FEET_PER_SEC))
             
         elif (unit == Unit.REV_PER_MIN):
             # rpm
-            uom = self.createQuotientUOM(UnitType.FREQUENCY, unit, MeasurementSystem.unitStr("rpm.name"), \
-                    MeasurementSystem.unitStr("rpm.symbol"), MeasurementSystem.unitStr("rpm.desc"), self.getOne(), self.getMinute())
+            uom = self.createQuotientUOM(UnitType.FREQUENCY, unit, Localizer.instance().langStr("rpm.name"), \
+                    Localizer.instance().langStr("rpm.symbol"), Localizer.instance().langStr("rpm.desc"), self.getOne(), self.getMinute())
             
         return uom
     
@@ -691,61 +693,61 @@ class MeasurementSystem:
         if (unit == Unit.US_GALLON):
             # gallon 
             uom = self.createScalarUOM(UnitType.VOLUME, unit, \
-                MeasurementSystem.unitStr("us_gallon.name"), MeasurementSystem.unitStr("us_gallon.symbol"), MeasurementSystem.unitStr("us_gallon.desc"))
+                Localizer.instance().langStr("us_gallon.name"), Localizer.instance().langStr("us_gallon.symbol"), Localizer.instance().langStr("us_gallon.desc"))
             uom.setConversion(231.0, self.getUOM(Unit.CUBIC_INCH), 0.0)
             
         elif (unit == Unit. US_BARREL):
             # barrel
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_bbl.name"), \
-                    MeasurementSystem.unitStr("us_bbl.symbol"), MeasurementSystem.unitStr("us_bbl.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_bbl.name"), \
+                    Localizer.instance().langStr("us_bbl.symbol"), Localizer.instance().langStr("us_bbl.desc"))
             uom.setConversion(42.0, self.getUOM(Unit.US_GALLON))
             
         elif (unit == Unit. US_BUSHEL):
             # bushel
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_bu.name"), \
-                    MeasurementSystem.unitStr("us_bu.symbol"), MeasurementSystem.unitStr("us_bu.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_bu.name"), \
+                    Localizer.instance().langStr("us_bu.symbol"), Localizer.instance().langStr("us_bu.desc"))
             uom.setConversion(2150.42058, self.getUOM(Unit.CUBIC_INCH))
             
         elif (unit == Unit. US_FLUID_OUNCE):
             # fluid ounce
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_fl_oz.name"), \
-                    MeasurementSystem.unitStr("us_fl_oz.symbol"), MeasurementSystem.unitStr("us_fl_oz.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_fl_oz.name"), \
+                    Localizer.instance().langStr("us_fl_oz.symbol"), Localizer.instance().langStr("us_fl_oz.desc"))
             uom.setConversion(0.0078125, self.getUOM(Unit.US_GALLON))
             
         elif (unit == Unit. US_CUP):
             # cup
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_cup.name"), \
-                    MeasurementSystem.unitStr("us_cup.symbol"), MeasurementSystem.unitStr("us_cup.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_cup.name"), \
+                    Localizer.instance().langStr("us_cup.symbol"), Localizer.instance().langStr("us_cup.desc"))
             uom.setConversion(8.0, self.getUOM(Unit.US_FLUID_OUNCE))
 
         elif (unit == Unit. US_PINT):
             # pint
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_pint.name"), \
-                    MeasurementSystem.unitStr("us_pint.symbol"), MeasurementSystem.unitStr("us_pint.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_pint.name"), \
+                    Localizer.instance().langStr("us_pint.symbol"), Localizer.instance().langStr("us_pint.desc"))
             uom.setConversion(16.0, self.getUOM(Unit.US_FLUID_OUNCE))
             
         elif (unit == Unit. US_QUART):
             # quart
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_quart.name"), \
-                    MeasurementSystem.unitStr("us_quart.symbol"), MeasurementSystem.unitStr("us_quart.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_quart.name"), \
+                    Localizer.instance().langStr("us_quart.symbol"), Localizer.instance().langStr("us_quart.desc"))
             uom.setConversion(32.0, self.getUOM(Unit.US_FLUID_OUNCE))
             
         elif (unit == Unit. US_TABLESPOON):
             # tablespoon
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_tbsp.name"), \
-                    MeasurementSystem.unitStr("us_tbsp.symbol"), MeasurementSystem.unitStr("us_tbsp.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_tbsp.name"), \
+                    Localizer.instance().langStr("us_tbsp.symbol"), Localizer.instance().langStr("us_tbsp.desc"))
             uom.setConversion(0.5, self.getUOM(Unit.US_FLUID_OUNCE))
             
         elif (unit == Unit. US_TEASPOON):
             # teaspoon
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("us_tsp.name"), \
-                    MeasurementSystem.unitStr("us_tsp.symbol"), MeasurementSystem.unitStr("us_tsp.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("us_tsp.name"), \
+                    Localizer.instance().langStr("us_tsp.symbol"), Localizer.instance().langStr("us_tsp.desc"))
             uom.setConversion(1.0 / 6.0, self.getUOM(Unit.US_FLUID_OUNCE))
             
         elif (unit == Unit. US_TON):
             # ton
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("us_ton.name"), \
-                    MeasurementSystem.unitStr("us_ton.symbol"), MeasurementSystem.unitStr("us_ton.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("us_ton.name"), \
+                    Localizer.instance().langStr("us_ton.symbol"), Localizer.instance().langStr("us_ton.desc"))
             uom.setConversion(2000.0, self.getUOM(Unit.POUND_MASS))
             
         return uom
@@ -756,55 +758,55 @@ class MeasurementSystem:
         if (unit == Unit.BR_GALLON):
             # gallon 
             uom = self.createScalarUOM(UnitType.VOLUME, unit, \
-                MeasurementSystem.unitStr("br_gallon.name"), MeasurementSystem.unitStr("br_gallon.symbol"), MeasurementSystem.unitStr("br_gallon.desc"))
+                Localizer.instance().langStr("br_gallon.name"), Localizer.instance().langStr("br_gallon.symbol"), Localizer.instance().langStr("br_gallon.desc"))
             uom.setConversion(277.4194327916215, self.getUOM(Unit.CUBIC_INCH), 0.0)
             
         elif (unit == Unit.BR_BUSHEL):
             # bushel
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_bu.name"), \
-                    MeasurementSystem.unitStr("br_bu.symbol"), MeasurementSystem.unitStr("br_bu.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_bu.name"), \
+                    Localizer.instance().langStr("br_bu.symbol"), Localizer.instance().langStr("br_bu.desc"))
             uom.setConversion(8.0, self.getUOM(Unit.BR_GALLON))
             
         elif (unit == Unit.BR_FLUID_OUNCE):
             # fluid ounce
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_fl_oz.name"), \
-                    MeasurementSystem.unitStr("br_fl_oz.symbol"), MeasurementSystem.unitStr("br_fl_oz.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_fl_oz.name"), \
+                    Localizer.instance().langStr("br_fl_oz.symbol"), Localizer.instance().langStr("br_fl_oz.desc"))
             uom.setConversion(0.00625, self.getUOM(Unit.BR_GALLON))
             
         elif (unit == Unit.BR_CUP):
             # cup
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_cup.name"), \
-                    MeasurementSystem.unitStr("br_cup.symbol"), MeasurementSystem.unitStr("br_cup.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_cup.name"), \
+                    Localizer.instance().langStr("br_cup.symbol"), Localizer.instance().langStr("br_cup.desc"))
             uom.setConversion(8.0, self.getUOM(Unit.BR_FLUID_OUNCE))
             
         elif (unit == Unit.BR_PINT):
             # pint
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_pint.name"), \
-                    MeasurementSystem.unitStr("br_pint.symbol"), MeasurementSystem.unitStr("br_pint.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_pint.name"), \
+                    Localizer.instance().langStr("br_pint.symbol"), Localizer.instance().langStr("br_pint.desc"))
             uom.setConversion(20.0, self.getUOM(Unit.BR_FLUID_OUNCE))
             
         elif (unit == Unit.BR_QUART):
             # quart
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_quart.name"), \
-                    MeasurementSystem.unitStr("br_quart.symbol"), MeasurementSystem.unitStr("br_quart.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_quart.name"), \
+                    Localizer.instance().langStr("br_quart.symbol"), Localizer.instance().langStr("br_quart.desc"))
             uom.setConversion(40.0, self.getUOM(Unit.BR_FLUID_OUNCE))
             
         elif (unit == Unit.BR_TABLESPOON):
             # tablespoon
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_tbsp.name"), \
-                    MeasurementSystem.unitStr("br_tbsp.symbol"), MeasurementSystem.unitStr("br_tbsp.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_tbsp.name"), \
+                    Localizer.instance().langStr("br_tbsp.symbol"), Localizer.instance().langStr("br_tbsp.desc"))
             uom.setConversion(0.625, self.getUOM(Unit.BR_FLUID_OUNCE))
             
         elif (unit == Unit.BR_TEASPOON):
             # teaspoon
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, MeasurementSystem.unitStr("br_tsp.name"), \
-                    MeasurementSystem.unitStr("br_tsp.symbol"), MeasurementSystem.unitStr("br_tsp.desc"))
+            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_tsp.name"), \
+                    Localizer.instance().langStr("br_tsp.symbol"), Localizer.instance().langStr("br_tsp.desc"))
             uom.setConversion(5.0 / 24.0, self.getUOM(Unit.BR_FLUID_OUNCE))
             
         elif (unit == Unit.BR_TON):
             # ton
-            uom = self.createScalarUOM(UnitType.MASS, unit, MeasurementSystem.unitStr("br_ton.name"), \
-                    MeasurementSystem.unitStr("br_ton.symbol"), MeasurementSystem.unitStr("br_ton.desc"))
+            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("br_ton.name"), \
+                    Localizer.instance().langStr("br_ton.symbol"), Localizer.instance().langStr("br_ton.desc"))
             uom.setConversion(2240.0, self.getUOM(Unit.POUND_MASS))
             
         return uom
@@ -815,16 +817,16 @@ class MeasurementSystem:
         if (unit == Unit.US_DOLLAR):
             # dollar 
             uom = self.createScalarUOM(UnitType.CURRENCY, unit, \
-                MeasurementSystem.unitStr("us_dollar.name"), MeasurementSystem.unitStr("us_dollar.symbol"), MeasurementSystem.unitStr("us_dollar.desc"))
+                Localizer.instance().langStr("us_dollar.name"), Localizer.instance().langStr("us_dollar.symbol"), Localizer.instance().langStr("us_dollar.desc"))
             
         elif (unit == Unit.EURO):
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, MeasurementSystem.unitStr.getString("euro.name"), \
-                    MeasurementSystem.unitStr.getString("euro.symbol"), MeasurementSystem.unitStr.getString("euro.desc"))
+            uom = self.createScalarUOM(UnitType.CURRENCY, unit, Localizer.instance().langStr("euro.name"), \
+                    Localizer.instance().langStr("euro.symbol"), Localizer.instance().langStr("euro.desc"))
             
 
         elif (unit == Unit.YUAN):
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, MeasurementSystem.unitStr.getString("yuan.name"), \
-                    MeasurementSystem.unitStr.getString("yuan.symbol"), MeasurementSystem.unitStr.getString("yuan.desc"))
+            uom = self.createScalarUOM(UnitType.CURRENCY, unit, Localizer.instance().langStr("yuan.name"), \
+                    Localizer.instance().langStr("yuan.symbol"), Localizer.instance().langStr("yuan.desc"))
             
         return uom
     
@@ -860,138 +862,138 @@ class MeasurementSystem:
 
         if (constant == Constant. LIGHT_VELOCITY):
             named = Quantity(299792458.0, self.getUOM(Unit.METRE_PER_SEC))
-            named.setName(MeasurementSystem.unitStr("light.name"))
-            named.setSymbol(MeasurementSystem.unitStr("light.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("light.desc"))
+            named.setName(Localizer.instance().langStr("light.name"))
+            named.setSymbol(Localizer.instance().langStr("light.symbol"))
+            named.setDescription(Localizer.instance().langStr("light.desc"))
             
         elif (constant == Constant. LIGHT_YEAR):
             year = Quantity(1.0, self.getUOM(Unit.JULIAN_YEAR))
             named = self.getQuantity(Constant.LIGHT_VELOCITY).multiply(year)
-            named.setName(MeasurementSystem.unitStr("ly.name"))
-            named.setSymbol(MeasurementSystem.unitStr("ly.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("ly.desc"))
+            named.setName(Localizer.instance().langStr("ly.name"))
+            named.setSymbol(Localizer.instance().langStr("ly.symbol"))
+            named.setDescription(Localizer.instance().langStr("ly.desc"))
             
         elif (constant == Constant. GRAVITY):
             named = Quantity(9.80665, self.getUOM(Unit.METRE_PER_SEC_SQUARED))
-            named.setName(MeasurementSystem.unitStr("gravity.name"))
-            named.setSymbol(MeasurementSystem.unitStr("gravity.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("gravity.desc"))
+            named.setName(Localizer.instance().langStr("gravity.name"))
+            named.setSymbol(Localizer.instance().langStr("gravity.symbol"))
+            named.setDescription(Localizer.instance().langStr("gravity.desc"))
             
         elif (constant == Constant. PLANCK_CONSTANT):
             js = self.createProductUOM(self.getUOM(Unit.JOULE), self.getSecond())
             named = Quantity(6.62607015E-34, js)
-            named.setName(MeasurementSystem.unitStr("planck.name"))
-            named.setSymbol(MeasurementSystem.unitStr("planck.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("planck.desc"))
+            named.setName(Localizer.instance().langStr("planck.name"))
+            named.setSymbol(Localizer.instance().langStr("planck.symbol"))
+            named.setDescription(Localizer.instance().langStr("planck.desc"))
             
         elif (constant == Constant. BOLTZMANN_CONSTANT):
             jk = self.createQuotientUOM(self.getUOM(Unit.JOULE), self.getUOM(Unit.KELVIN))
             named = Quantity(1.380649E-23, jk)
-            named.setName(MeasurementSystem.unitStr("boltzmann.name"))
-            named.setSymbol(MeasurementSystem.unitStr("boltzmann.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("boltzmann.desc"))    
+            named.setName(Localizer.instance().langStr("boltzmann.name"))
+            named.setSymbol(Localizer.instance().langStr("boltzmann.symbol"))
+            named.setDescription(Localizer.instance().langStr("boltzmann.desc"))    
 
         elif (constant == Constant. AVAGADRO_CONSTANT):
             # NA
             named = Quantity(6.02214076E+23, self.getOne())
-            named.setName(MeasurementSystem.unitStr("avo.name"))
-            named.setSymbol(MeasurementSystem.unitStr("avo.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("avo.desc"))
+            named.setName(Localizer.instance().langStr("avo.name"))
+            named.setSymbol(Localizer.instance().langStr("avo.symbol"))
+            named.setDescription(Localizer.instance().langStr("avo.desc"))
             
         elif (constant == Constant. GAS_CONSTANT):
             # R
             named = self.getQuantity(Constant.BOLTZMANN_CONSTANT).multiply(self.getQuantity(Constant.AVAGADRO_CONSTANT))
-            named.setName(MeasurementSystem.unitStr("gas.name"))
-            named.setSymbol(MeasurementSystem.unitStr("gas.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("gas.desc"))
+            named.setName(Localizer.instance().langStr("gas.name"))
+            named.setSymbol(Localizer.instance().langStr("gas.symbol"))
+            named.setDescription(Localizer.instance().langStr("gas.desc"))
             
         elif (constant == Constant. ELEMENTARY_CHARGE):
             # e
             named = Quantity(1.602176634E-19, self.getUOM(Unit.COULOMB))
-            named.setName(MeasurementSystem.unitStr("e.name"))
-            named.setSymbol(MeasurementSystem.unitStr("e.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("e.desc"))
+            named.setName(Localizer.instance().langStr("e.name"))
+            named.setSymbol(Localizer.instance().langStr("e.symbol"))
+            named.setDescription(Localizer.instance().langStr("e.desc"))
             
         elif (constant == Constant. FARADAY_CONSTANT):
             # F = e.NA
             qe = self.getQuantity(Constant.ELEMENTARY_CHARGE)
             named = qe.multiply(self.getQuantity(Constant.AVAGADRO_CONSTANT))
-            named.setName(MeasurementSystem.unitStr("faraday.name"))
-            named.setSymbol(MeasurementSystem.unitStr("faraday.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("faraday.desc"))
+            named.setName(Localizer.instance().langStr("faraday.name"))
+            named.setSymbol(Localizer.instance().langStr("faraday.symbol"))
+            named.setDescription(Localizer.instance().langStr("faraday.desc"))
             
         elif (constant == Constant. ELECTRIC_PERMITTIVITY):
             # epsilon0 = 1/(mu0*c^2)
             vc = self.getQuantity(Constant.LIGHT_VELOCITY)
             named = self.getQuantity(Constant.MAGNETIC_PERMEABILITY).multiply(vc).multiply(vc).invert()
-            named.setName(MeasurementSystem.unitStr("eps0.name"))
-            named.setSymbol(MeasurementSystem.unitStr("eps0.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("eps0.desc"))
+            named.setName(Localizer.instance().langStr("eps0.name"))
+            named.setSymbol(Localizer.instance().langStr("eps0.symbol"))
+            named.setDescription(Localizer.instance().langStr("eps0.desc"))
             
         elif (constant == Constant. MAGNETIC_PERMEABILITY):
             # mu0
             hm = self.createQuotientUOM(self.getUOM(Unit.HENRY), self.getUOM(Unit.METRE))
             fourPi = 4.0 * math.pi * 1.0E-07
             named = Quantity(fourPi, hm)
-            named.setName(MeasurementSystem.unitStr("mu0.name"))
-            named.setSymbol(MeasurementSystem.unitStr("mu0.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("mu0.desc"))
+            named.setName(Localizer.instance().langStr("mu0.name"))
+            named.setSymbol(Localizer.instance().langStr("mu0.symbol"))
+            named.setDescription(Localizer.instance().langStr("mu0.desc"))
             
         elif (constant == Constant. ELECTRON_MASS):
             # me
             named = Quantity(9.1093835611E-28, self.getUOM(Unit.GRAM))
-            named.setName(MeasurementSystem.unitStr("me.name"))
-            named.setSymbol(MeasurementSystem.unitStr("me.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("me.desc"))
+            named.setName(Localizer.instance().langStr("me.name"))
+            named.setSymbol(Localizer.instance().langStr("me.symbol"))
+            named.setDescription(Localizer.instance().langStr("me.desc"))
             
         elif (constant == Constant. PROTON_MASS):
             # mp
             named = Quantity(1.67262189821E-24, self.getUOM(Unit.GRAM))
-            named.setName(MeasurementSystem.unitStr("mp.name"))
-            named.setSymbol(MeasurementSystem.unitStr("mp.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("mp.desc"))
+            named.setName(Localizer.instance().langStr("mp.name"))
+            named.setSymbol(Localizer.instance().langStr("mp.symbol"))
+            named.setDescription(Localizer.instance().langStr("mp.desc"))
             
         elif (constant == Constant. STEFAN_BOLTZMANN):
             k4 = self.createPowerUOM(self.getUOM(Unit.KELVIN), 4)
             sb = self.createQuotientUOM(self.getUOM(Unit.WATTS_PER_SQ_METRE), k4)
             named = Quantity(5.67036713E-08, sb)
-            named.setName(MeasurementSystem.unitStr("sb.name"))
-            named.setSymbol(MeasurementSystem.unitStr("sb.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("sb.desc"))
+            named.setName(Localizer.instance().langStr("sb.name"))
+            named.setSymbol(Localizer.instance().langStr("sb.symbol"))
+            named.setDescription(Localizer.instance().langStr("sb.desc"))
             
         elif (constant == Constant. HUBBLE_CONSTANT):
             kps = self.getUOM(Prefix.kilo(), self.getUOM(Unit.METRE_PER_SEC))
             mpc = self.getUOM(Prefix.mega(), self.getUOM(Unit.PARSEC))
             hubble = self.createQuotientUOM(kps, mpc)
             named = Quantity(71.9, hubble)
-            named.setName(MeasurementSystem.unitStr("hubble.name"))
-            named.setSymbol(MeasurementSystem.unitStr("hubble.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("hubble.desc"))
+            named.setName(Localizer.instance().langStr("hubble.name"))
+            named.setSymbol(Localizer.instance().langStr("hubble.symbol"))
+            named.setDescription(Localizer.instance().langStr("hubble.desc"))
                  
         elif (constant == Constant. CAESIUM_FREQUENCY):
             named = Quantity(9192631770.0, self.getUOM(Unit.HERTZ))
-            named.setName(MeasurementSystem.unitStr("caesium.name"))
-            named.setSymbol(MeasurementSystem.unitStr("caesium.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("caesium.desc"))
+            named.setName(Localizer.instance().langStr("caesium.name"))
+            named.setSymbol(Localizer.instance().langStr("caesium.symbol"))
+            named.setDescription(Localizer.instance().langStr("caesium.desc"))
                       
         elif (constant == Constant. LUMINOUS_EFFICACY):
             kcd = self.createQuotientUOM(self.getUOM(Unit.LUMEN), self.getUOM(Unit.WATT))
             named = Quantity(683.0, kcd)
-            named.setName(MeasurementSystem.unitStr("kcd.name"))
-            named.setSymbol(MeasurementSystem.unitStr("kcd.symbol"))
-            named.setDescription(MeasurementSystem.unitStr("kcd.desc"))
+            named.setName(Localizer.instance().langStr("kcd.name"))
+            named.setSymbol(Localizer.instance().langStr("kcd.symbol"))
+            named.setDescription(Localizer.instance().langStr("kcd.desc"))
 
         return named
     
     def createPowerUOM(self, unitType, unit, name, symbol, description, base, exponent):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setPowerUnit(base, exponent)
-        self.registerUnit(uom)
+        CacheManager.instance().registerUnit(uom)
         return uom
     
     def createUnclassifiedPowerUOM(self, base, exponent): 
         if (base is None):          
-            msg = MeasurementSystem.messageStr("base.cannot.be.null")
+            msg = Localizer.instance().messageStr("base.cannot.be.null")
             raise Exception(msg)
     
         # create symbol
@@ -1001,16 +1003,16 @@ class MeasurementSystem:
     def createProductUOM(self, unitType, unit, name, symbol, description, multiplier, multiplicand):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setProductUnits(multiplier, multiplicand)
-        self.registerUnit(uom)
+        CacheManager.instance().registerUnit(uom)
         return uom
     
     def createUnclassifiedProductUOM(self, multiplier, multiplicand):
         if (multiplier is None):          
-            msg = MeasurementSystem.messageStr("multiplier.cannot.be.null")
+            msg = Localizer.instance().messageStr("multiplier.cannot.be.null")
             raise Exception(msg)
         
         if (multiplicand is None):          
-            msg = MeasurementSystem.messageStr("multiplicand.cannot.be.null")
+            msg = Localizer.instance().messageStr("multiplicand.cannot.be.null")
             raise Exception(msg)
         
         symbol = UnitOfMeasure.generateProductSymbol(multiplier, multiplicand)
@@ -1018,11 +1020,11 @@ class MeasurementSystem:
     
     def createUnclassifiedQuotientUOM(self, dividend, divisor):
         if (dividend is None):
-            msg = MeasurementSystem.messageStr("dividend.cannot.be.null")
+            msg = Localizer.instance().messageStr("dividend.cannot.be.null")
             raise Exception(msg)
         
         if (divisor is None):
-            msg = MeasurementSystem.messageStr("divisor.cannot.be.null")
+            msg = Localizer.instance().messageStr("divisor.cannot.be.null")
             raise Exception(msg)
         
         symbol = UnitOfMeasure.generateQuotientSymbol(dividend, divisor)
@@ -1031,25 +1033,26 @@ class MeasurementSystem:
     def createQuotientUOM(self, unitType, unit, name, symbol, description, dividend, divisor):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setQuotientUnits(dividend, divisor)
-        self.registerUnit(uom)
+        CacheManager.instance().registerUnit(uom)
         return uom
 
     def createUOM(self, unitType, unit, name, symbol, description):
         if (symbol is None or len(symbol) == 0):
-            msg = MeasurementSystem.messageStr("symbol.cannot.be.null")
+            msg = Localizer.instance().messageStr("symbol.cannot.be.null")
             raise Exception(msg)
         
         if (unitType is None):
-            msg = MeasurementSystem.messageStr("unit.type.cannot.be.null")
+            msg = Localizer.instance().messageStr("unit.type.cannot.be.null")
             raise Exception(msg)
         
-        uom = self.cacheManager.self.getUOM(symbol)
+        uom = CacheManager.instance().getUOMBySymbol(symbol)
         
         if (uom is None):
             # create a new one
             uom = UnitOfMeasure(unitType, name, symbol, description)
-            uom.setAbscissaUnit(uom)
-            uom.setEnumeration(unit)
+            
+            uom.abscissaUnit = uom
+            uom.unit = unit
             
         return uom
     
@@ -1379,6 +1382,6 @@ class MeasurementSystem:
         return quantity.convert(MeasurementSystem.instance().getUOM(prefix, unit))
     
     def quantityToPower(self, quantity, exponent):
-        amount = math.pow(self.quantity, exponent)
+        amount = Operands.powOp(self.quantity, exponent)
         uom = MeasurementSystem.instance().createPowerUOM(quantity.uom, exponent)
         return Quantity(amount, uom) 

@@ -35,7 +35,7 @@ class Localizer:
         # Get an error message by its id
         return self.messages.gettext(msgId)
     
-    def unitStr(self, msgId):
+    def langStr(self, msgId):
         if (self.units is None):
             # translated user-visible text for this locale  and country code
             self.units = gettext.translation('units', localedir='locales', languages=[Localizer.getLC()])

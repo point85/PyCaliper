@@ -34,3 +34,12 @@ msgstr "Conversion:"
 
 msgid "base.text"
 msgstr "Base Symbol:"
+
+###################################### SI ###############################################
+# one
+msgid "one.name"
+msgstr "one"
+msgid "one.symbol"
+msgstr "1"
+msgid "one.desc"
+msgstr "Dimension-less one"

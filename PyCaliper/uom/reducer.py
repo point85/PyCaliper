@@ -134,7 +134,7 @@ class Reducer:
             if (power < 0):
                 # negative, put in denominator
                 if (len(denominator) > 0):
-                        denominator = denominator + Operands.mult()
+                        denominator = denominator + Operands.multOp()
                         
                 if (unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                         denominator = denominator + unit.getSymbol()
@@ -142,24 +142,24 @@ class Reducer:
 
                 if (power < -1):
                     if (power == -2):
-                        denominator = denominator + Operands.sq()
+                        denominator = denominator + Operands.sqOp()
                     elif (power == -3):
                         denominator = denominator + Operands.cubed()
                     else:
-                        denominator = denominator + Operands.pow() + abs(power)
+                        denominator = denominator + Operands.powOp() + abs(power)
             elif (power >= 1 and unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                 # positive, put in numerator
                 if (len(numerator) > 0):
-                    numerator = numerator + Operands.mult() + unit.getSymbol()
+                    numerator = numerator + Operands.multOp() + unit.getSymbol()
                     numeratorCount = numeratorCount + 1
 
                 if (power > 1):
                     if (power == 2):
-                        numerator = numerator + Operands.sq()
+                        numerator = numerator + Operands.sqOp()
                     elif (power == 3):
                         numerator = numerator + Operands.cubed()
                     else:
-                        numerator = numerator + Operands.pow() + power
+                        numerator = numerator + Operands.powOp() + power
             else:
                 # unary, don't add a '1'
                 pass
@@ -173,8 +173,8 @@ class Reducer:
                 result = numerator
             else:
                 if (denominatorCount == 1):
-                    result = numerator + Operands.div() + denominator
+                    result = numerator + Operands.divOp() + denominator
                 else:
-                    result = numerator + Operands.div() + Operands.lp()+ denominator + Operands.rp()
+                    result = numerator + Operands.divOp() + Operands.lpChar()+ denominator + Operands.rpChar()
 
             return result       

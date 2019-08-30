@@ -64,7 +64,7 @@ class CacheManager:
         
     def registerUnit(self, uom):
         # get first by symbol
-        current = self.symbolRegistry[uom.symbol]
+        current = self.getUOMBySymbol(uom.symbol)
 
         if (current is not None):
             # already cached
@@ -79,8 +79,9 @@ class CacheManager:
 
         # finally cache by base symbol
         key = uom.getBaseSymbol()
-
-        if (self.baseRegistry[key] is None):
+        uom = self.getBaseUOM(key)
+        
+        if (uom is None):
             self.baseRegistry[key] = uom
 
     def getTypeMap(self, unitType):            

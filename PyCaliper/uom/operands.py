@@ -3,19 +3,19 @@ class Operands():
         pass
     
     @staticmethod
-    def mult():    
+    def multOp():    
         return '\xB7'
  
     @staticmethod
-    def div():    
+    def divOp():    
         return '/'
  
     @staticmethod
-    def pow():    
+    def powOp():    
         return '^'
  
     @staticmethod
-    def sq():    
+    def sqOp():    
         return '\xB2'
  
     @staticmethod
@@ -23,11 +23,11 @@ class Operands():
         return '\xB3'
  
     @staticmethod
-    def lp():    
+    def lpChar():    
         return '('
  
     @staticmethod
-    def rp():    
+    def rpChar():    
         return ')'
  
     @staticmethod

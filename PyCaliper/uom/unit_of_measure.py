@@ -23,7 +23,7 @@ class UnitOfMeasure(Symbolic):
         super().__init__(name, symbol, description)
         
         self.conversionRegistry = {}
-        self.category = Localizer.instance().unitStr("default.category.text")
+        self.category = Localizer.instance().langStr("default.category.text")
         self.unit = None
         self.unitType = UnitType.UNCLASSIFIED     
         self.abscissaUnit = self
@@ -80,19 +80,19 @@ class UnitOfMeasure(Symbolic):
     
     def __str__(self):
         # type
-        value = Localizer.instance().unitStr("unit.type.text") + " " + str(self.unitType) + ", "
+        value = Localizer.instance().langStr("unit.type.text") + " " + str(self.unitType) + ", "
         
         # enumeration
         if (self.unit is not None):
-            value = value + Localizer.instance().unitStr("enum.text") + " " + str(self.unit) + ", "
+            value = value + Localizer.instance().langStr("enum.text") + " " + str(self.unit) + ", "
             
         # symbol
-        value = value + Localizer.instance().unitStr("symbol.text") + " " + self.symbol + ", "
-        value = value + Localizer.instance().unitStr("conversion.text") + " "
+        value = value + Localizer.instance().langStr("symbol.text") + " " + self.symbol + ", "
+        value = value + Localizer.instance().langStr("conversion.text") + " "
         
         # scaling factor
         if (not math.isclose(self.scalingFactor, 1.0)):
-            value = value + str(self.scalingFactor) + Operands.mult()
+            value = value + str(self.scalingFactor) + Operands.multOp()
             
         # abscissa unit
         if (self.abscissaUnit is not None) :
@@ -100,10 +100,10 @@ class UnitOfMeasure(Symbolic):
             
         # offset
         if (not math.isclose(self.offset, 0.0)):   
-            value = value + " + " + str(self.offset) + ", " + Localizer.instance().unitStr("base.text") + " "
+            value = value + " + " + str(self.offset) 
             
         # base symbol
-        value = value + self.getBaseSymbol()
+        value = value + ", " + Localizer.instance().langStr("base.text") + " " + self.getBaseSymbol()
             
         return value
     
@@ -220,20 +220,20 @@ class UnitOfMeasure(Symbolic):
 
     @staticmethod 
     def generatePowerSymbol(base, exponent):
-        return base.symbol + Operands.pow() + str(exponent)
+        return base.symbol + Operands.powOp() + str(exponent)
 
     @staticmethod
     def generateProductSymbol(multiplier, multiplicand):
         symbol = None
         if (multiplier == multiplicand):
-            symbol = multiplier.symbol + Operands.sq()
+            symbol = multiplier.symbol + Operands.sqOp()
         else:
-            symbol = multiplier.symbol + Operands.mult() + multiplicand.symbol
+            symbol = multiplier.symbol + Operands.multOp() + multiplicand.symbol
         return symbol
 
     @staticmethod
     def generateQuotientSymbol(dividend, divisor):
-        return dividend.symbol + Operands.div() + divisor.symbol   
+        return dividend.symbol + Operands.divOp() + divisor.symbol   
     
     def clonePower(self, uom):
         newUOM = UnitOfMeasure()
@@ -580,6 +580,3 @@ class UnitOfMeasure(Symbolic):
     
     def multiply(self, multiplicand):
         return self.multiplyOrDivide(multiplicand, False)
-    
-    def setAbscissaUnit(self, abscissaUnit):
-        self.abscissaUnit = abscissaUnit
