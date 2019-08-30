@@ -17,10 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: en_US\n"
 
-#: messages.py:1
-msgid "must.be.same.as"
+msgid "must.be.same.as" 
 msgstr "The unit of measure {0} of type {1} must be the same as {2} of type {3}."
 
-#: messages.py:2
-msgid "amount.cannot.be.null"
+msgid "amount.cannot.be.null" 
 msgstr "The amount cannot be null."

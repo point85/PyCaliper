@@ -1,16 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class Symbolic(ABC):
-    def __init__(self, name: str, symbol: str, description: str):
+    def __init__(self, name, symbol, description):
         self.name = name
         self.symbol = symbol
         self.description = description
         
         super().__init__()
-    
-    @abstractmethod
-    def do_something(self):
-        pass
     
     def __str__(self):
         value = ""

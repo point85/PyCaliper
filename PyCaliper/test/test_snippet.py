@@ -2,7 +2,6 @@ import unittest
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.constant import Constant
 from PyCaliper.uom.measurement_system import MeasurementSystem
-from PyCaliper.uom.resource_bundle import ResourceBundle
 
 class TestPrefix(unittest.TestCase):
 
@@ -21,10 +20,6 @@ class TestPrefix(unittest.TestCase):
         print (second)
         
         self.assertEqual(first, second)
-
-    def test_bundle(self):
-        messages = ResourceBundle("messages")
-        print (messages.getString("must.be.same.as"))
 
 if __name__ == '__main__':
     unittest.main()

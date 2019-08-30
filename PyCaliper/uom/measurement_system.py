@@ -1,28 +1,12 @@
-import gettext
-import locale
 import math
 
 from PyCaliper.uom.constant import Constant
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.unit import Unit
-from PyCaliper.uom.unit_of_measure import UnitOfMeasure
+#from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.unit_type import UnitType
-
-
-# get the default locale and the language code
-thisLocale = locale.getdefaultlocale('LANG)')
-langCC = thisLocale[0]
-
-# translated text with error messages for this locale
-messages = gettext.translation('messages', localedir='locales', languages=[langCC[0:2]])
-messages.install()
-_M = messages.gettext
-
-# translated user-visible text for this locale
-units = gettext.translation('units', localedir='locales', languages=[langCC[0:2]])
-units.install()
-_U = units.gettext
+from builtins import staticmethod
 
 class CacheManager:
     def __init__(self):
@@ -30,13 +14,13 @@ class CacheManager:
         self.baseRegistry = {}
         self.unitRegistry = {}
     
-    def getUOMBySymbol(self, symbol: str) -> UnitOfMeasure:
+    def getUOMBySymbol(self, symbol):
         return self.symbolRegistry[symbol]
         
-    def getUOMByUnit(self, unit: Unit) -> UnitOfMeasure:
+    def getUOMByUnit(self, unit):
         return self.unitRegistry[unit]
     
-    def getBaseUOM(self, baseSymbol: str) -> UnitOfMeasure:
+    def getBaseUOM(self, baseSymbol):
         return self.baseRegistry[baseSymbol]
         
     def clearCache(self):
@@ -56,7 +40,7 @@ class CacheManager:
     def getEnumerationCache(self):
         return self.unitRegistry  
     
-    def unregisterUnit(self, uom: UnitOfMeasure):
+    def unregisterUnit(self, uom):
         # remove by enumeration
         if (uom.unitType is not None):
             del self.unitRegistry[uom.unit] 
@@ -65,7 +49,7 @@ class CacheManager:
         del self.symbolRegistry[uom.symbol]
         del self.baseRegistry[uom.getBaseSymbol()]
         
-    def registerUnit(self, uom: UnitOfMeasure):
+    def registerUnit(self, uom):
         # get first by symbol
         current = self.symbolRegistry[uom.symbol]
 
@@ -86,10 +70,7 @@ class CacheManager:
         if (self.baseRegistry[key] is None):
             self.baseRegistry[key] = uom
 
-class MeasurementSystem:
-    # name of resource bundle with translatable strings for exception messages
-    __MESSAGE_BUNDLE_NAME = "Message"
-    
+class MeasurementSystem:    
     # single instance
     unifiedSystem = None
     
@@ -100,24 +81,11 @@ class MeasurementSystem:
 
     @staticmethod
     def instance():
-        if MeasurementSystem.unifiedSystem == None:
+        if (MeasurementSystem.unifiedSystem is None):
             MeasurementSystem()
         return MeasurementSystem.unifiedSystem 
-            
-    @staticmethod
-    def messageStr(msgId: str) -> str :
-        """ Get an error message by its id """
-        return messages.gettext(msgId)
     
-    @staticmethod
-    def unitStr(msgId: str) -> str :
-        """ Get a unit name, symbol or description by its id """
-        return units.gettext(msgId)
-    
-    def area(self, cachedMap):
-        cachedMap[UnitType.LENGTH] = 2
-    
-    def getTypeMap(self, unitType: UnitType):            
+    def getTypeMap(self, unitType):            
         if (self.unitTypeRegistry.get(unitType) is not None):
             return self.unitTypeRegistry[unitType]
         
@@ -139,7 +107,7 @@ class MeasurementSystem:
         
         return cachedMap
     
-    def getUOM(self, unit: Unit) -> UnitOfMeasure:
+    def getUOM(self, unit):
         uom = self.cacheManager.getUOM(unit)
 
         if (uom is None):
@@ -149,12 +117,12 @@ class MeasurementSystem:
     def getOne(self):
         return self.getUOMByUnit(Unit.ONE)
     
-    def createScalarUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description:str) -> UnitOfMeasure:
+    def createScalarUOM(self, unitType, unit, name, symbol, description):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         self.registerUnit(uom)
         return uom
     
-    def createSIUnit(self, unit: Unit) -> UnitOfMeasure:
+    def createSIUnit(self, unit):
         uom = None
         
         if (unit == Unit.ONE):
@@ -579,7 +547,7 @@ class MeasurementSystem:
         
         return uom
     
-    def createCustomaryUnit(self, unit: Unit) -> UnitOfMeasure:
+    def createCustomaryUnit(self, unit):
         uom = None
         
         if (unit == Unit.RANKINE):
@@ -802,7 +770,7 @@ class MeasurementSystem:
             
         return uom
     
-    def createUSUnit(self, unit: Unit) -> UnitOfMeasure:
+    def createUSUnit(self, unit):
         uom = None
         
         if (unit == Unit.US_GALLON):
@@ -867,7 +835,7 @@ class MeasurementSystem:
             
         return uom
         
-    def createBRUnit(self, unit: Unit) -> UnitOfMeasure:
+    def createBRUnit(self, unit):
         uom = None
         
         if (unit == Unit.BR_GALLON):
@@ -926,7 +894,7 @@ class MeasurementSystem:
             
         return uom
     
-    def createFinancialUnit(self, unit: Unit) -> UnitOfMeasure:
+    def createFinancialUnit(self, unit):
         uom = None
         
         if (unit == Unit.US_DOLLAR):
@@ -935,17 +903,17 @@ class MeasurementSystem:
                 MeasurementSystem.unitStr("us_dollar.name"), MeasurementSystem.unitStr("us_dollar.symbol"), MeasurementSystem.unitStr("us_dollar.desc"))
             
         elif (unit == Unit.EURO):
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, units.getString("euro.name"), \
-                    units.getString("euro.symbol"), units.getString("euro.desc"))
+            uom = self.createScalarUOM(UnitType.CURRENCY, unit, MeasurementSystem.unitStr.getString("euro.name"), \
+                    MeasurementSystem.unitStr.getString("euro.symbol"), MeasurementSystem.unitStr.getString("euro.desc"))
             
 
         elif (unit == Unit.YUAN):
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, units.getString("yuan.name"), \
-                    units.getString("yuan.symbol"), units.getString("yuan.desc"))
+            uom = self.createScalarUOM(UnitType.CURRENCY, unit, MeasurementSystem.unitStr.getString("yuan.name"), \
+                    MeasurementSystem.unitStr.getString("yuan.symbol"), MeasurementSystem.unitStr.getString("yuan.desc"))
             
         return uom
     
-    def createUOMForUnit(self, unit: Unit) -> UnitOfMeasure:
+    def createUOMForUnit(self, unit):
         # SI
         uom = self.createSIUnit(unit)
         
@@ -972,7 +940,7 @@ class MeasurementSystem:
         
         return self.createFinancialUnit(unit)
     
-    def getQuantity(self, constant: Constant) -> Quantity:
+    def getQuantity(self, constant: Constant):
         named = None
 
         if (constant == Constant. LIGHT_VELOCITY):
@@ -1100,13 +1068,14 @@ class MeasurementSystem:
 
         return named
     
-    def createPowerUOM(self, unitType: UnitType, unit: Unit, name: str, symbol:str, description:str, base: UnitOfMeasure, exponent: int) -> UnitOfMeasure:
+    def createPowerUOM(self, unitType, unit, name, symbol, description, base, exponent):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setPowerUnit(base, exponent)
         self.registerUnit(uom)
         return uom
     
-    def createUnclassifiedPowerUOM(self, base: UnitOfMeasure, exponent: int) -> UnitOfMeasure:  
+    def createUnclassifiedPowerUOM(self, base, exponent): 
+        from PyCaliper.uom.unit_of_measure import UnitOfMeasure 
         if (base is None):          
             msg = MeasurementSystem.messageStr("base.cannot.be.null")
             raise Exception(msg)
@@ -1115,13 +1084,14 @@ class MeasurementSystem:
         symbol = UnitOfMeasure.generatePowerSymbol(base, exponent)
         return self.createPowerUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, base, exponent)
     
-    def createProductUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description: str, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure) -> UnitOfMeasure:
+    def createProductUOM(self, unitType, unit, name, symbol, description, multiplier, multiplicand):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setProductUnits(multiplier, multiplicand)
         self.registerUnit(uom)
         return uom
     
-    def createUnclassifiedProductUOM(self, multiplier: UnitOfMeasure, multiplicand: UnitOfMeasure) -> UnitOfMeasure:
+    def createUnclassifiedProductUOM(self, multiplier, multiplicand):
+        from PyCaliper.uom.unit_of_measure import UnitOfMeasure
         if (multiplier is None):          
             msg = MeasurementSystem.messageStr("multiplier.cannot.be.null")
             raise Exception(msg)
@@ -1133,7 +1103,8 @@ class MeasurementSystem:
         symbol = UnitOfMeasure.generateProductSymbol(multiplier, multiplicand)
         return self.createProductUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, multiplier, multiplicand)
     
-    def createUnclassifiedQuotientUOM(self, dividend: UnitOfMeasure, divisor: UnitOfMeasure) -> UnitOfMeasure:
+    def createUnclassifiedQuotientUOM(self, dividend, divisor):
+        from PyCaliper.uom.unit_of_measure import UnitOfMeasure
         if (dividend is None):
             msg = MeasurementSystem.messageStr("dividend.cannot.be.null")
             raise Exception(msg)
@@ -1145,13 +1116,14 @@ class MeasurementSystem:
         symbol = UnitOfMeasure.generateQuotientSymbol(dividend, divisor)
         return self.createQuotientUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, dividend, divisor)
     
-    def createQuotientUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description: str, dividend: UnitOfMeasure, divisor: UnitOfMeasure) -> UnitOfMeasure:
+    def createQuotientUOM(self, unitType, unit, name, symbol, description, dividend, divisor):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setQuotientUnits(dividend, divisor)
         self.registerUnit(uom)
         return uom
 
-    def createUOM(self, unitType: UnitType, unit: Unit, name: str, symbol: str, description: str) -> UnitOfMeasure:
+    def createUOM(self, unitType, unit, name, symbol, description):
+        from PyCaliper.uom.unit_of_measure import UnitOfMeasure
         if (symbol is None or len(symbol) == 0):
             msg = MeasurementSystem.messageStr("symbol.cannot.be.null")
             raise Exception(msg)
@@ -1170,23 +1142,23 @@ class MeasurementSystem:
             
         return uom
     
-    def getSecond(self) -> UnitOfMeasure:
+    def getSecond(self):
         return self.getUOMByUnit(Unit.SECOND)
     
-    def getMinute(self) -> UnitOfMeasure:
+    def getMinute(self):
         return self.getUOMByUnit(Unit.MINUTE)
     
-    def getHour(self) -> UnitOfMeasure:
+    def getHour(self):
         return self.getUOMByUnit(Unit.HOUR)
     
-    def getDay(self) -> UnitOfMeasure:
+    def getDay(self):
         return self.getUOMByUnit(Unit.DAY)
     
-    def getRegisteredUnits(self) -> [UnitOfMeasure]:
+    def getRegisteredUnits(self):
         units = self.cacheManager.getCachedUnits()
         return units.sort()
     
-    def getUnitsOfMeasure(self, unitType: UnitType) -> [UnitOfMeasure]:
+    def getUnitsOfMeasure(self, unitType):
         units = []
         
         if (unitType == UnitType.LENGTH):
@@ -1451,13 +1423,13 @@ class MeasurementSystem:
             units.append(self.getUOM(Unit.CUBIC_METRE_PER_SEC))
             units.append(self.getUOM(Unit.CUBIC_FEET_PER_SEC))
             
-    def getUOMBySymbol(self, symbol: str) -> UnitOfMeasure:
+    def getUOMBySymbol(self, symbol):
         return self.cacheManager.getUOMBySymbol(symbol)
             
-    def getUOMForUnit(self, prefix: Prefix, unit: Unit) -> UnitOfMeasure:
+    def getUOMForUnit(self, prefix: Prefix, unit):
         return self.getUOMWithPrefix(prefix, MeasurementSystem.instance().getUOM(unit))
     
-    def getUOMWithPrefix(self, prefix: Prefix, targetUOM: UnitOfMeasure) -> UnitOfMeasure:
+    def getUOMWithPrefix(self, prefix: Prefix, targetUOM):
         symbol = prefix.symbol+ targetUOM.symbol
         scaled = self.getUOMBySymbol(symbol)
 
@@ -1476,4 +1448,26 @@ class MeasurementSystem:
 
         return scaled
     
+    def quantityFromPrefixedUnit(self, amount, prefix, unit):
+        uom = MeasurementSystem.instance().getUOM(prefix, unit)
+        return Quantity(amount, uom)
     
+    def quantityFromUnit(self, amount, unit): 
+        uom = MeasurementSystem.instance().getUOM(unit)
+        return Quantity(amount, uom)
+        
+    def quantityFromStringUnit(self, strAmount, unit):
+        amount = Quantity.createAmountFromString(strAmount)
+        uom = MeasurementSystem.instance().getUOM(unit)
+        return Quantity(amount, uom)
+    
+    def convertQuantityToUnit(self, quantity, unit):
+        return quantity.convert(MeasurementSystem.instance().getUOM(unit))
+    
+    def convertQuantityToPrefixUnit(self, quantity, prefix, unit):
+        return quantity.convert(MeasurementSystem.instance().getUOM(prefix, unit))
+    
+    def quantityToPower(self, quantity, exponent):
+        amount = math.pow(self.quantity, exponent)
+        uom = MeasurementSystem.instance().createPowerUOM(quantity.uom, exponent)
+        return Quantity(amount, uom) 

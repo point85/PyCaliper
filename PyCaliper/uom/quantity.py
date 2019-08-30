@@ -1,61 +1,60 @@
 from PyCaliper.uom.symbolic import Symbolic
-from PyCaliper.uom.unit_of_measure import UnitOfMeasure
-from PyCaliper.uom.prefix import Prefix
-from PyCaliper.uom.unit import Unit
-from PyCaliper.uom.measurement_system import MeasurementSystem
-from builtins import staticmethod
+#from PyCaliper.uom.measurement_system import MeasurementSystem
+from PyCaliper.uom.localizer import Localizer
 import math
+from builtins import staticmethod
 
 class Quantity(Symbolic):
-    def __init__(self, amount: float, uom: UnitOfMeasure):
+    def __init__(self, amount, uom):
         super(None, None, None)
         
         self.amount = amount
         self.uom = uom
         
     def __hash__(self):
-        return hash(self.args)
+        return hash(str(self.amount) + self.uom.symbol)
         
     def __eq__(self, other):
         answer = False
-        
-        return answer
     
         if (other is not None and isinstance(other, Quantity)):
-            # same amount and same unit of measure
-            if (self.amount == other.amount and self.uom == other.uom):
+            # same amount and same unit of measures
+            if (math.isclose(self.amount, other.amount) and self.uom == other.uom):
                 answer = True
-            return answer
+        return answer
         
     def __str__(self):
         return self.amount + ", [" + str(self.uom) + "] " + str(super)
    
     @staticmethod
-    def createAmount(self, value) -> float:
+    def createAmountFromString(value):
         if (value is None):
-            msg = MeasurementSystem.messageStr("amount.cannot.be.null")
+            msg = Localizer.instance().messageStr("amount.cannot.be.null")
             raise Exception(msg) 
 
         return float(value)
-        
-    def fromPrefixedUnit(self, amount: float, prefix: Prefix, unit: Unit):
+    """    
+    def fromPrefixedUnit(self, amount, prefix, unit):
         uom = MeasurementSystem.instance().getUOM(prefix, unit)
         self(amount, uom)
+    """
         
-    def fromStringUOM(self, amount: str, uom: UnitOfMeasure):
-        value = self.createAmountFromString(amount)
+    def fromStringUOM(self, amount, uom):
+        value = Quantity.createAmountFromString(amount)
         self(value, uom)
-        
-    def fromUnit(self, amount: float, unit: Unit): 
+    
+    """    
+    def fromUnit(self, amount, unit): 
         uom = MeasurementSystem.instance().getUOM(unit)
         self(amount, uom)
         
-    def fromStringUnit(self, amount: str, unit: Unit):
-        value = self.createAmountFromString(amount)
+    def fromStringUnit(self, strAmount, unit):
+        value = Quantity.createAmountFromString(strAmount)
         uom = MeasurementSystem.instance().getUOM(unit)
         self(value, uom)
+    """
         
-    def convert(self, toUOM: UnitOfMeasure) -> Quantity:
+    def convert(self, toUOM):
         multiplier = self.uom.getConversionFactor(toUOM)
         thisOffset = self.uom.offset
         targetOffset = toUOM.offset
@@ -72,61 +71,65 @@ class Quantity(Symbolic):
         # create the quantity now
         return Quantity(newAmount, toUOM)
     
-    def convertToUnit(self, unit: Unit) -> Quantity:
+    """
+    def convertToUnit(self, unit):
         return self.convert(MeasurementSystem.instance().getUOM(unit))
     
-    def convertToPrefixUnit(self, prefix: Prefix, unit: Unit) -> Quantity:
+    def convertToPrefixUnit(self, prefix, unit):
         return self.convert(MeasurementSystem.instance().getUOM(prefix, unit))
+    """
     
-    def convertToPowerProduct(self, uom1: UnitOfMeasure, uom2: UnitOfMeasure) -> Quantity:
+    def convertToPowerProduct(self, uom1, uom2):
         newUOM = self.uom.clonePowerProduct(uom1, uom2)
         return self.convert(newUOM)
     
-    def convertToPower(self, uom: UnitOfMeasure) -> Quantity:
+    def convertToPower(self, uom):
         newUOM = self.uom.clonePower(uom)
         return self.convert(newUOM)
         
-    def subtract(self, other: Quantity) -> Quantity:
+    def subtract(self, other):
         toSubtract = other.convert(self.uom)
         amount = self.amount - toSubtract.amount
         return Quantity(amount, self.uom)
     
-    def add(self, other: Quantity) -> Quantity:
+    def add(self, other):
         toAdd = other.convert(self.uom)
         amount = self.amount + toAdd.amount
         return Quantity(amount, self.uom)
     
-    def divide(self, other: Quantity) -> Quantity:
+    def divide(self, other):
         if (other.amount == 0.0):
-            msg = MeasurementSystem.messageStr("divisor.cannot.be.zero")
+            msg = Localizer.instance().messageStr("divisor.cannot.be.zero")
             raise Exception(msg)
 
         amount = self.amount / other.amount
         newUOM = self.uom.divide(other.uom)
         return Quantity(amount, newUOM)
     
-    def divideByAmount(self, divisor: float) -> Quantity:
+    def divideByAmount(self, divisor):
         return  Quantity(self.amount / divisor, self.uom)
     
-    def multiply(self, other: Quantity) -> Quantity:
+    def multiply(self, other):
         amount = self.amount * other.amount
         newUOM = self.uom.multiply(other.uom)
         return Quantity(amount, newUOM)
     
-    def multiplyByAmount(self, multiplier: float) -> Quantity:
+    def multiplyByAmount(self, multiplier):
         return Quantity(self.amount * multiplier, self.uom)
     
-    def power(self, exponent: int) -> Quantity:
+    """
+    def power(self, exponent: int):
         amount = math.pow(self.amount, exponent)
         newUOM = MeasurementSystem.instance().createPowerUOM(self.uom, exponent)
         return Quantity(amount, newUOM) 
+    """
     
-    def invert(self) -> Quantity:
+    def invert(self):
         amount = 1.0 / self.amount
         uom = self.uom.invert()
         return Quantity(amount, uom)  
     
-    def compare(self, other: Quantity) -> int:
+    def compare(self, other):
         toCompare = other
         
         if (self.uom != other.uom):
@@ -140,9 +143,6 @@ class Quantity(Symbolic):
         else:
             return 1
 
-    def classify(self) -> Quantity:
+    def classify(self):
         self.uom.classify()
-        return self
-"""
-
-"""    
+        return self    
