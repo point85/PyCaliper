@@ -134,7 +134,7 @@ class Reducer:
             if (power < 0):
                 # negative, put in denominator
                 if (len(denominator) > 0):
-                        denominator = denominator + Operands.multOp()
+                        denominator = denominator + Operands.MULT
                         
                 if (unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                         denominator = denominator + unit.getSymbol()
@@ -142,30 +142,30 @@ class Reducer:
 
                 if (power < -1):
                     if (power == -2):
-                        denominator = denominator + Operands.sqOp()
+                        denominator = denominator + Operands.SQ
                     elif (power == -3):
-                        denominator = denominator + Operands.cubed()
+                        denominator = denominator + Operands.CUBED
                     else:
-                        denominator = denominator + Operands.powOp() + abs(power)
+                        denominator = denominator + Operands.POW + abs(power)
             elif (power >= 1 and unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                 # positive, put in numerator
                 if (len(numerator) > 0):
-                    numerator = numerator + Operands.multOp() + unit.getSymbol()
+                    numerator = numerator + Operands.MULT + unit.getSymbol()
                     numeratorCount = numeratorCount + 1
 
                 if (power > 1):
                     if (power == 2):
-                        numerator = numerator + Operands.sqOp()
+                        numerator = numerator + Operands.SQ
                     elif (power == 3):
-                        numerator = numerator + Operands.cubed()
+                        numerator = numerator + Operands.CUBED
                     else:
-                        numerator = numerator + Operands.powOp() + power
+                        numerator = numerator + Operands.POW + power
             else:
                 # unary, don't add a '1'
                 pass
             
         if (numeratorCount == 0):
-            numerator = numerator + Operands.oneChar()
+            numerator = numerator + Operands.ONE
 
             result = None
 
@@ -173,8 +173,8 @@ class Reducer:
                 result = numerator
             else:
                 if (denominatorCount == 1):
-                    result = numerator + Operands.divOp() + denominator
+                    result = numerator + Operands.DIV + denominator
                 else:
-                    result = numerator + Operands.divOp() + Operands.lpChar()+ denominator + Operands.rpChar()
+                    result = numerator + Operands.DIV + Operands.LP + denominator + Operands.RP
 
             return result       

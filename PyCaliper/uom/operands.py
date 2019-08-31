@@ -2,34 +2,12 @@ class Operands():
     def __init__(self):
         pass
     
-    @staticmethod
-    def multOp():    
-        return '\xB7'
- 
-    @staticmethod
-    def divOp():    
-        return '/'
- 
-    @staticmethod
-    def powOp():    
-        return '^'
- 
-    @staticmethod
-    def sqOp():    
-        return '\xB2'
- 
-    @staticmethod
-    def cubed():    
-        return '\xB3'
- 
-    @staticmethod
-    def lpChar():    
-        return '('
- 
-    @staticmethod
-    def rpChar():    
-        return ')'
- 
-    @staticmethod
-    def oneChar():    
-        return '1'
+    # operators    
+    MULT = '\xB7'
+    DIV = '/'
+    POW = '^'
+    SQ = '\xB2'
+    CUBED ='\xB3'
+    LP = '('
+    RP = ')'
+    ONE = '1'

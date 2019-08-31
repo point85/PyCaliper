@@ -1,4 +1,4 @@
-# SOME DESCRIPTIVE TITLE.
+# Translatable exception messages
 # Copyright (C) YEAR ORGANIZATION
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -22,3 +22,42 @@ msgstr "The unit of measure {0} of type {1} must be the same as {2} of type {3}.
 
 msgid "amount.cannot.be.null" 
 msgstr "The amount cannot be null."
+
+msgid "symbol.cannot.be.null" 
+msgstr "The symbol cannot be null."
+
+msgid "dividend.cannot.be.null" 
+msgstr "The dividend cannot be null for the quotient unit of measure with symbol {0}."
+
+msgid "divisor.cannot.be.null" 
+msgstr "The divisor cannot be null for the quotient unit of measure with symbol {0}."
+
+msgid "multiplier.cannot.be.null" 
+msgstr "The multiplier cannot be null for the product unit of measure with symbol {0}."
+
+msgid "multiplicand.cannot.be.null" 
+msgstr "The multiplicand cannot be null for the product unit of measure with symbol {0}."
+
+msgid "base.cannot.be.null" 
+msgstr "The base cannot be null for the power unit of measure with symbol {0}."
+
+msgid "unit.type.cannot.be.null" 
+msgstr "The type of the unit of measure cannot be null."
+ 
+msgid "unit.cannot.be.null" 
+msgstr "The unit of measure cannot be null."
+
+msgid "offset.not.supported" 
+msgstr "The unit of measure {0} cannot have an offset."
+
+msgid "incompatible.units" 
+msgstr "The unit of measure {0} cannot be converted to {1}."
+
+msgid "conversion.not.allowed" 
+msgstr "The scaling factor must be 1 and the offset must be 0."
+
+msgid "circular.references" 
+msgstr "The unit of measure with symbol {0} has circular references and cannot be created."
+
+msgid "divisor.cannot.be.zero" 
+msgstr "The amount to divide by must not be zero."

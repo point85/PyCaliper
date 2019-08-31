@@ -17,6 +17,8 @@ class MeasurementSystem:
     
     def __init__(self):
         MeasurementSystem.unifiedSystem = self
+        
+        self.createUnitDicts()
 
     @staticmethod
     def instance():
@@ -24,8 +26,25 @@ class MeasurementSystem:
             MeasurementSystem()
         return MeasurementSystem.unifiedSystem 
     
+    def createUnitDicts(self):
+        self.finDict = {
+            Unit.US_DOLLAR : self.usDollar, 
+            Unit.EURO : self.euro, 
+            Unit.YUAN : self.yuan}
+        
+        self.brDict = {
+            Unit.BR_GALLON : self.brGallon, 
+            Unit.BR_BUSHEL : self.brBushel,
+            Unit.BR_FLUID_OUNCE : self.brFluidOunce,
+            Unit.BR_CUP : self.brCup,
+            Unit.BR_PINT : self.brPint,
+            Unit.BR_QUART : self.brQuart,
+            Unit.BR_TABLESPOON : self.brTablespoon,
+            Unit.BR_TEASPOON : self.brTeaspoon,
+            Unit.BR_TON : self.brTon}
+        
     def getUOM(self, unit):
-        uom = self.cacheManager.getUOM(unit)
+        uom = CacheManager.instance().getUOMByUnit(unit)
 
         if (uom is None):
             uom = self.createUOMForUnit(unit)
@@ -751,111 +770,83 @@ class MeasurementSystem:
             uom.setConversion(2000.0, self.getUOM(Unit.POUND_MASS))
             
         return uom
-        
-    def createBRUnit(self, unit):
-        uom = None
-        
-        if (unit == Unit.BR_GALLON):
-            # gallon 
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, \
+    
+    def brGallon(self):
+        uom=  self.createScalarUOM(UnitType.VOLUME, Unit.BR_GALLON, \
                 Localizer.instance().langStr("br_gallon.name"), Localizer.instance().langStr("br_gallon.symbol"), Localizer.instance().langStr("br_gallon.desc"))
-            uom.setConversion(277.4194327916215, self.getUOM(Unit.CUBIC_INCH), 0.0)
-            
-        elif (unit == Unit.BR_BUSHEL):
-            # bushel
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_bu.name"), \
-                    Localizer.instance().langStr("br_bu.symbol"), Localizer.instance().langStr("br_bu.desc"))
-            uom.setConversion(8.0, self.getUOM(Unit.BR_GALLON))
-            
-        elif (unit == Unit.BR_FLUID_OUNCE):
-            # fluid ounce
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_fl_oz.name"), \
-                    Localizer.instance().langStr("br_fl_oz.symbol"), Localizer.instance().langStr("br_fl_oz.desc"))
-            uom.setConversion(0.00625, self.getUOM(Unit.BR_GALLON))
-            
-        elif (unit == Unit.BR_CUP):
-            # cup
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_cup.name"), \
-                    Localizer.instance().langStr("br_cup.symbol"), Localizer.instance().langStr("br_cup.desc"))
-            uom.setConversion(8.0, self.getUOM(Unit.BR_FLUID_OUNCE))
-            
-        elif (unit == Unit.BR_PINT):
-            # pint
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_pint.name"), \
-                    Localizer.instance().langStr("br_pint.symbol"), Localizer.instance().langStr("br_pint.desc"))
-            uom.setConversion(20.0, self.getUOM(Unit.BR_FLUID_OUNCE))
-            
-        elif (unit == Unit.BR_QUART):
-            # quart
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_quart.name"), \
-                    Localizer.instance().langStr("br_quart.symbol"), Localizer.instance().langStr("br_quart.desc"))
-            uom.setConversion(40.0, self.getUOM(Unit.BR_FLUID_OUNCE))
-            
-        elif (unit == Unit.BR_TABLESPOON):
-            # tablespoon
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_tbsp.name"), \
-                    Localizer.instance().langStr("br_tbsp.symbol"), Localizer.instance().langStr("br_tbsp.desc"))
-            uom.setConversion(0.625, self.getUOM(Unit.BR_FLUID_OUNCE))
-            
-        elif (unit == Unit.BR_TEASPOON):
-            # teaspoon
-            uom = self.createScalarUOM(UnitType.VOLUME, unit, Localizer.instance().langStr("br_tsp.name"), \
-                    Localizer.instance().langStr("br_tsp.symbol"), Localizer.instance().langStr("br_tsp.desc"))
-            uom.setConversion(5.0 / 24.0, self.getUOM(Unit.BR_FLUID_OUNCE))
-            
-        elif (unit == Unit.BR_TON):
-            # ton
-            uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("br_ton.name"), \
-                    Localizer.instance().langStr("br_ton.symbol"), Localizer.instance().langStr("br_ton.desc"))
-            uom.setConversion(2240.0, self.getUOM(Unit.POUND_MASS))
-            
+        uom.setConversion(277.4194327916215, self.getUOM(Unit.CUBIC_INCH), 0.0) 
         return uom
     
-    def createFinancialUnit(self, unit):
-        uom = None
-        
-        if (unit == Unit.US_DOLLAR):
-            # dollar 
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, \
-                Localizer.instance().langStr("us_dollar.name"), Localizer.instance().langStr("us_dollar.symbol"), Localizer.instance().langStr("us_dollar.desc"))
-            
-        elif (unit == Unit.EURO):
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, Localizer.instance().langStr("euro.name"), \
-                    Localizer.instance().langStr("euro.symbol"), Localizer.instance().langStr("euro.desc"))
-            
-
-        elif (unit == Unit.YUAN):
-            uom = self.createScalarUOM(UnitType.CURRENCY, unit, Localizer.instance().langStr("yuan.name"), \
-                    Localizer.instance().langStr("yuan.symbol"), Localizer.instance().langStr("yuan.desc"))
-            
+    def brBushel(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_BUSHEL, Localizer.instance().langStr("br_bu.name"), \
+            Localizer.instance().langStr("br_bu.symbol"), Localizer.instance().langStr("br_bu.desc"))
+        uom.setConversion(8.0, self.getUOM(Unit.BR_GALLON))
         return uom
+    
+    def brFluidOunce(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_FLUID_OUNCE, Localizer.instance().langStr("br_fl_oz.name"), \
+            Localizer.instance().langStr("br_fl_oz.symbol"), Localizer.instance().langStr("br_fl_oz.desc"))
+        uom.setConversion(0.00625, self.getUOM(Unit.BR_GALLON))
+        return uom
+    
+    def brCup(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_CUP, Localizer.instance().langStr("br_cup.name"), \
+            Localizer.instance().langStr("br_cup.symbol"), Localizer.instance().langStr("br_cup.desc"))
+        uom.setConversion(8.0, self.getUOM(Unit.BR_FLUID_OUNCE))
+        return uom
+    
+    def brPint(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_PINT, Localizer.instance().langStr("br_pint.name"), \
+            Localizer.instance().langStr("br_pint.symbol"), Localizer.instance().langStr("br_pint.desc"))
+        uom.setConversion(20.0, self.getUOM(Unit.BR_FLUID_OUNCE))
+        return uom
+    
+    def brQuart(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_QUART, Localizer.instance().langStr("br_quart.name"), \
+            Localizer.instance().langStr("br_quart.symbol"), Localizer.instance().langStr("br_quart.desc"))
+        uom.setConversion(40.0, self.getUOM(Unit.BR_FLUID_OUNCE))
+        return uom
+    
+    def brTablespoon(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_TABLESPOON, Localizer.instance().langStr("br_tbsp.name"), \
+           Localizer.instance().langStr("br_tbsp.symbol"), Localizer.instance().langStr("br_tbsp.desc"))
+        uom.setConversion(0.625, self.getUOM(Unit.BR_FLUID_OUNCE))  
+        return uom 
+    
+    def brTeaspoon(self):
+        uom = self.createScalarUOM(UnitType.VOLUME, Unit.BR_TEASPOON, Localizer.instance().langStr("br_tsp.name"), \
+            Localizer.instance().langStr("br_tsp.symbol"), Localizer.instance().langStr("br_tsp.desc"))
+        uom.setConversion(5.0 / 24.0, self.getUOM(Unit.BR_FLUID_OUNCE))
+        return uom
+    
+    def brTon(self):
+        uom = self.createScalarUOM(UnitType.MASS, Unit.BR_TON, Localizer.instance().langStr("br_ton.name"), \
+            Localizer.instance().langStr("br_ton.symbol"), Localizer.instance().langStr("br_ton.desc"))
+        uom.setConversion(2240.0, self.getUOM(Unit.POUND_MASS))        
+        return uom     
+    
+    def usDollar(self):
+        # dollar 
+        return self.createScalarUOM(UnitType.CURRENCY, Unit.US_DOLLAR, \
+            Localizer.instance().langStr("us_dollar.name"), Localizer.instance().langStr("us_dollar.symbol"), Localizer.instance().langStr("us_dollar.desc"))
+        
+    def euro(self):
+        return self.createScalarUOM(UnitType.CURRENCY, Unit.EURO, Localizer.instance().langStr("euro.name"), \
+            Localizer.instance().langStr("euro.symbol"), Localizer.instance().langStr("euro.desc"))
+        
+    def yuan(self):
+        return self.createScalarUOM(UnitType.CURRENCY, Unit.YUAN, Localizer.instance().langStr("yuan.name"), \
+            Localizer.instance().langStr("yuan.symbol"), Localizer.instance().langStr("yuan.desc"))
     
     def createUOMForUnit(self, unit):
-        # SI
-        uom = self.createSIUnit(unit)
+        uom = None
         
-        if (uom is not None):
-            return uom
-        
-        # Customary
-        uom = self.createCustomaryUnit(unit)
-        
-        if (uom is not None):
-            return uom
-        
-        # US
-        uom = self.createUSUnit(unit)
-        
-        if (uom is not None):
-            return uom
-        
-        # British
-        uom = self.createBRUnit(unit)
-        
-        if (uom is not None):
-            return uom
-        
-        return self.createFinancialUnit(unit)
+        if (unit in self.brDict):
+            uom = self.brDict[unit]()
+        elif (unit in self.finDict):
+            uom = self.finDict[unit]()
+            
+        return uom
     
     def getQuantity(self, constant: Constant):
         named = None
@@ -1057,19 +1048,19 @@ class MeasurementSystem:
         return uom
     
     def getSecond(self):
-        return self.cacheManager.getUOMByUnit(Unit.SECOND)
+        return CacheManager.instance().getUOMByUnit(Unit.SECOND)
     
     def getMinute(self):
-        return self.cacheManager.getUOMByUnit(Unit.MINUTE)
+        return CacheManager.instance().getUOMByUnit(Unit.MINUTE)
     
     def getHour(self):
-        return self.cacheManager.getUOMByUnit(Unit.HOUR)
+        return CacheManager.instance().getUOMByUnit(Unit.HOUR)
     
     def getDay(self):
-        return self.cacheManager.getUOMByUnit(Unit.DAY)
+        return CacheManager.instance().getUOMByUnit(Unit.DAY)
     
     def getRegisteredUnits(self):
-        units = self.cacheManager.getCachedUnits()
+        units = CacheManager.instance().getCachedUnits()
         return units.sort()
     
     def getUnitsOfMeasure(self, unitType):
@@ -1338,7 +1329,7 @@ class MeasurementSystem:
             units.append(self.getUOM(Unit.CUBIC_FEET_PER_SEC))
             
     def getUOMBySymbol(self, symbol):
-        return self.cacheManager.getUOMBySymbol(symbol)
+        return CacheManager.instance().getUOMBySymbol(symbol)
             
     def getUOMForUnit(self, prefix: Prefix, unit):
         return self.getUOMWithPrefix(prefix, MeasurementSystem.instance().getUOM(unit))
@@ -1382,6 +1373,6 @@ class MeasurementSystem:
         return quantity.convert(MeasurementSystem.instance().getUOM(prefix, unit))
     
     def quantityToPower(self, quantity, exponent):
-        amount = Operands.powOp(self.quantity, exponent)
+        amount = math.pow(self.quantity, exponent)
         uom = MeasurementSystem.instance().createPowerUOM(quantity.uom, exponent)
         return Quantity(amount, uom) 

@@ -92,7 +92,7 @@ class UnitOfMeasure(Symbolic):
         
         # scaling factor
         if (not math.isclose(self.scalingFactor, 1.0)):
-            value = value + str(self.scalingFactor) + Operands.multOp()
+            value = value + str(self.scalingFactor) + Operands.MULT
             
         # abscissa unit
         if (self.abscissaUnit is not None) :
@@ -165,7 +165,7 @@ class UnitOfMeasure(Symbolic):
         self.bridgeAbscissaUnit = abscissaUnit
         self.bridgeOffset = offset
 
-    def setConversion(self, scalingFactor, abscissaUnit, offset):
+    def setConversion(self, scalingFactor, abscissaUnit, offset = 0.0):
         if (abscissaUnit is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
             raise Exception(msg)
@@ -220,20 +220,20 @@ class UnitOfMeasure(Symbolic):
 
     @staticmethod 
     def generatePowerSymbol(base, exponent):
-        return base.symbol + Operands.powOp() + str(exponent)
+        return base.symbol + Operands.POW + str(exponent)
 
     @staticmethod
     def generateProductSymbol(multiplier, multiplicand):
         symbol = None
         if (multiplier == multiplicand):
-            symbol = multiplier.symbol + Operands.sqOp()
+            symbol = multiplier.symbol + Operands.SQ
         else:
-            symbol = multiplier.symbol + Operands.multOp() + multiplicand.symbol
+            symbol = multiplier.symbol + Operands.MULT + multiplicand.symbol
         return symbol
 
     @staticmethod
     def generateQuotientSymbol(dividend, divisor):
-        return dividend.symbol + Operands.divOp() + divisor.symbol   
+        return dividend.symbol + Operands.DIV + divisor.symbol   
     
     def clonePower(self, uom):
         newUOM = UnitOfMeasure()
