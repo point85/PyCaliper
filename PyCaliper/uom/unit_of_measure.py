@@ -72,10 +72,10 @@ class UnitOfMeasure(Symbolic):
         return True
     
     def __lt__(self, other):
-        return self.__symbol < other.__symbol
+        return self.symbol < other.symbol
 
     def __gt__(self, other):
-        return self.__symbol > other.__symbol
+        return self.symbol > other.symbol
     
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -113,7 +113,8 @@ class UnitOfMeasure(Symbolic):
         self.baseSymbol = symbol
         
     def setPowerProduct(self, uom1, exponent1, uom2, exponent2):
-        self.setPowerProduct(uom1, exponent1)
+        self.uom1 = uom1
+        self.exponent1 = exponent1
         self.uom2 = uom2
         self.exponent2 = exponent2
         

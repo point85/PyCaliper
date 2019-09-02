@@ -15,10 +15,16 @@ class TestImports(unittest.TestCase):
     def test1(self):
         try:
             ms = MeasurementSystem.instance()
-            uom = ms.createSIUnit(Unit.ONE)
+            uom = ms.getUOM(Unit.POUND_FORCE)
+            print(str(uom)) 
+            uom = ms.getUOM(Unit.ONE)
             print(str(uom))  
-            uom = ms.createFinancialUnit(Unit.US_DOLLAR)
-            print(str(uom))            
+            uom = ms.getUOM(Unit.US_DOLLAR)
+            print(str(uom))     
+            uom = ms.getUOM(Unit.US_GALLON)
+            print(str(uom)) 
+            uom = ms.getUOM(Unit.BR_BUSHEL)
+            print(str(uom))  
             
             """
             ms.createFinDict()

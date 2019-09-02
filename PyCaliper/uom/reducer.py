@@ -137,7 +137,7 @@ class Reducer:
                     denominator = denominator + Operands.MULT
                         
                 if (unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
-                    denominator = denominator + unit.getSymbol()
+                    denominator = denominator + unit.symbol
                     denominatorCount = denominatorCount + 1
 
                 if (power < -1):
@@ -150,7 +150,7 @@ class Reducer:
             elif (power >= 1 and unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                 # positive, put in numerator
                 if (len(numerator) > 0):
-                    numerator = numerator + Operands.MULT + unit.getSymbol()
+                    numerator = numerator + Operands.MULT + unit.symbol
                     numeratorCount = numeratorCount + 1
 
                 if (power > 1):
