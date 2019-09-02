@@ -1,20 +1,22 @@
+import math
+from builtins import staticmethod
+import time
 from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.unit_type import UnitType
 from PyCaliper.uom.measurement_type import MeasurementType
 from PyCaliper.uom.localizer import Localizer
 from PyCaliper.uom.reducer import Reducer
-import math
-from builtins import staticmethod
-import time
 from PyCaliper.uom.operands import Operands
 from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.unit import Unit
+
 
 class PathParameters:
     # UOM, scaling factor and power cumulative along a conversion path
     def __init__(self, pathUOM, pathFactor):
         self.pathUOM = pathUOM
         self.pathFactor = pathFactor
+
           
 class UnitOfMeasure(Symbolic):  
     __MAX_SYMBOL_LENGTH = 16
@@ -48,11 +50,11 @@ class UnitOfMeasure(Symbolic):
         
     def __eq__(self, other):
         # same type
-        if (other == None or self.unitType != other.unitType):
+        if (other is None or self.unitType != other.unitType):
             return False
         
         # same unit enumeration
-        if (self.unit != None and other.unit != None and self.unit != other.unit):
+        if (self.unit is not None and other.unit is not None and self.unit != other.unit):
             return False
         
         # same abscissa unit symbols            
@@ -69,13 +71,13 @@ class UnitOfMeasure(Symbolic):
 
         return True
     
-    def __lt__ (self, other):
+    def __lt__(self, other):
         return self.__symbol < other.__symbol
 
-    def __gt__ (self, other):
+    def __gt__(self, other):
         return self.__symbol > other.__symbol
     
-    def __ne__ (self, other):
+    def __ne__(self, other):
         return not self.__eq__(other)
     
     def __str__(self):
@@ -95,7 +97,7 @@ class UnitOfMeasure(Symbolic):
             value = value + str(self.scalingFactor) + Operands.MULT
             
         # abscissa unit
-        if (self.abscissaUnit is not None) :
+        if (self.abscissaUnit is not None):
             value = value + self.abscissaUnit.symbol
             
         # offset
@@ -108,7 +110,7 @@ class UnitOfMeasure(Symbolic):
         return value
     
     def setBaseSymbol(self, symbol):
-            self.baseSymbol = symbol
+        self.baseSymbol = symbol
         
     def setPowerProduct(self, uom1, exponent1, uom2, exponent2):
         self.setPowerProduct(uom1, exponent1)
@@ -165,7 +167,7 @@ class UnitOfMeasure(Symbolic):
         self.bridgeAbscissaUnit = abscissaUnit
         self.bridgeOffset = offset
 
-    def setConversion(self, scalingFactor, abscissaUnit, offset = 0.0):
+    def setConversion(self, scalingFactor, abscissaUnit, offset=0.0):
         if (abscissaUnit is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
             raise Exception(msg)
@@ -215,7 +217,7 @@ class UnitOfMeasure(Symbolic):
     
     @staticmethod    
     def generateIntermediateSymbol():
-        ms = time.time_ns() # 1000000 
+        ms = time.time_ns()
         return str(ms)
 
     @staticmethod 
@@ -298,12 +300,11 @@ class UnitOfMeasure(Symbolic):
         return self
 
     @staticmethod
-    def checkTypes(uom1,  uom2):
+    def checkTypes(uom1, uom2):
         thisType = uom1.getUnitType()
         targetType = uom2.getUnitType()
 
-        if (thisType != UnitType.UNCLASSIFIED and targetType != UnitType.UNCLASSIFIED and thisType != UnitType.UNITY \
-            and targetType != UnitType.UNITY and  thisType != targetType):
+        if (thisType != UnitType.UNCLASSIFIED and targetType != UnitType.UNCLASSIFIED and thisType != UnitType.UNITY and targetType != UnitType.UNITY and thisType != targetType):
             msg = Localizer.instance().messageStr("must.be.same.as").format(uom1, uom1.getUnitType(), uom2, uom2.getUnitType())
             raise Exception(msg)
     
@@ -344,7 +345,7 @@ class UnitOfMeasure(Symbolic):
         invert = False
         one = CacheManager.instance().getUOMByUnit(Unit.ONE)
     
-            # check if quotient
+        # check if quotient
         if (self.getMeasurementType() == MeasurementType.QUOTIENT):
             if (uom2 == one): 
                 msg = Localizer.instance().messageStr("incompatible.units").format(self, one)
@@ -355,7 +356,6 @@ class UnitOfMeasure(Symbolic):
             if (uom1 == one or uom2 == one): 
                 msg = Localizer.instance().messageStr("incompatible.units").format(self, one)
                 raise Exception(msg)
-
 
         newUOM = uom1.multiplyOrDivide(uom2, invert)
         newUOM.unitType = self.unitType

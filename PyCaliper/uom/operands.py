@@ -1,7 +1,4 @@
 class Operands():
-    def __init__(self):
-        pass
-    
     # operators    
     MULT = '\xB7'
     DIV = '/'
@@ -11,3 +8,6 @@ class Operands():
     LP = '('
     RP = ')'
     ONE = '1'
+    
+    def __init__(self):
+        pass

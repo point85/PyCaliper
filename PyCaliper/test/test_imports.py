@@ -5,19 +5,41 @@ from PyCaliper.uom.localizer import Localizer
 from PyCaliper.uom.measurement_system import MeasurementSystem
 #from PyCaliper.uom.reducer import Reducer
 #from PyCaliper.uom.operands import Operands
-#from PyCaliper.uom.cache_manager import CacheManager
+from PyCaliper.uom.cache_manager import CacheManager
 #from PyCaliper.uom.quantity import Quantity
 #from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.unit import Unit
 from PyCaliper.uom.unit_type import UnitType
     
 class TestImports(unittest.TestCase):
+    def brGallon(self, ms):
+        uom=  ms.createScalarUOM(UnitType.VOLUME, Unit.BR_GALLON, \
+                Localizer.instance().langStr("br_gallon.name"), Localizer.instance().langStr("br_gallon.symbol"), Localizer.instance().langStr("br_gallon.desc"))
+        uom.setConversion(277.4194327916215, ms.getUOM(Unit.CUBIC_INCH), 0.0) 
+        return uom
+    
+    def createBrDict(self):    
+        self.brDict = {Unit.BR_GALLON : self.brGallon}
     
     def test1(self):
         try:
             ms = MeasurementSystem.instance()
+            uom = ms.createSIUnit(Unit.ONE)
+            #uom = ms.createFinancialUnit(Unit.US_DOLLAR)
+            print(str(uom))            
+            
+            """
+            ms.createFinDict()
+            
+            if (ms.brDict is None):
+                ms.createBrDict()
+            else:    
+                if (Unit.BR_GALLON in self.brDict):
+                    uom = ms.brDict[Unit.BR_GALLON]() 
+            """
+            #uom = ms.createUOMForUnit(Unit.BR_GALLON)
             #uom = ms.finDict[Unit.US_DOLLAR]()
-            uom = ms.brDict[Unit.BR_GALLON]()
+            #uom = ms.brDict[Unit.BR_GALLON]()
             #uom = ms.createScalarUOM(UnitType.MASS, Unit.BR_TON, Localizer.instance().langStr("br_ton.name"), \
             #    Localizer.instance().langStr("br_ton.symbol"), Localizer.instance().langStr("br_ton.desc"))
             #uom.setConversion(2240.0, ms.getUOM(Unit.POUND_MASS))
@@ -25,7 +47,7 @@ class TestImports(unittest.TestCase):
             #uom = sys.createUOMForUnit(Unit.US_DOLLAR)
     
             #uom = sys.createUOMForUnit(Unit.BR_GALLON)
-            print(str(uom))
+            #print(str(uom))
         
             """
             uom = sys.createScalarUOM(UnitType.UNITY, Unit.ONE, \

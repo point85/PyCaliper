@@ -1,7 +1,8 @@
 from PyCaliper.uom.unit_type import UnitType
 
+
 class CacheManager:
-        # single instance
+    # single instance
     manager = None
     
     def __init__(self):
@@ -85,7 +86,7 @@ class CacheManager:
             self.baseRegistry[key] = uom
 
     def getTypeMap(self, unitType):            
-        if (self.unitTypeRegistry.get(unitType) is not None):
+        if (unitType in self.unitTypeRegistry):
             return self.unitTypeRegistry[unitType]
         
         cachedMap = {}
@@ -95,10 +96,10 @@ class CacheManager:
             cachedMap[UnitType.LENGTH] = 2
         elif (unitType == UnitType.VOLUME):
             cachedMap[UnitType.LENGTH] = 3
-        elif (unitType ==  UnitType.DENSITY):
+        elif (unitType == UnitType.DENSITY):
             cachedMap[UnitType.MASS] = 1
             cachedMap[UnitType.LENGTH] = -3
-        elif (unitType ==  UnitType.VELOCITY):
+        elif (unitType == UnitType.VELOCITY):
             cachedMap[UnitType.LENGTH] = 1
             cachedMap[UnitType.TIME] = -1
         else:

@@ -1,5 +1,6 @@
 from abc import ABC
 
+
 class Symbolic(ABC):
     def __init__(self, name, symbol, description):
         self.name = name
@@ -21,4 +22,3 @@ class Symbolic(ABC):
             value = value + ", " + self.description + ')'
                    
         return value
-    

@@ -3,6 +3,7 @@ from PyCaliper.uom.operands import Operands
 from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.unit import Unit
 
+
 class Reducer:
     def __init__(self):
         self.MAX_RECURSIONS = 100
@@ -88,8 +89,7 @@ class Reducer:
             
         # up a level
         level = level - 1    
-        
-              
+                 
     def addTerm(self, uom, invert):        
         # add a UOM and exponent pair to the map of reduced Terms
         unitPower = 1
@@ -134,11 +134,11 @@ class Reducer:
             if (power < 0):
                 # negative, put in denominator
                 if (len(denominator) > 0):
-                        denominator = denominator + Operands.MULT
+                    denominator = denominator + Operands.MULT
                         
                 if (unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
-                        denominator = denominator + unit.getSymbol()
-                        denominatorCount = denominatorCount + 1
+                    denominator = denominator + unit.getSymbol()
+                    denominatorCount = denominatorCount + 1
 
                 if (power < -1):
                     if (power == -2):

@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+
 class Unit(Enum):
     """
     Unit is an enumeration of common units of measure in the International

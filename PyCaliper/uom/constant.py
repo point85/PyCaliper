@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+
 class Constant(Enum):
     """
     This enumeration contains the values for fundamental constants commonly used
