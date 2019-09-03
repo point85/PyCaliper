@@ -15,26 +15,18 @@ class TestImports(unittest.TestCase):
     def test1(self):
         try:
             ms = MeasurementSystem.instance()
-            uom = ms.getUOM(Unit.POUND_FORCE)
+            uom = ms.createScalarUOM(UnitType.VOLUME, Unit.BR_GALLON, Localizer.instance().langStr("br_gallon.name"), Localizer.instance().langStr("br_gallon.symbol"), Localizer.instance().langStr("br_gallon.desc"))
+            #uom.setConversion(277.4194327916215, self.getUOM(Unit.CUBIC_INCH), 0.0) 
+            #uom = ms.getUOM(Unit.METRE)
+            #print(str(uom)) 
+            #uom = ms.getUOM(Unit.FOOT)
+            #print(str(uom))  
+            #uom = ms.getUOM(Unit.CUBIC_INCH)
+            #print(str(uom))     
+            #uom = ms.getUOM(Unit.BR_GALLON)
             print(str(uom)) 
-            uom = ms.getUOM(Unit.ONE)
+            #uom = ms.getUOM(Unit.BR_BUSHEL)
             print(str(uom))  
-            uom = ms.getUOM(Unit.US_DOLLAR)
-            print(str(uom))     
-            uom = ms.getUOM(Unit.US_GALLON)
-            print(str(uom)) 
-            uom = ms.getUOM(Unit.BR_BUSHEL)
-            print(str(uom))  
-            
-            """
-            ms.createFinDict()
-            
-            if (ms.brDict is None):
-                ms.createBrDict()
-            else:    
-                if (Unit.BR_GALLON in self.brDict):
-                    uom = ms.brDict[Unit.BR_GALLON]() 
-            """
             #uom = ms.createUOMForUnit(Unit.BR_GALLON)
             #uom = ms.finDict[Unit.US_DOLLAR]()
             #uom = ms.brDict[Unit.BR_GALLON]()
@@ -46,51 +38,6 @@ class TestImports(unittest.TestCase):
     
             #uom = sys.createUOMForUnit(Unit.BR_GALLON)
             #print(str(uom))
-        
-            """
-            uom = sys.createScalarUOM(UnitType.UNITY, Unit.ONE, \
-                Localizer.instance().langStr("one.name"), Localizer.instance().langStr("one.symbol"), Localizer.instance().langStr("one.desc"))
-            s = uom.symbol
-            b = uom.getBaseSymbol()
-            print(str(uom))
-            
-            uom = sys.createScalarUOM(UnitType.LENGTH, None, "n", "cat", "d")
-            s = uom.symbol
-            b = uom.getBaseSymbol()
-            print(str(uom))
-            
-            uom = UnitOfMeasure(UnitType.LENGTH, "name", "symbol", "desc")
-            #uom.isTerminal()
-                    
-            reducer = Reducer()
-            reducer.explode(uom)
-            
-            
-            print (uom.getBaseSymbol())
-            
-            s = self.toString(uom)
-            #print("UOM" + str(uom))
-            
-            cm = CacheManager.instance() 
-            
-            one = cm.getUOMByUnit(Unit.ONE)
-            print("One: " + str(one))
-    
-            value = Localizer.instance().langStr("unit.type.text") + " " + str(UnitType.LENGTH) + ", "
-            print(value)
-    
-            q = Quantity(1.1, None)
-            q.amount = 2.2
-            print(str(q))
-    
-            uom = cm.getUOMBySymbol("m")
-            print(uom)
-            
-            r = Reducer()
-            print(r.MAX_RECURSIONS)
-            o = Operands()
-            print(o.multOp())
-            """
             
             print ("Done!")
         except:

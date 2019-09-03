@@ -16,12 +16,19 @@ class MeasurementSystem:
     
     def __init__(self):
         MeasurementSystem.unifiedSystem = self
+        self.primeUomCache()
 
     @staticmethod
     def instance():
         if (MeasurementSystem.unifiedSystem is None):
             MeasurementSystem()
         return MeasurementSystem.unifiedSystem 
+    
+    def primeUomCache(self):
+        self.getUOM(Unit.ONE)
+        self.getUOM(Unit.SECOND)
+        self.getUOM(Unit.METRE)
+        self.getUOM(Unit.CELSIUS)
         
     def getUOM(self, unit):
         uom = CacheManager.instance().getUOMByUnit(unit)
@@ -31,7 +38,7 @@ class MeasurementSystem:
         return uom
         
     def getOne(self):
-        return CacheManager.instance().getUOMByUnit(Unit.ONE)
+        return self.getUOM(Unit.ONE)
     
     def createScalarUOM(self, unitType, unit, name, symbol, description):
         uom = self.createUOM(unitType, unit, name, symbol, description)
@@ -804,128 +811,128 @@ class MeasurementSystem:
     def getQuantity(self, constant: Constant):
         named = None
 
-        if (constant == Constant. LIGHT_VELOCITY):
+        if (constant == Constant.LIGHT_VELOCITY):
             named = Quantity(299792458.0, self.getUOM(Unit.METRE_PER_SEC))
-            named.setName(Localizer.instance().langStr("light.name"))
-            named.setSymbol(Localizer.instance().langStr("light.symbol"))
-            named.setDescription(Localizer.instance().langStr("light.desc"))
+            named.name = Localizer.instance().langStr("light.name")
+            named.symbol = Localizer.instance().langStr("light.symbol")
+            named.description = Localizer.instance().langStr("light.desc")
             
-        elif (constant == Constant. LIGHT_YEAR):
+        elif (constant == Constant.LIGHT_YEAR):
             year = Quantity(1.0, self.getUOM(Unit.JULIAN_YEAR))
             named = self.getQuantity(Constant.LIGHT_VELOCITY).multiply(year)
-            named.setName(Localizer.instance().langStr("ly.name"))
-            named.setSymbol(Localizer.instance().langStr("ly.symbol"))
-            named.setDescription(Localizer.instance().langStr("ly.desc"))
+            named.name = Localizer.instance().langStr("ly.name")
+            named.symbol = Localizer.instance().langStr("ly.symbol")
+            named.description = Localizer.instance().langStr("ly.desc")
             
-        elif (constant == Constant. GRAVITY):
+        elif (constant == Constant.GRAVITY):
             named = Quantity(9.80665, self.getUOM(Unit.METRE_PER_SEC_SQUARED))
-            named.setName(Localizer.instance().langStr("gravity.name"))
-            named.setSymbol(Localizer.instance().langStr("gravity.symbol"))
-            named.setDescription(Localizer.instance().langStr("gravity.desc"))
+            named.name = Localizer.instance().langStr("gravity.name")
+            named.symbol = Localizer.instance().langStr("gravity.symbol")
+            named.description = Localizer.instance().langStr("gravity.desc")
             
-        elif (constant == Constant. PLANCK_CONSTANT):
+        elif (constant == Constant.PLANCK_CONSTANT):
             js = self.createProductUOM(self.getUOM(Unit.JOULE), self.getSecond())
             named = Quantity(6.62607015E-34, js)
-            named.setName(Localizer.instance().langStr("planck.name"))
-            named.setSymbol(Localizer.instance().langStr("planck.symbol"))
-            named.setDescription(Localizer.instance().langStr("planck.desc"))
+            named.name = Localizer.instance().langStr("planck.name")
+            named.symbol = Localizer.instance().langStr("planck.symbol")
+            named.description = Localizer.instance().langStr("planck.desc")
             
-        elif (constant == Constant. BOLTZMANN_CONSTANT):
+        elif (constant == Constant.BOLTZMANN_CONSTANT):
             jk = self.createQuotientUOM(self.getUOM(Unit.JOULE), self.getUOM(Unit.KELVIN))
             named = Quantity(1.380649E-23, jk)
-            named.setName(Localizer.instance().langStr("boltzmann.name"))
-            named.setSymbol(Localizer.instance().langStr("boltzmann.symbol"))
-            named.setDescription(Localizer.instance().langStr("boltzmann.desc"))    
+            named.name = Localizer.instance().langStr("boltzmann.name")
+            named.symbol = Localizer.instance().langStr("boltzmann.symbol")
+            named.description = Localizer.instance().langStr("boltzmann.desc")    
 
-        elif (constant == Constant. AVAGADRO_CONSTANT):
+        elif (constant == Constant.AVAGADRO_CONSTANT):
             # NA
             named = Quantity(6.02214076E+23, self.getOne())
-            named.setName(Localizer.instance().langStr("avo.name"))
-            named.setSymbol(Localizer.instance().langStr("avo.symbol"))
-            named.setDescription(Localizer.instance().langStr("avo.desc"))
+            named.name = Localizer.instance().langStr("avo.name")
+            named.symbol = Localizer.instance().langStr("avo.symbol")
+            named.description = Localizer.instance().langStr("avo.desc")
             
-        elif (constant == Constant. GAS_CONSTANT):
+        elif (constant == Constant.GAS_CONSTANT):
             # R
             named = self.getQuantity(Constant.BOLTZMANN_CONSTANT).multiply(self.getQuantity(Constant.AVAGADRO_CONSTANT))
-            named.setName(Localizer.instance().langStr("gas.name"))
-            named.setSymbol(Localizer.instance().langStr("gas.symbol"))
-            named.setDescription(Localizer.instance().langStr("gas.desc"))
+            named.name = Localizer.instance().langStr("gas.name")
+            named.symbol = Localizer.instance().langStr("gas.symbol")
+            named.description = Localizer.instance().langStr("gas.desc")
             
-        elif (constant == Constant. ELEMENTARY_CHARGE):
+        elif (constant == Constant.ELEMENTARY_CHARGE):
             # e
             named = Quantity(1.602176634E-19, self.getUOM(Unit.COULOMB))
-            named.setName(Localizer.instance().langStr("e.name"))
-            named.setSymbol(Localizer.instance().langStr("e.symbol"))
-            named.setDescription(Localizer.instance().langStr("e.desc"))
+            named.name = Localizer.instance().langStr("e.name")
+            named.symbol = Localizer.instance().langStr("e.symbol")
+            named.description = Localizer.instance().langStr("e.desc")
             
-        elif (constant == Constant. FARADAY_CONSTANT):
+        elif (constant == Constant.FARADAY_CONSTANT):
             # F = e.NA
             qe = self.getQuantity(Constant.ELEMENTARY_CHARGE)
             named = qe.multiply(self.getQuantity(Constant.AVAGADRO_CONSTANT))
-            named.setName(Localizer.instance().langStr("faraday.name"))
-            named.setSymbol(Localizer.instance().langStr("faraday.symbol"))
-            named.setDescription(Localizer.instance().langStr("faraday.desc"))
+            named.name = Localizer.instance().langStr("faraday.name")
+            named.symbol = Localizer.instance().langStr("faraday.symbol")
+            named.description = Localizer.instance().langStr("faraday.desc")
             
-        elif (constant == Constant. ELECTRIC_PERMITTIVITY):
+        elif (constant == Constant.ELECTRIC_PERMITTIVITY):
             # epsilon0 = 1/(mu0*c^2)
             vc = self.getQuantity(Constant.LIGHT_VELOCITY)
             named = self.getQuantity(Constant.MAGNETIC_PERMEABILITY).multiply(vc).multiply(vc).invert()
-            named.setName(Localizer.instance().langStr("eps0.name"))
-            named.setSymbol(Localizer.instance().langStr("eps0.symbol"))
-            named.setDescription(Localizer.instance().langStr("eps0.desc"))
+            named.name = Localizer.instance().langStr("eps0.name")
+            named.symbol = Localizer.instance().langStr("eps0.symbol")
+            named.description = Localizer.instance().langStr("eps0.desc")
             
-        elif (constant == Constant. MAGNETIC_PERMEABILITY):
+        elif (constant == Constant.MAGNETIC_PERMEABILITY):
             # mu0
             hm = self.createQuotientUOM(self.getUOM(Unit.HENRY), self.getUOM(Unit.METRE))
             fourPi = 4.0 * math.pi * 1.0E-07
             named = Quantity(fourPi, hm)
-            named.setName(Localizer.instance().langStr("mu0.name"))
-            named.setSymbol(Localizer.instance().langStr("mu0.symbol"))
-            named.setDescription(Localizer.instance().langStr("mu0.desc"))
+            named.name = Localizer.instance().langStr("mu0.name")
+            named.symbol = Localizer.instance().langStr("mu0.symbol")
+            named.description = Localizer.instance().langStr("mu0.desc")
             
-        elif (constant == Constant. ELECTRON_MASS):
+        elif (constant == Constant.ELECTRON_MASS):
             # me
             named = Quantity(9.1093835611E-28, self.getUOM(Unit.GRAM))
-            named.setName(Localizer.instance().langStr("me.name"))
-            named.setSymbol(Localizer.instance().langStr("me.symbol"))
-            named.setDescription(Localizer.instance().langStr("me.desc"))
+            named.name = Localizer.instance().langStr("me.name")
+            named.symbol = Localizer.instance().langStr("me.symbol")
+            named.description = Localizer.instance().langStr("me.desc")
             
-        elif (constant == Constant. PROTON_MASS):
+        elif (constant == Constant.PROTON_MASS):
             # mp
             named = Quantity(1.67262189821E-24, self.getUOM(Unit.GRAM))
-            named.setName(Localizer.instance().langStr("mp.name"))
-            named.setSymbol(Localizer.instance().langStr("mp.symbol"))
-            named.setDescription(Localizer.instance().langStr("mp.desc"))
+            named.name = Localizer.instance().langStr("mp.name")
+            named.symbol = Localizer.instance().langStr("mp.symbol")
+            named.description = Localizer.instance().langStr("mp.desc")
             
-        elif (constant == Constant. STEFAN_BOLTZMANN):
+        elif (constant == Constant.STEFAN_BOLTZMANN):
             k4 = self.createPowerUOM(self.getUOM(Unit.KELVIN), 4)
             sb = self.createQuotientUOM(self.getUOM(Unit.WATTS_PER_SQ_METRE), k4)
             named = Quantity(5.67036713E-08, sb)
-            named.setName(Localizer.instance().langStr("sb.name"))
-            named.setSymbol(Localizer.instance().langStr("sb.symbol"))
-            named.setDescription(Localizer.instance().langStr("sb.desc"))
+            named.name = Localizer.instance().langStr("sb.name")
+            named.symbol = Localizer.instance().langStr("sb.symbol")
+            named.description = Localizer.instance().langStr("sb.desc")
             
-        elif (constant == Constant. HUBBLE_CONSTANT):
+        elif (constant == Constant.HUBBLE_CONSTANT):
             kps = self.getUOM(Prefix.kilo(), self.getUOM(Unit.METRE_PER_SEC))
             mpc = self.getUOM(Prefix.mega(), self.getUOM(Unit.PARSEC))
             hubble = self.createQuotientUOM(kps, mpc)
             named = Quantity(71.9, hubble)
-            named.setName(Localizer.instance().langStr("hubble.name"))
-            named.setSymbol(Localizer.instance().langStr("hubble.symbol"))
-            named.setDescription(Localizer.instance().langStr("hubble.desc"))
+            named.name = Localizer.instance().langStr("hubble.name")
+            named.symbol = Localizer.instance().langStr("hubble.symbol")
+            named.description = Localizer.instance().langStr("hubble.desc")
                  
-        elif (constant == Constant. CAESIUM_FREQUENCY):
+        elif (constant == Constant.CAESIUM_FREQUENCY):
             named = Quantity(9192631770.0, self.getUOM(Unit.HERTZ))
-            named.setName(Localizer.instance().langStr("caesium.name"))
-            named.setSymbol(Localizer.instance().langStr("caesium.symbol"))
-            named.setDescription(Localizer.instance().langStr("caesium.desc"))
+            named.name = Localizer.instance().langStr("caesium.name")
+            named.symbol = Localizer.instance().langStr("caesium.symbol")
+            named.description = Localizer.instance().langStr("caesium.desc")
                       
-        elif (constant == Constant. LUMINOUS_EFFICACY):
+        elif (constant == Constant.LUMINOUS_EFFICACY):
             kcd = self.createQuotientUOM(self.getUOM(Unit.LUMEN), self.getUOM(Unit.WATT))
             named = Quantity(683.0, kcd)
-            named.setName(Localizer.instance().langStr("kcd.name"))
-            named.setSymbol(Localizer.instance().langStr("kcd.symbol"))
-            named.setDescription(Localizer.instance().langStr("kcd.desc"))
+            named.name = Localizer.instance().langStr("kcd.name")
+            named.symbol = Localizer.instance().langStr("kcd.symbol")
+            named.description = Localizer.instance().langStr("kcd.desc")
 
         return named
     
@@ -1001,13 +1008,13 @@ class MeasurementSystem:
         return uom
     
     def getSecond(self):
-        return CacheManager.instance().getUOMByUnit(Unit.SECOND)
+        return self.getUOM(Unit.SECOND)
     
     def getMinute(self):
-        return CacheManager.instance().getUOMByUnit(Unit.MINUTE)
+        return self.getUOM(Unit.MINUTE)
     
     def getHour(self):
-        return CacheManager.instance().getUOMByUnit(Unit.HOUR)
+        return self.getUOM(Unit.HOUR)
     
     def getRegisteredUnits(self):
         units = CacheManager.instance().getCachedUnits()
