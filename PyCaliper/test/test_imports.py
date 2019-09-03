@@ -15,12 +15,16 @@ from PyCaliper.uom.unit_type import UnitType
 class TestImports(unittest.TestCase):    
     def test1(self):
         try:
-            t = gettext.translation('units', localedir='locales', languages=[Localizer.getLC()])
-            t.install()
+            messages = gettext.translation('units', localedir='locales', languages=[Localizer.getLC()])
+            messages.install()
+            print(messages.gettext("us_tsp.desc"))
+            
             #ms = MeasurementSystem.instance()
             #uom = ms.createScalarUOM(UnitType.VOLUME, Unit.BR_GALLON, Localizer.instance().langStr("br_gallon.name"), Localizer.instance().langStr("br_gallon.symbol"), Localizer.instance().langStr("br_gallon.desc"))
             #uom.setConversion(277.4194327916215, self.getUOM(Unit.CUBIC_INCH), 0.0) 
-            #uom = ms.getUOM(Unit.METRE)
+            #uom = ms.getUOM(Unit.ONE)
+            #print(str(uom)) 
+            #uom = ms.getUOM(Unit.ONE)
             #print(str(uom)) 
             #uom = ms.getUOM(Unit.FOOT)
             #print(str(uom))  

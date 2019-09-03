@@ -28,13 +28,13 @@ class MeasurementSystem:
         self.getUOM(Unit.ONE)
         self.getUOM(Unit.SECOND)
         self.getUOM(Unit.METRE)
-        self.getUOM(Unit.CELSIUS)
         
     def getUOM(self, unit):
         uom = CacheManager.instance().getUOMByUnit(unit)
 
         if (uom is None):
             uom = self.createUOMForUnit(unit)
+            
         return uom
         
     def getOne(self):

@@ -575,7 +575,7 @@ class UnitOfMeasure(Symbolic):
         if (UnitOfMeasure.isValidExponent(self.exponent2) and self.exponent2 < 0):
             inverted = self.getDivisor().divide(self.getDividend())
         else:
-            inverted = CacheManager.instance().getOne().divide(self)
+            inverted = CacheManager.instance().getUOMByUnit(Unit.ONE).divide(self)
 
         return inverted
     
