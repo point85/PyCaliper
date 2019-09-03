@@ -94,14 +94,157 @@ class CacheManager:
         
         if (unitType == UnitType.AREA):
             cachedMap[UnitType.LENGTH] = 2
+            
         elif (unitType == UnitType.VOLUME):
             cachedMap[UnitType.LENGTH] = 3
+            
         elif (unitType == UnitType.DENSITY):
             cachedMap[UnitType.MASS] = 1
             cachedMap[UnitType.LENGTH] = -3
+            
         elif (unitType == UnitType.VELOCITY):
             cachedMap[UnitType.LENGTH] = 1
             cachedMap[UnitType.TIME] = -1
+            
+        elif (unitType == UnitType.VOLUMETRIC_FLOW):
+            cachedMap[UnitType.LENGTH] = 3
+            cachedMap[UnitType.TIME] = -1
+            
+        elif (unitType == UnitType.MASS_FLOW):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.TIME] = -1
+                    
+        elif (unitType == UnitType.FREQUENCY):
+            cachedMap[UnitType.TIME] = -1
+                    
+        elif (unitType == UnitType.ACCELERATION):
+            cachedMap[UnitType.LENGTH] = 1
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.FORCE):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = 1
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.PRESSURE):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = -1
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.ENERGY):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.POWER):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.TIME] = -3
+                    
+        elif (unitType == UnitType.ELECTRIC_CHARGE):
+            cachedMap[UnitType.ELECTRIC_CURRENT] = 1
+            cachedMap[UnitType.TIME] = 1
+                    
+        elif (unitType == UnitType.ELECTROMOTIVE_FORCE):
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.ELECTRIC_CURRENT] = -1
+            cachedMap[UnitType.TIME] = -3
+                    
+        elif (unitType == UnitType.ELECTRIC_RESISTANCE):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = -3
+            cachedMap[UnitType.ELECTRIC_CURRENT] = 2
+            cachedMap[UnitType.TIME] = 4
+                    
+        elif (unitType == UnitType.ELECTRIC_CAPACITANCE):
+            cachedMap[UnitType.MASS] = -1
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.ELECTRIC_CURRENT] = -2
+            cachedMap[UnitType.TIME] = -3
+                    
+        elif (unitType == UnitType.ELECTRIC_PERMITTIVITY):
+            cachedMap[UnitType.MASS] = -1
+            cachedMap[UnitType.LENGTH] = -3
+            cachedMap[UnitType.ELECTRIC_CURRENT] = 2
+            cachedMap[UnitType.TIME] = 4
+                    
+        elif (unitType == UnitType.ELECTRIC_FIELD_STRENGTH):
+            cachedMap[UnitType.ELECTRIC_CURRENT] = 1
+            cachedMap[UnitType.LENGTH] = -1
+                    
+        elif (unitType == UnitType.MAGNETIC_FLUX):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.ELECTRIC_CURRENT] = -1
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.MAGNETIC_FLUX_DENSITY):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.ELECTRIC_CURRENT] = -1
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.ELECTRIC_INDUCTANCE):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.ELECTRIC_CURRENT] = -2
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.ELECTRIC_CONDUCTANCE):
+            cachedMap[UnitType.MASS] = -1
+            cachedMap[UnitType.LENGTH] = -2
+            cachedMap[UnitType.ELECTRIC_CURRENT] = 2
+            cachedMap[UnitType.TIME] = 3
+                    
+        elif (unitType == UnitType.LUMINOUS_FLUX):
+            cachedMap[UnitType.LUMINOSITY] = 1
+                    
+        elif (unitType == UnitType.ILLUMINANCE):
+            cachedMap[UnitType.LUMINOSITY] = 1
+            cachedMap[UnitType.LENGTH] = -2
+                    
+        elif (unitType == UnitType.RADIATION_DOSE_ABSORBED):
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.RADIATION_DOSE_EFFECTIVE):
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.TIME] = -2
+                    
+        elif (unitType == UnitType.RADIATION_DOSE_RATE):
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.TIME] = -3
+                    
+        elif (unitType == UnitType.RADIOACTIVITY):
+            cachedMap[UnitType.TIME] = -1
+                    
+        elif (unitType == UnitType.CATALYTIC_ACTIVITY):
+            cachedMap[UnitType.SUBSTANCE_AMOUNT] = 1
+            cachedMap[UnitType.TIME] = -1
+                    
+        elif (unitType == UnitType.DYNAMIC_VISCOSITY):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.LENGTH] = 1
+            cachedMap[UnitType.TIME] = -1
+                    
+        elif (unitType == UnitType.KINEMATIC_VISCOSITY):
+            cachedMap[UnitType.LENGTH] = 2
+            cachedMap[UnitType.TIME] = -1
+                    
+        elif (unitType == UnitType.RECIPROCAL_LENGTH):
+            cachedMap[UnitType.LENGTH] = -1
+                    
+        elif (unitType == UnitType.TIME_SQUARED):
+            cachedMap[UnitType.TIME] = 2
+                    
+        elif (unitType == UnitType.MOLAR_CONCENTRATION):
+            cachedMap[UnitType.SUBSTANCE_AMOUNT] = 1
+            cachedMap[UnitType.LENGTH] = -3
+                    
+        elif (unitType == UnitType.IRRADIANCE):
+            cachedMap[UnitType.MASS] = 1
+            cachedMap[UnitType.TIME] = -3
+                            
         else:
             pass
         

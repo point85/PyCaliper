@@ -9,27 +9,27 @@ class Reducer:
         self.MAX_RECURSIONS = 100
         self.STARTING_LEVEL = -1
         self.terms = {}
-        self.mapScalingFactor = 1
+        self.mapScalingFactor = 1.0
         self.pathExponents = []
         self.counter = 0
     
-    def explode(self, unit):
-        self.explodeRecursively(unit, self.STARTING_LEVEL)
+    def explode(self, uom):
+        self.explodeRecursively(uom, self.STARTING_LEVEL)
         
-    def explodeRecursively(self, unit, level):
+    def explodeRecursively(self, uom, level):
         self.counter = self.counter + 1
         if (self.counter > self.MAX_RECURSIONS):
-            msg = Localizer.messageStr("circular.references").format(unit.symbol)
+            msg = Localizer.messageStr("circular.references").format(uom.symbol)
             raise Exception(msg)
         
         # down a level
         level = level + 1
         
         # scaling factor to abscissa unit
-        scalingFactor = unit.scalingFactor
+        scalingFactor = uom.scalingFactor
         
         # explode the abscissa unit
-        abscissaUnit = unit.abscissaUnit
+        abscissaUnit = uom.abscissaUnit
         
         uom1 = abscissaUnit.uom1
         uom2 = abscissaUnit.uom2
@@ -42,17 +42,15 @@ class Reducer:
             lastExponent = self.pathExponents[len(self.pathExponents) - 1]
 
             # compute the overall scaling factor
-            factor = 1
+            factor = 1.0
             
-            i = 0
-            while (i < abs(lastExponent)):
+            for _ in range(abs(lastExponent)):
                 factor = factor * scalingFactor
 
                 if (lastExponent < 0):
                     self.mapScalingFactor = self.mapScalingFactor / factor
                 else:
                     self.mapScalingFactor = self.mapScalingFactor * factor
-                i = i + 1
         else:
             self.mapScalingFactor = scalingFactor    
             
@@ -60,7 +58,7 @@ class Reducer:
             if (not abscissaUnit.isTerminal()):
                 # keep exploding down the conversion path
                 currentMapFactor = self.mapScalingFactor
-                self.mapScalingFactor = 1
+                self.mapScalingFactor = 1.0
                 self.explodeRecursively(abscissaUnit, self.STARTING_LEVEL)
                 self.mapScalingFactor = self.mapScalingFactor * currentMapFactor
             else:
@@ -73,7 +71,7 @@ class Reducer:
                 # variable = 1 if something == 1 else 0
                 invert = True if pathExponent < 0 else False
                 
-                for i in range(abs(pathExponent)):
+                for _ in range(abs(pathExponent)):
                     self.addTerm(abscissaUnit, invert)
         else:
             # explode UOM #1
@@ -97,7 +95,7 @@ class Reducer:
 
         if (not invert):
             # get existing power
-            if (uom not in self.terms):
+            if (uom not in self.terms.keys()):
                 # add first time
                 power = unitPower
             else:
@@ -106,7 +104,7 @@ class Reducer:
                     power = self.terms[uom] + unitPower
         else:
             # denominator with negative powers
-            if (uom not in self.terms):
+            if (uom not in self.terms.keys()):
                 # add first time
                 power = -unitPower
             else:
@@ -128,16 +126,17 @@ class Reducer:
         denominatorCount = 0
         
         # sort units by symbol (ascending)
-        for unit in sorted(self.terms.keys()):
-            power = self.terms[unit]
+        sortedTerms = sorted(self.terms.keys())
+        for uom in sortedTerms:
+            power = self.terms[uom]
         
             if (power < 0):
                 # negative, put in denominator
                 if (len(denominator) > 0):
                     denominator = denominator + Operands.MULT
                         
-                if (unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
-                    denominator = denominator + unit.symbol
+                if (uom != CacheManager.instance().getUOMByUnit(Unit.ONE)):
+                    denominator = denominator + uom.symbol
                     denominatorCount = denominatorCount + 1
 
                 if (power < -1):
@@ -147,11 +146,12 @@ class Reducer:
                         denominator = denominator + Operands.CUBED
                     else:
                         denominator = denominator + Operands.POW + abs(power)
-            elif (power >= 1 and unit != CacheManager.instance().getUOMByUnit(Unit.ONE)):
+            elif (power >= 1 and uom != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                 # positive, put in numerator
                 if (len(numerator) > 0):
-                    numerator = numerator + Operands.MULT + unit.symbol
-                    numeratorCount = numeratorCount + 1
+                    numerator = numerator + Operands.MULT
+                numerator = numerator + uom.symbol
+                numeratorCount = numeratorCount + 1
 
                 if (power > 1):
                     if (power == 2):
@@ -167,14 +167,17 @@ class Reducer:
         if (numeratorCount == 0):
             numerator = numerator + Operands.ONE
 
-            result = None
+        result = None
 
-            if (denominatorCount == 0):
-                result = numerator
+        if (denominatorCount == 0):
+            result = numerator
+        else:
+            if (denominatorCount == 1):
+                result = numerator + Operands.DIV + denominator
             else:
-                if (denominatorCount == 1):
-                    result = numerator + Operands.DIV + denominator
-                else:
-                    result = numerator + Operands.DIV + Operands.LP + denominator + Operands.RP
+                result = numerator + Operands.DIV + Operands.LP + denominator + Operands.RP
 
-            return result       
+        return result       
+
+    def __str__(self):
+        return str(self.mapScalingFactor) + str(self.terms)

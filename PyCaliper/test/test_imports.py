@@ -15,11 +15,11 @@ from PyCaliper.uom.unit_type import UnitType
 class TestImports(unittest.TestCase):    
     def test1(self):
         try:
-            messages = gettext.translation('units', localedir='locales', languages=[Localizer.getLC()])
-            messages.install()
-            print(messages.gettext("us_tsp.desc"))
+            #messages = gettext.translation('units', localedir='locales', languages=[Localizer.getLC()])
+            #messages.install()
+            #print(messages.gettext("us_tsp.desc"))
             
-            #ms = MeasurementSystem.instance()
+            ms = MeasurementSystem.instance()
             #uom = ms.createScalarUOM(UnitType.VOLUME, Unit.BR_GALLON, Localizer.instance().langStr("br_gallon.name"), Localizer.instance().langStr("br_gallon.symbol"), Localizer.instance().langStr("br_gallon.desc"))
             #uom.setConversion(277.4194327916215, self.getUOM(Unit.CUBIC_INCH), 0.0) 
             #uom = ms.getUOM(Unit.ONE)
@@ -30,8 +30,11 @@ class TestImports(unittest.TestCase):
             #print(str(uom))  
             #uom = ms.getUOM(Unit.CUBIC_INCH)
             #print(str(uom))     
-            #uom = ms.getUOM(Unit.BR_GALLON)
-            #print(str(uom)) 
+            uom = ms.getUOM(Unit.NEWTON)
+            print(str(uom)) 
+            powerMap = uom.getReducer()
+            base = powerMap.buildBaseString()
+            print(base)
             #uom = ms.getUOM(Unit.BR_BUSHEL)
             #print(str(uom))  
             #uom = ms.createUOMForUnit(Unit.BR_GALLON)
