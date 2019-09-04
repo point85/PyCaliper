@@ -1,12 +1,109 @@
 from enum import Enum, auto
 
 
+class MeasurementType(Enum):
+    """
+    An enumeration of the basic types of units of measure
+    """
+    SCALAR = auto() 
+    PRODUCT = auto() 
+    QUOTIENT = auto() 
+    POWER = auto()
+    
+    
+class Constant(Enum):
+    """
+    This enumeration contains the values for fundamental constants commonly used
+         in science, technology, engineering and math.
+    """
+    LIGHT_VELOCITY = auto()
+    LIGHT_YEAR = auto() 
+    GRAVITY = auto() 
+    PLANCK_CONSTANT = auto() 
+    BOLTZMANN_CONSTANT = auto() 
+    AVAGADRO_CONSTANT = auto() 
+    GAS_CONSTANT = auto() 
+    ELEMENTARY_CHARGE = auto() 
+    ELECTRIC_PERMITTIVITY = auto() 
+    MAGNETIC_PERMEABILITY = auto() 
+    FARADAY_CONSTANT = auto() 
+    ELECTRON_MASS = auto() 
+    PROTON_MASS = auto() 
+    STEFAN_BOLTZMANN = auto() 
+    HUBBLE_CONSTANT = auto() 
+    CAESIUM_FREQUENCY = auto() 
+    LUMINOUS_EFFICACY = auto() 
+    
+    def __str__(self):
+        return self.name + ", " + str(self.value)
+
+
+class UnitType(Enum):
+    # dimension-less "1"
+    UNITY = auto()
+
+    # fundamental
+    LENGTH = auto() 
+    MASS = auto() 
+    TIME = auto() 
+    ELECTRIC_CURRENT = auto() 
+    TEMPERATURE = auto() 
+    SUBSTANCE_AMOUNT = auto() 
+    LUMINOSITY = auto()
+
+    # other physical
+    AREA = auto() 
+    VOLUME = auto() 
+    DENSITY = auto() 
+    VELOCITY = auto() 
+    VOLUMETRIC_FLOW = auto() 
+    MASS_FLOW = auto() 
+    FREQUENCY = auto() 
+    ACCELERATION = auto() 
+    FORCE = auto() 
+    PRESSURE = auto() 
+    ENERGY = auto() 
+    POWER = auto() 
+    ELECTRIC_CHARGE = auto()
+    ELECTROMOTIVE_FORCE = auto() 
+    ELECTRIC_RESISTANCE = auto() 
+    ELECTRIC_CAPACITANCE = auto() 
+    ELECTRIC_PERMITTIVITY = auto() 
+    ELECTRIC_FIELD_STRENGTH = auto()
+    MAGNETIC_FLUX = auto() 
+    MAGNETIC_FLUX_DENSITY = auto() 
+    ELECTRIC_INDUCTANCE = auto() 
+    ELECTRIC_CONDUCTANCE = auto()
+    LUMINOUS_FLUX = auto() 
+    ILLUMINANCE = auto() 
+    RADIATION_DOSE_ABSORBED = auto() 
+    RADIATION_DOSE_EFFECTIVE = auto() 
+    RADIATION_DOSE_RATE = auto() 
+    RADIOACTIVITY = auto() 
+    CATALYTIC_ACTIVITY = auto() 
+    DYNAMIC_VISCOSITY = auto()
+    KINEMATIC_VISCOSITY = auto() 
+    RECIPROCAL_LENGTH = auto() 
+    PLANE_ANGLE = auto() 
+    SOLID_ANGLE = auto() 
+    INTENSITY = auto() 
+    COMPUTER_SCIENCE = auto() 
+    TIME_SQUARED = auto() 
+    MOLAR_CONCENTRATION = auto() 
+    IRRADIANCE = auto()
+
+    # currency
+    CURRENCY = auto()
+
+    # unclassified.  Reserved for use when creating custom units of measure.
+    UNCLASSIFIED = auto()
+
+
 class Unit(Enum):
     """
     Unit is an enumeration of common units of measure in the International
     Customary = auto() SI = auto() US and British Imperial systems.
     """
-    
     # dimension-less "1" or unity
     ONE = auto() 
     PERCENT = auto()
@@ -190,3 +287,18 @@ class Unit(Enum):
     US_DOLLAR = auto() 
     EURO = auto() 
     YUAN = auto()
+ 
+    
+class Operands():
+    # operators    
+    MULT = '\xB7'
+    DIV = '/'
+    POW = '^'
+    SQ = '\xB2'
+    CUBED ='\xB3'
+    LP = '('
+    RP = ')'
+    ONE = '1'
+    
+    def __init__(self):
+        pass

@@ -1,7 +1,7 @@
 
 import locale
 from PyCaliper.uom.measurement_system import MeasurementSystem
-from PyCaliper.uom.unit_type import UnitType
+from PyCaliper.uom.enums import UnitType
 """
 gettext.bindtextdomain('test_locale', localedir='locales')
 gettext.textdomain('test_locale')

@@ -1,12 +1,12 @@
 import math
 from builtins import staticmethod
 from PyCaliper.uom.cache_manager import CacheManager
-from PyCaliper.uom.constant import Constant
+from PyCaliper.uom.enums import Constant
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
-from PyCaliper.uom.unit import Unit
+from PyCaliper.uom.enums import Unit
 from PyCaliper.uom.unit_of_measure import UnitOfMeasure
-from PyCaliper.uom.unit_type import UnitType
+from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.localizer import Localizer
 
 

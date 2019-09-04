@@ -1,8 +1,7 @@
-from PyCaliper.uom.symbolic import Symbolic
-from PyCaliper.uom.localizer import Localizer
 import math
 from builtins import staticmethod
-
+from PyCaliper.uom.symbolic import Symbolic
+from PyCaliper.uom.localizer import Localizer
 
 class Quantity(Symbolic):
     def __init__(self, amount, uom):

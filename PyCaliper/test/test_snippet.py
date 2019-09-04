@@ -1,6 +1,6 @@
 import unittest
 from PyCaliper.uom.prefix import Prefix
-from PyCaliper.uom.constant import Constant
+from PyCaliper.uom.enums import Constant
 from PyCaliper.uom.measurement_system import MeasurementSystem
 
 class TestPrefix(unittest.TestCase):

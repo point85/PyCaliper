@@ -1,16 +1,7 @@
 import unittest
 import sys
-import gettext
-
-from PyCaliper.uom.localizer import Localizer
 from PyCaliper.uom.measurement_system import MeasurementSystem
-#from PyCaliper.uom.reducer import Reducer
-#from PyCaliper.uom.operands import Operands
-#from PyCaliper.uom.cache_manager import CacheManager
-#from PyCaliper.uom.quantity import Quantity
-#from PyCaliper.uom.unit_of_measure import UnitOfMeasure
-from PyCaliper.uom.unit import Unit
-from PyCaliper.uom.unit_type import UnitType
+from PyCaliper.uom.enums import Unit
     
 class TestImports(unittest.TestCase):    
     def test1(self):

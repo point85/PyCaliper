@@ -1,4 +1,4 @@
-from PyCaliper.uom.unit_type import UnitType
+from PyCaliper.uom.enums import UnitType
 
 
 class CacheManager:

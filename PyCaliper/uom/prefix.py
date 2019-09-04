@@ -2,7 +2,6 @@ class Prefix:
     """
     The Prefix class defines SI unit of measure prefixes as well as those found in computer science.
     """
-    
     @classmethod
     def yotta(cls):
         # SI prefix 10^24
