@@ -55,15 +55,25 @@ class CacheManager:
         return self.unitRegistry  
     
     def unregisterUnit(self, uom):
+        if (uom is None):
+            return
+        
         # remove by enumeration
-        if (uom.unitType is not None):
+        if (uom.unit is not None):
             del self.unitRegistry[uom.unit] 
             
         # remove by symbol and base symbol
-        del self.symbolRegistry[uom.symbol]
-        del self.baseRegistry[uom.getBaseSymbol()]
+        if (uom.symbol in self.symbolRegistry):
+            del self.symbolRegistry[uom.symbol]
+            
+        key = uom.getBaseSymbol()
+        if (key in self.baseRegistry):
+            del self.baseRegistry[key]
         
     def registerUnit(self, uom):
+        if (uom is None):
+            return
+        
         # get first by symbol
         current = self.getUOMBySymbol(uom.symbol)
 
@@ -80,9 +90,8 @@ class CacheManager:
 
         # finally cache by base symbol
         key = uom.getBaseSymbol()
-        uom = self.getBaseUOM(key)
         
-        if (uom is None):
+        if (key not in self.baseRegistry):
             self.baseRegistry[key] = uom
 
     def getTypeMap(self, unitType):            

@@ -1298,29 +1298,29 @@ class MeasurementSystem:
         return CacheManager.instance().getUOMBySymbol(symbol)
             
     def getUOMForUnit(self, prefix, unit):
-        return self.getUOMWithPrefix(prefix, MeasurementSystem.instance().getUOM(unit))
+        return self.getPrefixedUOM(prefix, MeasurementSystem.instance().getUOM(unit))
     
-    def getUOMWithPrefix(self, prefix, targetUOM):
-        symbol = prefix.symbol + targetUOM.symbol
+    def getPrefixedUOM(self, prefix, uom):
+        symbol = prefix.symbol + uom.symbol
         scaled = self.getUOMBySymbol(symbol)
 
         # if not found, create it
         if (scaled is None):
             # generate a name and description
-            name = prefix.name + targetUOM.name
-            description = str(prefix.factor) + " " + str(targetUOM.name)
+            name = prefix.name + uom.name
+            description = str(prefix.factor) + " " + uom.name
 
             # scaling factor
-            scalingFactor = targetUOM.scalingFactor * prefix.factor
+            scalingFactor = uom.scalingFactor * prefix.factor
 
             # create the unit of measure and set conversion
-            scaled = self.createScalarUOM(targetUOM.unitType, None, name, symbol, description)
-            scaled.setConversion(scalingFactor, targetUOM.abscissaUnit)
+            scaled = self.createScalarUOM(uom.unitType, None, name, symbol, description)
+            scaled.setConversion(scalingFactor, uom.abscissaUnit)
 
         return scaled
     
     def quantityFromPrefixedUnit(self, amount, prefix, unit):
-        uom = MeasurementSystem.instance().getUOM(prefix, unit)
+        uom = MeasurementSystem.instance().getUOMForUnit(prefix, unit)
         return Quantity(amount, uom)
     
     def quantityFromUnit(self, amount, unit): 
