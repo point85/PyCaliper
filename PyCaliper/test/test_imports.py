@@ -5,6 +5,7 @@ from PyCaliper.uom.enums import Unit, UnitType
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.cache_manager import CacheManager
+from PyCaliper.test.base import BaseTest
     
 class TestImports(unittest.TestCase):    
     def test1(self):
@@ -33,25 +34,13 @@ class TestImports(unittest.TestCase):
             
             prefix = Prefix.kilo()
             uom = ms.getUOM(Unit.NEWTON)
-            uom = ms.getPrefixedUOM(prefix, uom)
-            print(str(uom)) 
-            """
-            symbol = prefix.symbol + uom.symbol
-            scaled = ms.getUOMBySymbol(symbol)
-            if (scaled is None):
-            # generate a name and description
-                name = prefix.name + uom.name
-                description = str(prefix.factor) + " " + uom.name
-    
-                # scaling factor
-                scalingFactor = uom.scalingFactor * prefix.factor
-    
-                # create the unit of measure and set conversion
-                scaled = ms.createScalarUOM(uom.unitType, None, name, symbol, description)
-                #scaled.setConversion(scalingFactor, uom.abscissaUnit)
+            uom = ms.createPrefixedUOM(prefix, uom)
+            #print(str(uom)) 
 
-            print(str(scaled))
-            """
+            bt = BaseTest()
+            #bt.snapshotSymbolCache()
+            #bt.snapshotBaseSymbolCache()
+            bt.snapshotUnitEnumerationCache()
            
             #uom = ms.getUOM(Unit.BR_BUSHEL)
             #print(str(uom))  

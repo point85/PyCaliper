@@ -16,7 +16,6 @@ class MeasurementSystem:
     
     def __init__(self):
         MeasurementSystem.__unifiedSystem = self
-        #TODO self.primeUomCache()
 
     @staticmethod
     def instance():
@@ -1296,11 +1295,8 @@ class MeasurementSystem:
             
     def getUOMBySymbol(self, symbol):
         return CacheManager.instance().getUOMBySymbol(symbol)
-            
-    def getUOMForUnit(self, prefix, unit):
-        return self.getPrefixedUOM(prefix, MeasurementSystem.instance().getUOM(unit))
     
-    def getPrefixedUOM(self, prefix, uom):
+    def createPrefixedUOM(self, prefix, uom):
         symbol = prefix.symbol + uom.symbol
         scaled = self.getUOMBySymbol(symbol)
 
@@ -1320,7 +1316,7 @@ class MeasurementSystem:
         return scaled
     
     def quantityFromPrefixedUnit(self, amount, prefix, unit):
-        uom = MeasurementSystem.instance().getUOMForUnit(prefix, unit)
+        uom = self.createPrefixedUOM(prefix, MeasurementSystem.instance().getUOM(unit))
         return Quantity(amount, uom)
     
     def quantityFromUnit(self, amount, unit): 
