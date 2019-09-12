@@ -3,6 +3,7 @@ from builtins import staticmethod
 from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.localizer import Localizer
 
+
 class Quantity(Symbolic):
     def __init__(self, amount, uom):
         super().__init__(None, None, None)
@@ -106,7 +107,7 @@ class Quantity(Symbolic):
         return Quantity(amount, newUOM)
     
     def divideByAmount(self, divisor):
-        return  Quantity(self.amount / divisor, self.uom)
+        return Quantity(self.amount / divisor, self.uom)
     
     def multiply(self, other):
         amount = self.amount * other.amount

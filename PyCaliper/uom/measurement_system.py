@@ -292,7 +292,7 @@ class MeasurementSystem:
             e = self.getQuantity(Constant.ELEMENTARY_CHARGE)
             uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("ev.name"),
                     Localizer.instance().langStr("ev.symbol"), Localizer.instance().langStr("ev.desc"), e.self.getUOM(), self.getUOM(Unit.VOLT))
-            uom.setScalingFactor(e.getAmount())
+            uom.scalingFactor = e.amount
 
         elif (unit == Unit.WATT_HOUR):
             # watt-hour
@@ -510,7 +510,7 @@ class MeasurementSystem:
             uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("slug.name"),
                 Localizer.instance().langStr("slug.symbol"), Localizer.instance().langStr("slug.desc"))
             g = self.getQuantity(Constant.GRAVITY).convert(self.getUOM(Unit.FEET_PER_SEC_SQUARED))
-            uom.setConversion(g.getAmount(), self.getUOM(Unit.POUND_MASS))
+            uom.setConversion(g.amount, self.getUOM(Unit.POUND_MASS))
                 
         elif (unit == Unit.FOOT):
             uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("foot.name"),
@@ -622,7 +622,7 @@ class MeasurementSystem:
         elif (unit == Unit.HP):
             uom = self.createProductUOM(UnitType.POWER, unit, Localizer.instance().langStr("hp.name"), Localizer.instance().langStr("hp.symbol"),
                 Localizer.instance().langStr("hp.desc"), self.getUOM(Unit.POUND_FORCE), self.getUOM(Unit.FEET_PER_SEC))
-            uom.setScalingFactor(550.0)
+            uom.scalingFactor = 550.0
             
         elif (unit == Unit.BTU):
             uom = self.createScalarUOM(UnitType.ENERGY, Unit.BTU, Localizer.instance().langStr("btu.name"), Localizer.instance().langStr("btu.symbol"),
@@ -641,7 +641,7 @@ class MeasurementSystem:
     
             # factor is acceleration of gravity
             gravity = self.getQuantity(Constant.GRAVITY).convert(self.getUOM(Unit.FEET_PER_SEC_SQUARED))
-            uom.setScalingFactor(gravity.getAmount())
+            uom.scalingFactor = gravity.amount
                 
         elif (unit == Unit.GRAIN):
             uom = self.createScalarUOM(UnitType.MASS, unit, Localizer.instance().langStr("grain.name"),
@@ -817,7 +817,7 @@ class MeasurementSystem:
 
         return uom
     
-    def getQuantity(self, constant: Constant):
+    def getQuantity(self, constant):
         named = None
 
         if (constant == Constant.LIGHT_VELOCITY):

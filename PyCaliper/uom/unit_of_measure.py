@@ -5,12 +5,21 @@ from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.enums import MeasurementType
 from PyCaliper.uom.localizer import Localizer
-from PyCaliper.uom.enums import Operands
 from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.enums import Unit
 
 
 class Reducer:
+    # operators    
+    MULT = '\xB7'
+    DIV = '/'
+    POW = '^'
+    SQ = '\xB2'
+    CUBED = '\xB3'
+    LP = '('
+    RP = ')'
+    ONE = '1'
+        
     def __init__(self):
         self.MAX_RECURSIONS = 100
         self.STARTING_LEVEL = -1
@@ -139,7 +148,7 @@ class Reducer:
             if (power < 0):
                 # negative, put in denominator
                 if (len(denominator) > 0):
-                    denominator = denominator + Operands.MULT
+                    denominator = denominator + Reducer.MULT
                         
                 if (uom != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                     denominator = denominator + uom.symbol
@@ -147,31 +156,31 @@ class Reducer:
 
                 if (power < -1):
                     if (power == -2):
-                        denominator = denominator + Operands.SQ
+                        denominator = denominator + Reducer.SQ
                     elif (power == -3):
-                        denominator = denominator + Operands.CUBED
+                        denominator = denominator + Reducer.CUBED
                     else:
-                        denominator = denominator + Operands.POW + abs(power)
+                        denominator = denominator + Reducer.POW + abs(power)
             elif (power >= 1 and uom != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                 # positive, put in numerator
                 if (len(numerator) > 0):
-                    numerator = numerator + Operands.MULT
+                    numerator = numerator + Reducer.MULT
                 numerator = numerator + uom.symbol
                 numeratorCount = numeratorCount + 1
 
                 if (power > 1):
                     if (power == 2):
-                        numerator = numerator + Operands.SQ
+                        numerator = numerator + Reducer.SQ
                     elif (power == 3):
-                        numerator = numerator + Operands.CUBED
+                        numerator = numerator + Reducer.CUBED
                     else:
-                        numerator = numerator + Operands.POW + power
+                        numerator = numerator + Reducer.POW + power
             else:
                 # unary, don't add a '1'
                 pass
             
         if (numeratorCount == 0):
-            numerator = numerator + Operands.ONE
+            numerator = numerator + Reducer.ONE
 
         result = None
 
@@ -179,9 +188,9 @@ class Reducer:
             result = numerator
         else:
             if (denominatorCount == 1):
-                result = numerator + Operands.DIV + denominator
+                result = numerator + Reducer.DIV + denominator
             else:
-                result = numerator + Operands.DIV + Operands.LP + denominator + Operands.RP
+                result = numerator + Reducer.DIV + Reducer.LP + denominator + Reducer.RP
 
         return result       
 
@@ -272,7 +281,7 @@ class UnitOfMeasure(Symbolic):
         
         # scaling factor
         if (not math.isclose(self.scalingFactor, 1.0)):
-            value = value + str(self.scalingFactor) + Operands.MULT
+            value = value + str(self.scalingFactor) + Reducer.MULT
             
         # abscissa unit
         if (self.abscissaUnit is not None):
@@ -401,20 +410,20 @@ class UnitOfMeasure(Symbolic):
 
     @staticmethod 
     def generatePowerSymbol(base, exponent):
-        return base.symbol + Operands.POW + str(exponent)
+        return base.symbol + Reducer.POW + str(exponent)
 
     @staticmethod
     def generateProductSymbol(multiplier, multiplicand):
         symbol = None
         if (multiplier == multiplicand):
-            symbol = multiplier.symbol + Operands.SQ
+            symbol = multiplier.symbol + Reducer.SQ
         else:
-            symbol = multiplier.symbol + Operands.MULT + multiplicand.symbol
+            symbol = multiplier.symbol + Reducer.MULT + multiplicand.symbol
         return symbol
 
     @staticmethod
     def generateQuotientSymbol(dividend, divisor):
-        return dividend.symbol + Operands.DIV + divisor.symbol   
+        return dividend.symbol + Reducer.DIV + divisor.symbol   
     
     def clonePower(self, uom):
         newUOM = UnitOfMeasure()
@@ -480,11 +489,11 @@ class UnitOfMeasure(Symbolic):
 
     @staticmethod
     def checkTypes(uom1, uom2):
-        thisType = uom1.getUnitType()
-        targetType = uom2.getUnitType()
+        thisType = uom1.unitType
+        targetType = uom2.unitType
 
         if (thisType != UnitType.UNCLASSIFIED and targetType != UnitType.UNCLASSIFIED and thisType != UnitType.UNITY and targetType != UnitType.UNITY and thisType != targetType):
-            msg = Localizer.instance().messageStr("must.be.same.as").format(uom1, uom1.getUnitType(), uom2, uom2.getUnitType())
+            msg = Localizer.instance().messageStr("must.be.same.as").format(uom1, thisType, uom2, targetType)
             raise Exception(msg)
     
     def getBaseSymbol(self):
@@ -499,8 +508,8 @@ class UnitOfMeasure(Symbolic):
         pathFactor = 1.0
         
         while (True):
-            scalingFactor = pathUOM.getScalingFactor()
-            abscissa = pathUOM.getAbscissaUnit()
+            scalingFactor = pathUOM.scalingFactor
+            abscissa = pathUOM.abscissaUnit
 
             pathFactor = pathFactor * scalingFactor
 
@@ -691,7 +700,9 @@ class UnitOfMeasure(Symbolic):
             raise Exception(msg)
         
         # first check the cache
-        cachedFactor = self.conversionRegistry[targetUOM]
+        cachedFactor = None
+        if targetUOM in self.conversionRegistry: 
+            cachedFactor = self.conversionRegistry[targetUOM]
 
         if (cachedFactor is not None):
             return cachedFactor
@@ -716,12 +727,12 @@ class UnitOfMeasure(Symbolic):
         # compute map factor
         matchCount = 0
         
-        for fromEntry in fromMap.items:
+        for fromEntry in fromMap.items():
             fromUOM = fromEntry[0]
             fromType = fromUOM.unitType
             fromPower = fromEntry[1]
 
-            for toEntry in toMap.items:
+            for toEntry in toMap.items():
                 toType = toEntry[0].unitType
 
                 if (fromType == toType):
