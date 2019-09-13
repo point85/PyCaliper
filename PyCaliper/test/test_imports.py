@@ -1,4 +1,4 @@
-#import unittest
+import unittest
 #import sys
 from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.enums import Unit
@@ -6,10 +6,10 @@ from PyCaliper.uom.enums import Unit
 #from PyCaliper.uom.quantity import Quantity
 #from PyCaliper.uom.prefix import Prefix
 #from PyCaliper.uom.cache_manager import CacheManager
-from PyCaliper.test.base import BaseTest
+from PyCaliper.test.base import TestUtils
 #from PyCaliper.uom.localizer import Localizer
     
-class TestImports(BaseTest):    
+class TestImports(unittest.TestCase):    
     def test1(self):
         #try:
             
@@ -22,9 +22,9 @@ class TestImports(BaseTest):
             """
             
             ft2 = ms.getUOM(Unit.SQUARE_FOOT)
-            self.snapshotSymbolCache()
-            self.snapshotUnitEnumerationCache()
-            self.snapshotBaseSymbolCache()
+            TestUtils.snapshotSymbolCache()
+            TestUtils.snapshotUnitEnumerationCache()
+            TestUtils.snapshotBaseSymbolCache()
             
             """
             n = Localizer.instance().langStr("acre.name")

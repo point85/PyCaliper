@@ -16,7 +16,7 @@ class MeasurementSystem:
     
     def __init__(self):
         MeasurementSystem.__unifiedSystem = self
-        #TODO self.primeUomCache()
+        self.primeUomCache()
         
     @staticmethod
     def instance():
@@ -30,11 +30,11 @@ class MeasurementSystem:
         self.getUOM(Unit.METRE)
         
     def getUOM(self, unit):
-        print("-->Check cache for " + str(unit))
+        #print("-->Check cache for " + str(unit))
         uom = CacheManager.instance().getUOMByUnit(unit)
 
         if (uom is None):
-            print("-->Creating uom for  " + str(unit))
+            #print("-->Creating uom for  " + str(unit))
             uom = self.createUOMForUnit(unit)
             
         return uom

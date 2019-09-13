@@ -81,7 +81,7 @@ class CacheManager:
             # already cached
             return
 
-        print("+++registering uom " + uom.symbol)
+        #print("+++registering uom " + uom.symbol)
         # cache it by symbol
         self.symbolRegistry[uom.symbol] = uom
 
@@ -90,12 +90,10 @@ class CacheManager:
             self.unitRegistry[uom.unit] = uom
 
         # TODO finally cache by base symbol
-        """
         key = uom.getBaseSymbol()
         
         if (key not in self.baseRegistry):
             self.baseRegistry[key] = uom
-        """
 
     def getTypeMap(self, unitType):            
         if (unitType in self.unitTypeRegistry):
