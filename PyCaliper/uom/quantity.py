@@ -38,11 +38,11 @@ class Quantity(Symbolic):
         uom = MeasurementSystem.instance().getUOM(prefix, unit)
         self(amount, uom)
     """
-        
+    """    
     def fromStringUOM(self, amount, uom):
         value = Quantity.createAmountFromString(amount)
         self(value, uom)
-    
+    """
     """    
     def fromUnit(self, amount, unit): 
         uom = MeasurementSystem.instance().getUOM(unit)

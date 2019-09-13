@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import math
 from builtins import staticmethod
 from PyCaliper.uom.cache_manager import CacheManager
@@ -34,9 +37,11 @@ class MeasurementSystem:
         uom = CacheManager.instance().getUOMByUnit(unit)
 
         if (uom is None):
-            #print("-->Creating uom for  " + str(unit))
+            #print("    Creating uom for  " + str(unit))
             uom = self.createUOMForUnit(unit)
-            
+        #else:
+            #TODO
+            #print("    Found UOM in cache")    
         return uom
         
     def getOne(self):
@@ -128,7 +133,7 @@ class MeasurementSystem:
                     Localizer.instance().langStr("kelvin.symbol"), Localizer.instance().langStr("kelvin.desc"))
 
         elif (unit == Unit.CELSIUS):
-            # °C = °K - 273.15
+            # ï¿½C = ï¿½K - 273.15
             uom = self.createScalarUOM(UnitType.TEMPERATURE, unit, Localizer.instance().langStr("celsius.name"),
                     Localizer.instance().langStr("celsius.symbol"), Localizer.instance().langStr("celsius.desc"))
             uom.setConversion(1.0, self.getUOM(Unit.KELVIN), 273.15)
@@ -273,7 +278,7 @@ class MeasurementSystem:
             uom.setConversion(4.184, self.getUOM(Unit.JOULE))
 
         elif (unit == Unit.NEWTON):
-            # force F = m·A (newton)
+            # force F = mï¿½A (newton)
             uom = self.createProductUOM(UnitType.FORCE, unit, Localizer.instance().langStr("newton.name"),
                     Localizer.instance().langStr("newton.symbol"), Localizer.instance().langStr("newton.desc"), self.getUOM(Unit.KILOGRAM),
                     self.getUOM(Unit.METRE_PER_SEC_SQUARED))
@@ -447,7 +452,7 @@ class MeasurementSystem:
             # length
             uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("angstrom.name"),
                     Localizer.instance().langStr("angstrom.symbol"), Localizer.instance().langStr("angstrom.desc"))
-            uom.setConversion(0.1, self.getUOM(Prefix.nano(), self.getUOM(Unit.METRE)))
+            uom.setConversion(0.1, self.createPrefixedUOM(Prefix.nano(), self.getUOM(Unit.METRE)))
 
         elif (unit == Unit.BIT):
             # computer bit
@@ -530,7 +535,7 @@ class MeasurementSystem:
         elif (unit == Unit.MIL):
             uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("mil.name"), Localizer.instance().langStr("mil.symbol"),
                 Localizer.instance().langStr("mil.desc"))
-            uom.setConversion(Prefix.milli().getFactor(), self.getUOM(Unit.INCH))
+            uom.setConversion(Prefix.milli().factor, self.getUOM(Unit.INCH))
                 
         elif (unit == Unit.POINT):
             uom = self.createScalarUOM(UnitType.LENGTH, unit, Localizer.instance().langStr("point.name"),
@@ -843,14 +848,14 @@ class MeasurementSystem:
             named.description = Localizer.instance().langStr("gravity.desc")
             
         elif (constant == Constant.PLANCK_CONSTANT):
-            js = self.createProductUOM(self.getUOM(Unit.JOULE), self.getSecond())
+            js = self.createUnclassifiedProductUOM(self.getUOM(Unit.JOULE), self.getSecond())
             named = Quantity(6.62607015E-34, js)
             named.name = Localizer.instance().langStr("planck.name")
             named.symbol = Localizer.instance().langStr("planck.symbol")
             named.description = Localizer.instance().langStr("planck.desc")
             
         elif (constant == Constant.BOLTZMANN_CONSTANT):
-            jk = self.createQuotientUOM(self.getUOM(Unit.JOULE), self.getUOM(Unit.KELVIN))
+            jk = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.JOULE), self.getUOM(Unit.KELVIN))
             named = Quantity(1.380649E-23, jk)
             named.name = Localizer.instance().langStr("boltzmann.name")
             named.symbol = Localizer.instance().langStr("boltzmann.symbol")
@@ -895,7 +900,7 @@ class MeasurementSystem:
             
         elif (constant == Constant.MAGNETIC_PERMEABILITY):
             # mu0
-            hm = self.createQuotientUOM(self.getUOM(Unit.HENRY), self.getUOM(Unit.METRE))
+            hm = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.HENRY), self.getUOM(Unit.METRE))
             fourPi = 4.0 * math.pi * 1.0E-07
             named = Quantity(fourPi, hm)
             named.name = Localizer.instance().langStr("mu0.name")
@@ -917,17 +922,17 @@ class MeasurementSystem:
             named.description = Localizer.instance().langStr("mp.desc")
             
         elif (constant == Constant.STEFAN_BOLTZMANN):
-            k4 = self.createPowerUOM(self.getUOM(Unit.KELVIN), 4)
-            sb = self.createQuotientUOM(self.getUOM(Unit.WATTS_PER_SQ_METRE), k4)
+            k4 = self.createUnclassifiedPowerUOM(self.getUOM(Unit.KELVIN), 4)
+            sb = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.WATTS_PER_SQ_METRE), k4)
             named = Quantity(5.67036713E-08, sb)
             named.name = Localizer.instance().langStr("sb.name")
             named.symbol = Localizer.instance().langStr("sb.symbol")
             named.description = Localizer.instance().langStr("sb.desc")
             
         elif (constant == Constant.HUBBLE_CONSTANT):
-            kps = self.getUOM(Prefix.kilo(), self.getUOM(Unit.METRE_PER_SEC))
-            mpc = self.getUOM(Prefix.mega(), self.getUOM(Unit.PARSEC))
-            hubble = self.createQuotientUOM(kps, mpc)
+            kps = self.createPrefixedUOM(Prefix.kilo(), self.getUOM(Unit.METRE_PER_SEC))
+            mpc = self.createPrefixedUOM(Prefix.mega(), self.getUOM(Unit.PARSEC))
+            hubble = self.createUnclassifiedQuotientUOM(kps, mpc)
             named = Quantity(71.9, hubble)
             named.name = Localizer.instance().langStr("hubble.name")
             named.symbol = Localizer.instance().langStr("hubble.symbol")
@@ -940,7 +945,7 @@ class MeasurementSystem:
             named.description = Localizer.instance().langStr("caesium.desc")
                       
         elif (constant == Constant.LUMINOUS_EFFICACY):
-            kcd = self.createQuotientUOM(self.getUOM(Unit.LUMEN), self.getUOM(Unit.WATT))
+            kcd = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.LUMEN), self.getUOM(Unit.WATT))
             named = Quantity(683.0, kcd)
             named.name = Localizer.instance().langStr("kcd.name")
             named.symbol = Localizer.instance().langStr("kcd.symbol")
@@ -1334,9 +1339,9 @@ class MeasurementSystem:
         return quantity.convert(MeasurementSystem.instance().getUOM(unit))
     
     def convertQuantityToPrefixUnit(self, quantity, prefix, unit):
-        return quantity.convert(MeasurementSystem.instance().getUOM(prefix, unit))
+        return quantity.convert(MeasurementSystem.instance().createPrefixedUOM(prefix, unit))
     
     def quantityToPower(self, quantity, exponent):
-        amount = math.pow(self.quantity, exponent)
-        uom = MeasurementSystem.instance().createPowerUOM(quantity.uom, exponent)
+        amount = math.pow(quantity, exponent)
+        uom = MeasurementSystem.instance().createUnclassifiedPowerUOM(quantity.uom, exponent)
         return Quantity(amount, uom)

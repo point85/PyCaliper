@@ -1,26 +1,28 @@
 import unittest
+#import sys
 from PyCaliper.uom.measurement_system import MeasurementSystem
-from PyCaliper.uom.prefix import Prefix
-from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.enums import Unit
+#from PyCaliper.uom.enums import UnitType
+#, UnitType, Constant
+from PyCaliper.uom.quantity import Quantity
+from PyCaliper.uom.prefix import Prefix
+#from PyCaliper.uom.cache_manager import CacheManager
+from PyCaliper.test.base import TestUtils
+    
 
-class TestBridges(unittest.TestCase):
-    """
-    def __init__(self):
-        super().__init__()
-    """    
-    def testBridges(self):
+class TestBridges(unittest.TestCase):  
+    def testBridges(self):        
         # SI
         kg = MeasurementSystem.instance().getUOM(Unit.KILOGRAM)
         m = MeasurementSystem.instance().getUOM(Unit.METRE)
-        km = MeasurementSystem.instance().getUOM(Prefix.kilo(), m)
+        km = MeasurementSystem.instance().createPrefixedUOM(Prefix.kilo(), m)
         litre = MeasurementSystem.instance().getUOM(Unit.LITRE)
         N = MeasurementSystem.instance().getUOM(Unit.NEWTON)
         m3 = MeasurementSystem.instance().getUOM(Unit.CUBIC_METRE)
         m2 = MeasurementSystem.instance().getUOM(Unit.SQUARE_METRE)
         Nm = MeasurementSystem.instance().getUOM(Unit.NEWTON_METRE)
         pa = MeasurementSystem.instance().getUOM(Unit.PASCAL)
-        kPa = MeasurementSystem.instance().getUOM(Prefix.kilo(), pa)
+        kPa = MeasurementSystem.instance().createPrefixedUOM(Prefix.kilo(), pa)
         celsius = MeasurementSystem.instance().getUOM(Unit.CELSIUS)
     
         # US
@@ -40,7 +42,7 @@ class TestBridges(unittest.TestCase):
         
         q1 = Quantity(10.0, ft)
         q2 = q1.convert(m)
-        self.assertAlmostEqual(q2.getAmount(), 3.048, None, None, self.DELTA6)
+        self.assertAlmostEqual(q2.amount, 3.048, None, None, TestUtils.DELTA6)
         
         """
         q3 = q2.convert(q1.getUOM())
@@ -76,8 +78,3 @@ class TestBridges(unittest.TestCase):
         q2 = q1.convert(kPa)
         assert BaseTest.isCloseTo(q2.getAmount(), 68.94757280343134, self.DELTA6)
         """
-
-"""
-if __name__ == '__main__':
-    unittest.main()
-"""

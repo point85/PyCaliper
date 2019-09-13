@@ -21,7 +21,7 @@ class Reducer:
     ONE = '1'
         
     def __init__(self):
-        self.MAX_RECURSIONS = 3
+        self.MAX_RECURSIONS = 100
         self.STARTING_LEVEL = -1
         self.terms = {}
         self.mapScalingFactor = 1.0
@@ -205,7 +205,7 @@ class PathParameters:
 class UnitOfMeasure(Symbolic):  
     __MAX_SYMBOL_LENGTH = 16
              
-    def __init__(self, unitType, name, symbol, description):
+    def __init__(self, unitType = None, name = None, symbol = None, description = None):
         super().__init__(name, symbol, description)
         
         self.conversionRegistry = {}
@@ -424,7 +424,7 @@ class UnitOfMeasure(Symbolic):
     
     def clonePower(self, uom):
         newUOM = UnitOfMeasure()
-        newUOM.setUnitType(self.unitType)
+        newUOM.unitType = self.unitType
 
         # check if quotient
         exponent = 1
@@ -519,7 +519,7 @@ class UnitOfMeasure(Symbolic):
         return PathParameters(pathUOM, pathFactor)
     
     def checkOffset(self, other):
-        if (math.isclose(other.offset, 0.0)):
+        if (not math.isclose(other.offset, 0.0)):
             msg = Localizer.instance().messageStr("offset.not.supported").format(str(other))
             raise Exception(msg)
         
@@ -619,8 +619,8 @@ class UnitOfMeasure(Symbolic):
         
         if (baseUOM is not None):
             # there is a conversion to the base UOM
-            thisFactor = thisReducer.scalingFactor
-            otherFactor = otherReducer.scalingFactor
+            thisFactor = thisReducer.mapScalingFactor
+            otherFactor = otherReducer.mapScalingFactor
 
             resultFactor = 0.0
             if (not invert):
