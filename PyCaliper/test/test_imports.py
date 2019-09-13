@@ -8,7 +8,7 @@ from PyCaliper.uom.prefix import Prefix
 from PyCaliper.test.base import TestUtils
     
 class TestImports(unittest.TestCase):   
-    def testBridges(self):        
+    def testBridges(self):      
         # SI
         kg = MeasurementSystem.instance().getUOM(Unit.KILOGRAM)
         m = MeasurementSystem.instance().getUOM(Unit.METRE)
@@ -185,3 +185,24 @@ class TestImports(unittest.TestCase):
 
         q1 = Quantity(10.0, d1)
         q2 = q1.convert(d2)
+        
+    def testBridgeUnits(self):
+        bridge1 = MeasurementSystem.instance().createScalarUOM(UnitType.UNCLASSIFIED, None, "Bridge1", "B1", "description")
+        bridge2 = MeasurementSystem.instance().createScalarUOM(UnitType.UNCLASSIFIED, None, "Bridge2", "B2", "description")
+
+        bridge1.setBridgeConversion(1.0, bridge2, 0.0)
+        self.assertTrue(bridge1.bridgeScalingFactor == 1.0)
+        self.assertTrue(bridge1.bridgeAbscissaUnit  == bridge2)
+        self.assertTrue(bridge1.bridgeOffset == 0.0)
+
+        try:
+            bridge1.setConversion(10.0, bridge1, 0.0)
+            self.fail("Invalid conversion")
+        except:
+            pass
+
+        try:
+            bridge1.setConversion(1.0, bridge1, 10.0)
+            self.fail("Invalid conversion")
+        except:
+            pass
