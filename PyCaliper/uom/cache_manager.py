@@ -59,7 +59,7 @@ class CacheManager:
             return
         
         # remove by enumeration
-        if (uom.unit is not None):
+        if (uom.unit is not None and uom.unit in self.unitRegistry):
             del self.unitRegistry[uom.unit] 
             
         # remove by symbol and base symbol
@@ -81,6 +81,7 @@ class CacheManager:
             # already cached
             return
 
+        print("+++registering uom " + uom.symbol)
         # cache it by symbol
         self.symbolRegistry[uom.symbol] = uom
 
@@ -88,11 +89,13 @@ class CacheManager:
         if (uom.unit is not None):
             self.unitRegistry[uom.unit] = uom
 
-        # finally cache by base symbol
+        # TODO finally cache by base symbol
+        """
         key = uom.getBaseSymbol()
         
         if (key not in self.baseRegistry):
             self.baseRegistry[key] = uom
+        """
 
     def getTypeMap(self, unitType):            
         if (unitType in self.unitTypeRegistry):

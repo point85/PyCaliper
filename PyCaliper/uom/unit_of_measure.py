@@ -21,7 +21,7 @@ class Reducer:
     ONE = '1'
         
     def __init__(self):
-        self.MAX_RECURSIONS = 100
+        self.MAX_RECURSIONS = 3
         self.STARTING_LEVEL = -1
         self.terms = {}
         self.mapScalingFactor = 1.0
@@ -32,76 +32,85 @@ class Reducer:
         self.explodeRecursively(uom, self.STARTING_LEVEL)
         
     def explodeRecursively(self, uom, level):
+        print("Exploding " + uom.symbol + " at level " + str(level) + " for abscissa unit: " + uom.abscissaUnit.symbol)
         self.counter = self.counter + 1
         if (self.counter > self.MAX_RECURSIONS):
-            msg = Localizer.messageStr("circular.references").format(uom.symbol)
+            msg = Localizer.instance().messageStr("circular.references").format(uom.symbol)
             raise Exception(msg)
         
         # down a level
         level = level + 1
         
         # scaling factor to abscissa unit
-        scalingFactor = uom.scalingFactor
+        #scalingFactor = uom.scalingFactor
         
         # explode the abscissa unit
-        abscissaUnit = uom.abscissaUnit
+        #abscissaUnit = uom.abscissaUnit
         
-        uom1 = abscissaUnit.uom1
-        uom2 = abscissaUnit.uom2
-        
-        exp1 = abscissaUnit.exponent1
-        exp2 = abscissaUnit.exponent2
+        #uom1 = abscissaUnit.uom1
+        #uom2 = abscissaUnit.uom2
+
+        #exp1 = abscissaUnit.exponent1
+        #exp2 = abscissaUnit.exponent2
         
         # scaling
         if (len(self.pathExponents) > 0):
             lastExponent = self.pathExponents[len(self.pathExponents) - 1]
+            print("last exponent: " + str(lastExponent))
 
             # compute the overall scaling factor
             factor = 1.0
             
             for _ in range(abs(lastExponent)):
-                factor = factor * scalingFactor
+                factor = factor * uom.scalingFactor
 
-                if (lastExponent < 0):
-                    self.mapScalingFactor = self.mapScalingFactor / factor
-                else:
-                    self.mapScalingFactor = self.mapScalingFactor * factor
+            if (lastExponent < 0):
+                self.mapScalingFactor = self.mapScalingFactor / factor
+            else:
+                self.mapScalingFactor = self.mapScalingFactor * factor
         else:
-            self.mapScalingFactor = scalingFactor    
+            self.mapScalingFactor = uom.scalingFactor    
             
-        if (uom1 is None):
-            if (not abscissaUnit.isTerminal()):
+        if (uom.abscissaUnit.uom1 is None):
+            print("uom1 is null")
+            if (not uom.abscissaUnit.isTerminal()):
+                print("Not terminal: " + uom.abscissaUnit.symbol)
                 # keep exploding down the conversion path
                 currentMapFactor = self.mapScalingFactor
                 self.mapScalingFactor = 1.0
-                self.explodeRecursively(abscissaUnit, self.STARTING_LEVEL)
+                self.explodeRecursively(uom.abscissaUnit, self.STARTING_LEVEL)
                 self.mapScalingFactor = self.mapScalingFactor * currentMapFactor
             else:
+                print(uom.abscissaUnit.symbol + " is terminal")
                 # multiply out all of the exponents down the path
                 pathExponent = 1
                 
                 for exp in self.pathExponents:
                     pathExponent = pathExponent * exp
                 
-                # variable = 1 if something == 1 else 0
                 invert = True if pathExponent < 0 else False
                 
                 for _ in range(abs(pathExponent)):
-                    self.addTerm(abscissaUnit, invert)
+                    print("Adding term "+ uom.abscissaUnit.symbol + " exponent " + str(pathExponent))
+                    self.addTerm(uom.abscissaUnit, invert)
         else:
+            print("*** uom1 is not null: " + uom.abscissaUnit.uom1.symbol)
             # explode UOM #1
-            self.pathExponents.append(exp1)
-            self.explodeRecursively(uom1, level)
+            self.pathExponents.append(uom.abscissaUnit.exponent1)
+            self.explodeRecursively(uom.abscissaUnit.uom1, level)
+            print("***Exploded uom1 at level: " + str(level))
             del self.pathExponents[level]  
             
-        if (uom2 is not None):
+        if (uom.abscissaUnit.uom2 is not None):
+            print("uom2 is not null: " + uom.abscissaUnit.uom2.symbol)
             # explode UOM #2
-            self.pathExponents.append(exp2)
-            self.explodeRecursively(uom2, level)
+            self.pathExponents.append(uom.abscissaUnit.exponent2)
+            self.explodeRecursively(uom.abscissaUnit.uom2, level)
             del self.pathExponents[level]     
             
         # up a level
-        level = level - 1    
+        level = level - 1 
+        print("Up a level to " + str(level))   
                  
     def addTerm(self, uom, invert):        
         # add a UOM and exponent pair to the map of reduced Terms

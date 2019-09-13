@@ -708,7 +708,7 @@ msgstr "area in square inches"
 msgid "ft2.name" 
 msgstr "square feet"
 msgid "ft2.symbol" 
-msgstr "ft"
+msgstr "ft2"
 msgid "ft2.desc" 
 msgstr "area in square feet"
 # square yard

@@ -1,22 +1,46 @@
 #import unittest
 #import sys
 from PyCaliper.uom.measurement_system import MeasurementSystem
-from PyCaliper.uom.enums import Unit, UnitType, Constant
-from PyCaliper.uom.quantity import Quantity
-from PyCaliper.uom.prefix import Prefix
+from PyCaliper.uom.enums import Unit
+#, UnitType, Constant
+#from PyCaliper.uom.quantity import Quantity
+#from PyCaliper.uom.prefix import Prefix
 #from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.test.base import BaseTest
-from PyCaliper.uom.localizer import Localizer
+#from PyCaliper.uom.localizer import Localizer
     
 class TestImports(BaseTest):    
     def test1(self):
         #try:
             
             ms = MeasurementSystem.instance()
+            """
+            ft = ms.getUOM(Unit.FOOT)
+            self.snapshotBaseSymbolCache()
+            self.snapshotSymbolCache()
+            self.snapshotUnitEnumerationCache()
+            """
             
-            uom = ms.getUOM(Unit.ACRE)
+            ft2 = ms.getUOM(Unit.SQUARE_FOOT)
+            self.snapshotSymbolCache()
+            self.snapshotUnitEnumerationCache()
+            self.snapshotBaseSymbolCache()
+            
+            """
+            n = Localizer.instance().langStr("acre.name")
+            s = Localizer.instance().langStr("acre.symbol")
+            d = Localizer.instance().langStr("acre.desc")
+            
+            uom = ms.createScalarUOM(UnitType.AREA, Unit.ACRE, n, s, d)
+            #s = uom.getBaseSymbol()
+            ft2 = ms.getUOM(Unit.SQUARE_FOOT)
+            print("$$$ setting conversion $$$")
+            uom.setConversion(43560.0, ft2)
+            self.snapshotBaseSymbolCache()
+            #uom = ms.getUOM(Unit.ACRE)
             
             print(str(uom)) 
+            """
             """
             m = MeasurementSystem.instance().getUOM(Unit.METRE)
             print(str(m))
@@ -63,11 +87,13 @@ class TestImports(BaseTest):
             ftlbf = MeasurementSystem.instance().getUOM(Unit.FOOT_POUND_FORCE)
             print(str(ftlbf))
             """
+            
+            """
             psi = MeasurementSystem.instance().getUOM(Unit.PSI)
             print(str(psi))
             fahrenheit = MeasurementSystem.instance().getUOM(Unit.FAHRENHEIT)
             print(str(fahrenheit)) 
-             
+            """ 
             #self.assertEqual(ft.bridgeOffset, 0.0)
 
         

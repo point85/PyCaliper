@@ -25,7 +25,7 @@ class BaseTest(unittest.TestCase):
         count = 0
         for entry in CacheManager.instance().symbolRegistry.items():
             count = count + 1
-            print("(" + str(count) + ") " + str(entry[0]) + ", " + str(entry[1]))
+            print("(" + str(count) + ") " + str(entry[0]) + ", " + entry[1].symbol)
 
     def snapshotBaseSymbolCache(self):
         print("Base symbol cache ...")
@@ -33,7 +33,7 @@ class BaseTest(unittest.TestCase):
         count = 0
         for entry in CacheManager.instance().baseRegistry.items():
             count = count + 1
-            print("(" + str(count) + ") " + str(entry[0]) + ", " + str(entry[1]))
+            print("(" + str(count) + ") " + str(entry[0]) + ", " + entry[1].symbol)
 
 
     def snapshotUnitEnumerationCache(self):
@@ -42,7 +42,7 @@ class BaseTest(unittest.TestCase):
         count = 0
         for entry in CacheManager.instance().unitRegistry.items():
             count = count + 1
-            print("(" + str(count) + ") " + str(entry[0]) + ", " + str(entry[1]))
+            print("(" + str(count) + ") " + str(entry[0]) + ", " + entry[1].symbol)
     
     @staticmethod
     def isCloseTo(actualValue, expectedValue, delta):

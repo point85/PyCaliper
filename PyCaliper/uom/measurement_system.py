@@ -16,7 +16,8 @@ class MeasurementSystem:
     
     def __init__(self):
         MeasurementSystem.__unifiedSystem = self
-
+        #TODO self.primeUomCache()
+        
     @staticmethod
     def instance():
         if (MeasurementSystem.__unifiedSystem is None):
@@ -29,9 +30,11 @@ class MeasurementSystem:
         self.getUOM(Unit.METRE)
         
     def getUOM(self, unit):
+        print("-->Check cache for " + str(unit))
         uom = CacheManager.instance().getUOMByUnit(unit)
 
         if (uom is None):
+            print("-->Creating uom for  " + str(unit))
             uom = self.createUOMForUnit(unit)
             
         return uom
@@ -577,7 +580,7 @@ class MeasurementSystem:
             uom = self.createPowerUOM(UnitType.AREA, unit, Localizer.instance().langStr("yd2.name"),
                 Localizer.instance().langStr("yd2.symbol"), Localizer.instance().langStr("yd2.desc"), self.getUOM(Unit.YARD), 2)    
                 
-        elif (unit == Unit.SQUARE_FOOT):
+        elif (unit == Unit.ACRE):
             uom = self.createScalarUOM(UnitType.AREA, unit, Localizer.instance().langStr("acre.name"),
                 Localizer.instance().langStr("acre.symbol"), Localizer.instance().langStr("acre.desc"))
             uom.setConversion(43560.0, self.getUOM(Unit.SQUARE_FOOT))
@@ -1010,7 +1013,6 @@ class MeasurementSystem:
         if (uom is None):
             # create a new one
             uom = UnitOfMeasure(unitType, name, symbol, description)
-            
             uom.abscissaUnit = uom
             uom.unit = unit
             
