@@ -1,5 +1,4 @@
 import math
-from builtins import staticmethod
 import time
 from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.enums import UnitType
@@ -171,7 +170,7 @@ class Reducer:
                     elif (power == 3):
                         numerator = numerator + Reducer.CUBED
                     else:
-                        numerator = numerator + Reducer.POW + power
+                        numerator = numerator + Reducer.POW + str(power)
             else:
                 # unary, don't add a '1'
                 pass
@@ -446,7 +445,7 @@ class UnitOfMeasure(Symbolic):
         return newUOM
    
     def classify(self):        
-        if (self.unitType != UnitType.UNCLASSIFIED):
+        if (self.unitType is not None and self.unitType != UnitType.UNCLASSIFIED):
             # already classified
             return self
 
@@ -468,7 +467,10 @@ class UnitOfMeasure(Symbolic):
             # same size, now check base unit types and exponents
             for uomBaseEntry in uomBaseMap.items():
                 uomBaseType = uomBaseEntry[0].unitType
-                unitValue = unitTypeMap[uomBaseType]
+                
+                unitValue = None
+                if (uomBaseType in unitTypeMap):
+                    unitValue = unitTypeMap[uomBaseType]
 
                 if (unitValue is None or unitValue != uomBaseEntry[1]):
                     # not a match
@@ -570,7 +572,11 @@ class UnitOfMeasure(Symbolic):
         for thisEntry in thisMap.items():
             thisUOM = thisEntry[0]
             thisPower = thisEntry[1]
-            otherPower = otherMap[thisUOM]
+            
+            otherPower = None
+            
+            if (thisUOM in otherMap):
+                otherPower = otherMap[thisUOM]
             
             if (otherPower is not None):
                 if (not invert):

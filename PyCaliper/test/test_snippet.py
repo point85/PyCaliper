@@ -1,25 +1,12 @@
 import unittest
-from PyCaliper.uom.prefix import Prefix
-from PyCaliper.uom.enums import Constant
-from PyCaliper.uom.measurement_system import MeasurementSystem
+
+from PyCaliper.uom.localizer import Localizer
+import os
 
 class TestPrefix(unittest.TestCase):
 
     def test_prefix(self):
-        yotta = Prefix.yotta()
-        print (yotta.name)
-        print (Constant.AVAGADRO_CONSTANT)
-        
-        print (Prefix.fromName("yotta"))
-
-    def test_singleton(self):
-        first = MeasurementSystem.instance()
-        print (first)
-        
-        second = MeasurementSystem.instance()
-        print (second)
-        
-        self.assertEqual(first, second)
-
-if __name__ == '__main__':
-    unittest.main()
+        cwd = os.getcwd()
+        TRANSLATION_ROOT = os.path.join(cwd, "locales")
+        print(TRANSLATION_ROOT)
+        print(Localizer.instance().langStr("m.name"))
