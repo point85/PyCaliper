@@ -37,9 +37,10 @@ class TestUtils():
             count = count + 1
             print("(" + str(count) + ") " + str(entry[0]) + ", " + entry[1].symbol)
     
+    """
     @staticmethod
     def isCloseTo(actualValue, expectedValue, delta):
         diff = abs(actualValue - expectedValue)
         return True if (diff <= delta) else False
-    
+    """
 

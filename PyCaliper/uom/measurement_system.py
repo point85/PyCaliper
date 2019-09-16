@@ -299,7 +299,7 @@ class MeasurementSystem:
             # ev
             e = self.getQuantity(Constant.ELEMENTARY_CHARGE)
             uom = self.createProductUOM(UnitType.ENERGY, unit, Localizer.instance().langStr("ev.name"),
-                    Localizer.instance().langStr("ev.symbol"), Localizer.instance().langStr("ev.desc"), e.self.getUOM(), self.getUOM(Unit.VOLT))
+                    Localizer.instance().langStr("ev.symbol"), Localizer.instance().langStr("ev.desc"), e.uom, self.getUOM(Unit.VOLT))
             uom.scalingFactor = e.amount
 
         elif (unit == Unit.WATT_HOUR):

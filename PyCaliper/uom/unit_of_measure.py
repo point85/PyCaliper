@@ -156,7 +156,7 @@ class Reducer:
                     elif (power == -3):
                         denominator = denominator + Reducer.CUBED
                     else:
-                        denominator = denominator + Reducer.POW + abs(power)
+                        denominator = denominator + Reducer.POW + str(abs(power))
             elif (power >= 1 and uom != CacheManager.instance().getUOMByUnit(Unit.ONE)):
                 # positive, put in numerator
                 if (len(numerator) > 0):
