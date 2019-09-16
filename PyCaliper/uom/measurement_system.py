@@ -176,13 +176,13 @@ class MeasurementSystem:
             # plane angle radian (rad)
             uom = self.createScalarUOM(UnitType.PLANE_ANGLE, unit, Localizer.instance().langStr("radian.name"),
                     Localizer.instance().langStr("radian.symbol"), Localizer.instance().langStr("radian.desc"))
-            uom.setConversion(self.getOne())
+            uom.setConversion(1.0, self.getOne())
 
         elif (unit == Unit.STERADIAN):
             # solid angle steradian (sr)
             uom = self.createScalarUOM(UnitType.SOLID_ANGLE, unit, Localizer.instance().langStr("steradian.name"),
                     Localizer.instance().langStr("steradian.symbol"), Localizer.instance().langStr("steradian.desc"))
-            uom.setConversion(self.getOne())
+            uom.setConversion(1.0, self.getOne())
 
         elif (unit == Unit.DEGREE):
             # degree of arc

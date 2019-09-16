@@ -101,7 +101,7 @@ class TestClassification(unittest.TestCase):
         self.assertTrue(amp.divide(m).classify().unitType == UnitType.ELECTRIC_FIELD_STRENGTH)
         
         # magnetic flux
-        self.assertTrue(kg.divide(amp).divide(s2.multiply(m2)).classify().unitType == UnitType.MAGNETIC_FLUX)    
+        self.assertTrue(kg.divide(amp).divide(s2).multiply(m2).classify().unitType == UnitType.MAGNETIC_FLUX)    
         
         # magnetic flux density
         self.assertTrue(kg.divide(amp).divide(s2).classify().unitType == UnitType.MAGNETIC_FLUX_DENSITY)
@@ -163,5 +163,3 @@ class TestClassification(unittest.TestCase):
         
         # irradiance
         self.assertTrue(kg.divide(s3).classify().unitType == UnitType.IRRADIANCE)
-
-        
