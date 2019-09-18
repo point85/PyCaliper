@@ -218,3 +218,50 @@ class TestQuantity(unittest.TestCase):
         q4 = q3.divide(q1)
         self.assertTrue(q4 == q2)
 
+    def testUSQuantity(self):
+        msys = MeasurementSystem.instance()
+        
+        gal = msys.getUOM(Unit.US_GALLON)
+        in3 = msys.getUOM(Unit.CUBIC_INCH)
+        floz = msys.getUOM(Unit.US_FLUID_OUNCE)
+        qt = msys.getUOM(Unit.US_QUART)
+
+        q1 = Quantity(10.0, gal)
+        q2 = q1.convert(in3)
+        self.assertAlmostEqual(q2.amount, 2310.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == in3)
+
+        q1 = Quantity(128.0, floz)
+        q2 = q1.convert(qt)
+        self.assertAlmostEqual(q2.amount, 4.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == qt)
+
+        ft = msys.getUOM(Unit.FOOT)
+        inch = msys.getUOM(Unit.INCH)
+        mi = msys.getUOM(Unit.MILE)
+
+        q1 = Quantity(10.0, ft)
+        q2 = q1.convert(inch)
+
+        q1 = Quantity(1.0, mi)
+
+        # British cup to US gallon
+        q1 = Quantity(10.0, msys.getUOM(Unit.BR_CUP))
+        q2 = q1.convert(msys.getUOM(Unit.US_GALLON))
+        self.assertAlmostEqual(q2.amount, 0.6, None, None, TestUtils.DELTA3)
+
+        # US ton to British ton
+        q1 = Quantity(10.0, msys.getUOM(Unit.US_TON))
+        q2 = q1.convert(msys.getUOM(Unit.BR_TON))
+        self.assertAlmostEqual(q2.amount, 8.928571428, None, None, TestUtils.DELTA6)
+
+        # troy ounce to ounce
+        q1 = Quantity(10.0, msys.getUOM(Unit.TROY_OUNCE))
+        q2 = q1.convert(msys.getUOM(Unit.OUNCE))
+        self.assertAlmostEqual(q2.amount, 10.971, None, None, TestUtils.DELTA3)
+
+        # deci-litre to quart
+        dl = msys.createPrefixedUOM(Prefix.deci(), msys.getUOM(Unit.LITRE))
+        q1 = Quantity(10.0, dl)
+        q2 = q1.convert(msys.getUOM(Unit.US_QUART))
+        self.assertAlmostEqual(q2.amount, 1.0566882, None, None, TestUtils.DELTA6)
