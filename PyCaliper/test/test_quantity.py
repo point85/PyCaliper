@@ -265,3 +265,164 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(10.0, dl)
         q2 = q1.convert(msys.getUOM(Unit.US_QUART))
         self.assertAlmostEqual(q2.amount, 1.0566882, None, None, TestUtils.DELTA6)
+        
+    def testSIQuantity(self):
+        msys = MeasurementSystem.instance()
+
+        litre = msys.getUOM(Unit.LITRE)
+        m3 = msys.getUOM(Unit.CUBIC_METRE)
+        m2 = msys.getUOM(Unit.SQUARE_METRE)
+        m = msys.getUOM(Unit.METRE)
+        cm = msys.createPrefixedUOM(Prefix.centi(), m)
+        mps = msys.getUOM(Unit.METRE_PER_SEC)
+        secPerM = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, None, "s/m", None, msys.getSecond(), m)
+        oneOverM = msys.getUOM(Unit.DIOPTER)
+        fperm = msys.getUOM(Unit.FARAD_PER_METRE)
+
+        oneOverCm = msys.createScalarUOM(UnitType.RECIPROCAL_LENGTH, None, None, "1/cm", None)
+        oneOverCm.setConversion(100.0, oneOverM)
+
+        q1 = Quantity(10.0, litre)
+        q2 = q1.convert(m3)
+        self.assertAlmostEqual(q2.amount, 0.01, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == m3)
+
+        q2 = q1.convert(litre)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == litre)
+
+        # add
+        q1 = Quantity(2.0, m)
+        q2 = Quantity(2.0, cm)
+        q3 = q1.add(q2)
+
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom.abscissaUnit == m)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 2.02, None, None, TestUtils.DELTA6)
+
+        q4 = q3.convert(cm)
+        self.assertAlmostEqual(q4.amount, 202, None, None, TestUtils.DELTA6)
+        self.assertTrue(q4.uom == cm)
+
+        # subtract
+        q3 = q3.subtract(q1)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom.abscissaUnit == m)
+        self.assertAlmostEqual(q3.amount, 0.02, None, None, TestUtils.DELTA6)
+
+        q4 = q3.convert(cm)
+        self.assertAlmostEqual(q4.amount, 2.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q4.uom == cm)
+
+        # multiply
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 4.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 0.01, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom.getBaseSymbol() == m2.getBaseSymbol())
+
+        q4 = q3.divide(q3)
+        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q4.uom == msys.getOne())
+
+        q4 = q3.divide(q1)
+        self.assertTrue(q4 == q2)
+
+        q4 = q3.convert(m2)
+        self.assertAlmostEqual(q4.amount, 0.04, None, None, TestUtils.DELTA6)
+        self.assertTrue(q4.uom == m2)
+
+        # divide
+        q3 = q3.divide(q2)
+        self.assertAlmostEqual(q3.amount, 2.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == m)
+        self.assertTrue(q3 == q1)
+
+        q3 = q3.convert(m)
+        self.assertAlmostEqual(q3.amount, 2.0, None, None, TestUtils.DELTA6)
+
+        q1 = Quantity(0.0, litre)
+
+        try:
+            q2 = q1.divide(q1)
+            self.fail("divide by zero)")
+        except:
+            pass
+
+        q1 = q3.convert(cm).divideByAmount(10.0)
+        self.assertAlmostEqual(q1.amount, 20.0, None, None, TestUtils.DELTA6)
+
+        # invert
+        q1 = Quantity(10.0, mps)
+        q2 = q1.invert()
+        self.assertAlmostEqual(q2.amount, 0.1, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == secPerM)
+
+        q2 = q2.invert()
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == mps)
+
+        q1 = Quantity(10.0, cm)
+        q2 = q1.invert()
+        self.assertAlmostEqual(q2.amount, 0.1, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == oneOverCm)
+
+        q2 = q2.convert(m.invert())
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom == oneOverM)
+
+        self.assertTrue(str(q2) != None)
+
+        # Newton-metres divided by metres
+        q1 = Quantity(10.0, msys.getUOM(Unit.NEWTON_METRE))
+        q2 = Quantity(1.0, msys.getUOM(Unit.METRE))
+        q3 = q1.divide(q2)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == msys.getUOM(Unit.NEWTON))
+
+        # length multiplied by force
+        q1 = Quantity(10.0, msys.getUOM(Unit.NEWTON))
+        q2 = Quantity(1.0, msys.getUOM(Unit.METRE))
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        nm2 = msys.getUOM(Unit.NEWTON_METRE)
+        self.assertTrue(q3.uom.getBaseSymbol() == nm2.getBaseSymbol())
+        q4 = q3.convert(msys.getUOM(Unit.JOULE))
+        self.assertTrue(q4.uom == msys.getUOM(Unit.JOULE))
+
+        # farads
+        q1 = Quantity(10.0, fperm)
+        q2 = Quantity(1.0, m)
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == msys.getUOM(Unit.FARAD))
+
+        # amps
+        q1 = Quantity(10.0, msys.getUOM(Unit.AMPERE_PER_METRE))
+        q2 = Quantity(1.0, m)
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == msys.getUOM(Unit.AMPERE))
+
+        # Boltzmann and Avogadro
+        boltzmann = msys.getQuantity(Constant.BOLTZMANN_CONSTANT)
+        avogadro = msys.getQuantity(Constant.AVAGADRO_CONSTANT)
+        gas = msys.getQuantity(Constant.GAS_CONSTANT)
+        qR = boltzmann.multiply(avogadro)
+        self.assertAlmostEqual(qR.uom.scalingFactor, gas.uom.scalingFactor, None, None, TestUtils.DELTA6)
+
+        # Sieverts
+        q1 = Quantity(20.0, msys.createPrefixedUOM(Prefix.milli(), msys.getUOM(Unit.SIEVERTS_PER_HOUR)))
+        q2 = Quantity(24.0, msys.getHour())
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 480.0, None, None, TestUtils.DELTA6)
+        
+        # If the concentration of a sulfuric acid solution is c(H2SO4) = 1 mol/L and the equivalence factor is 0.5, what is the normality?
+        mol = msys.getUOM(Unit.MOLE)
+        molPerL = msys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, None, "moler conc", "mol/L",
+                "mole per litre", mol, litre)
+        
+        feq = Quantity(0.5, molPerL)
+        
+        N = Quantity(1.0, molPerL).divide(feq)
+        self.assertAlmostEqual(N.amount, 2.0, None, None, TestUtils.DELTA6)
