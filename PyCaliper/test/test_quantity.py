@@ -605,3 +605,129 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(1.0, msys.getUOM(Unit.ELECTRON_VOLT))
         q2 = q1.convert(msys.getUOM(Unit.JOULE))
         self.assertAlmostEqual(q2.amount, 1.60217656535E-19, None, None, TestUtils.DELTA6)
+        
+    def testEquations(self):
+        msys = MeasurementSystem.instance()
+
+        # body mass index
+        height = Quantity(2.0, msys.getUOM(Unit.METRE))
+        mass = Quantity(100.0, msys.getUOM(Unit.KILOGRAM))
+        bmi = mass.divide(height.multiply(height))
+        self.assertAlmostEqual(bmi.amount, 25.0, None, None, TestUtils.DELTA6)
+
+        # E = mc^2
+        c = msys.getQuantity(Constant.LIGHT_VELOCITY)
+        m = Quantity(1.0, msys.getUOM(Unit.KILOGRAM))
+        e = m.multiply(c).multiply(c)
+        self.assertAlmostEqual(e.amount, 8.987551787368176E+16, None, None, TestUtils.DELTA6)
+        
+        # Ideal Gas Law, PV = nRT
+        # A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 C.
+        # How many moles of argon are in the cylinder?
+        p = Quantity(18.4, msys.getUOM(Unit.ATMOSPHERE)).convert(msys.getUOM(Unit.PASCAL))
+        v = Quantity(50.0, msys.getUOM(Unit.LITRE)).convert(msys.getUOM(Unit.CUBIC_METRE))
+        t = Quantity(127.0, msys.getUOM(Unit.CELSIUS)).convert(msys.getUOM(Unit.KELVIN))
+        n = p.multiply(v).divide(msys.getQuantity(Constant.GAS_CONSTANT).multiply(t))
+        self.assertAlmostEqual(n.amount, 28.018664, None, None, TestUtils.DELTA6)
+           
+        # energy of red light photon = Planck's constant times the frequency
+        frequency = Quantity(400.0, msys.createPrefixedUOM(Prefix.tera(), msys.getUOM(Unit.HERTZ)))
+        ev = msys.getQuantity(Constant.PLANCK_CONSTANT).multiply(frequency).convert(msys.getUOM(Unit.ELECTRON_VOLT))
+        self.assertAlmostEqual(ev.amount, 1.65, None, None, TestUtils.DELTA2)
+        
+        # wavelength of red light in nanometres
+        nm = msys.createPrefixedUOM(Prefix.nano(), msys.getUOM(Unit.METRE))
+        wavelength = msys.getQuantity(Constant.LIGHT_VELOCITY).divide(frequency).convert(nm)
+        self.assertAlmostEqual(wavelength.amount, 749.48, None, None, TestUtils.DELTA2)
+
+        # Newton's second law of motion (F = ma). Weight of 1 kg in lbf
+        mkg = Quantity(1.0, msys.getUOM(Unit.KILOGRAM))
+        f = mkg.multiply(msys.getQuantity(Constant.GRAVITY)).convert(msys.getUOM(Unit.POUND_FORCE))
+        self.assertAlmostEqual(f.amount, 2.20462, None, None, TestUtils.DELTA5)
+
+        # units per volume of solution, C = A x (m/V)
+        # create the "A" unit of measure
+        activityUnit = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "activity", "act",
+            "activity of material", msys.getUOM(Unit.UNIT), msys.createPrefixedUOM(Prefix.milli(), msys.getUOM(Unit.GRAM)))
+        
+        # calculate concentration
+        activity = Quantity(1.0, activityUnit)
+        litre = msys.getUOM(Unit.LITRE)
+        ml = msys.createPrefixedUOM(Prefix.milli(), litre)
+        g = msys.getUOM(Unit.GRAM)
+        mg = msys.createPrefixedUOM(Prefix.milli(), g)
+        grams = Quantity(1.0, g).convert(mg)
+        volume = Quantity(1.0, ml)
+        concentration = activity.multiply(grams.divide(volume))
+        self.assertAlmostEqual(concentration.amount, 1000.0, None, None, TestUtils.DELTA6)
+
+        katal = msys.getUOM(Unit.KATAL)
+        katals = concentration.multiply(Quantity(1.0, litre)).convert(katal)
+        self.assertAlmostEqual(katals.amount, 0.01666667, None, None, TestUtils.DELTA6)
+        
+        # The Stefan–Boltzmann law states that the power emitted per unit area
+        # of the surface of a black body is directly proportional to the fourth
+        # power of its absolute temperature: sigma * T^4
+
+        # calculate at 1000 Kelvin
+        temp = Quantity(1000.0, msys.getUOM(Unit.KELVIN))
+        t4 = msys.quantityToPower(temp, 4)
+        intensity = msys.getQuantity(Constant.STEFAN_BOLTZMANN).multiply(t4)
+        self.assertAlmostEqual(intensity.amount, 56703.67, None, None, TestUtils.DELTA2)
+        
+        # Hubble's law, v = H0 x D. Let D = 10 Mpc
+        d = Quantity(10.0, msys.createPrefixedUOM(Prefix.mega(), msys.getUOM(Unit.PARSEC)))
+        h0 = msys.getQuantity(Constant.HUBBLE_CONSTANT)
+        velocity = h0.multiply(d)
+        self.assertAlmostEqual(velocity.amount, 719, None, None, TestUtils.DELTA3)
+        
+        # Ideal Gas Law, PV = nRT
+        # A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 C.
+        # How many moles of argon are in the cylinder?
+        p = Quantity(18.4, msys.getUOM(Unit.ATMOSPHERE)).convert(msys.getUOM(Unit.PASCAL))
+        v = Quantity(50.0, msys.getUOM(Unit.LITRE)).convert(msys.getUOM(Unit.CUBIC_METRE))
+        t = Quantity(127.0, msys.getUOM(Unit.CELSIUS)).convert(msys.getUOM(Unit.KELVIN))
+        n = p.multiply(v).divide(msys.getQuantity(Constant.GAS_CONSTANT).multiply(t))
+        self.assertAlmostEqual(n.amount, 28.018664, None, None, TestUtils.DELTA6)
+        
+        # Arrhenius equation
+        # A device has an activation energy of 0.5 and a characteristic life of
+        # 2,750 hours at an accelerated temperature of 150 degrees Celsius.
+        # Calculate the characteristic life at an expected use temperature of
+        # 85 degrees Celsius.
+
+        # Convert the Boltzman constant from J/K to eV/K for the Arrhenius
+        # equation
+        C = msys.getUOM(Unit.CELSIUS)
+        Ta = Quantity(150.0, C)
+        # expected use temperature
+        Tu = Quantity(85.0, C)
+        
+        j = Quantity(1.0, msys.getUOM(Unit.JOULE))
+        eV = j.convert(msys.getUOM(Unit.ELECTRON_VOLT))
+        
+        # Boltzmann constant
+        bc = msys.getQuantity(Constant.BOLTZMANN_CONSTANT)
+        Kb = bc.multiplyByAmount(eV.amount)
+
+        # calculate the acceleration factor
+        K = msys.getUOM(Unit.KELVIN)
+        factor1 = Tu.convert(K).invert().subtract(Ta.convert(K).invert())
+        factor2 = Kb.invert().multiplyByAmount(0.5)
+        factor3 = factor1.multiply(factor2)
+        AF = math.exp(factor3.amount)
+        # calculate longer life at expected use temperature
+        life85 = Quantity(2750.0, msys.getHour())
+        life150 = life85.multiplyByAmount(AF)
+        self.assertAlmostEqual(life150.amount, 33121.4, None, None, TestUtils.DELTA1)
+
+        # energy of red light photon = Planck's constant times the frequency
+        hz = msys.getUOM(Unit.HERTZ)
+        thz = msys.createPrefixedUOM(Prefix.tera(), hz)
+        frequency = Quantity(400.0, thz)
+        qp = msys.getQuantity(Constant.PLANCK_CONSTANT)
+        evolt = msys.getUOM(Unit.ELECTRON_VOLT)
+        qpf = qp.multiply(frequency)
+        ev = qpf.convert(evolt)
+        self.assertAlmostEqual(ev.amount, 1.65, None, None, TestUtils.DELTA2)
+
