@@ -1342,6 +1342,6 @@ class MeasurementSystem:
         return quantity.convert(MeasurementSystem.instance().createPrefixedUOM(prefix, unit))
     
     def quantityToPower(self, quantity, exponent):
-        amount = math.pow(quantity, exponent)
+        amount = math.pow(quantity.amount, exponent)
         uom = MeasurementSystem.instance().createUnclassifiedPowerUOM(quantity.uom, exponent)
         return Quantity(amount, uom)

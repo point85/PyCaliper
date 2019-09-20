@@ -1,4 +1,5 @@
 import unittest
+import math
 
 from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.enums import Unit, UnitType, Constant
@@ -426,3 +427,181 @@ class TestQuantity(unittest.TestCase):
         
         N = Quantity(1.0, molPerL).divide(feq)
         self.assertAlmostEqual(N.amount, 2.0, None, None, TestUtils.DELTA6)
+        
+    def testPowers(self):
+        msys = MeasurementSystem.instance()
+        
+        m2 = msys.getUOM(Unit.SQUARE_METRE)
+        p2 = msys.createPowerUOM(UnitType.AREA, None, "m2^1", "m2^1", "square metres raised to power 1", m2, 1)
+        p4 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "m2^2", "m2^2", "square metres raised to power 2",
+            m2, 2)
+
+        q1 = Quantity(10.0, m2)
+        q3 = Quantity(10.0, p4)
+
+        q4 = q3.divide(q1)
+        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q4.uom.getBaseUOM() == m2)
+
+        q2 = q1.convert(p2)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom.getBaseUOM() == m2)
+
+        # power method
+        ft = msys.getUOM(Unit.FOOT)
+        ft2 = msys.getUOM(Unit.SQUARE_FOOT)
+        q1 = Quantity(10.0, ft)
+
+        q3 = msys.quantityToPower(q1, 2)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom.getBaseSymbol() == ft2.getBaseSymbol())
+
+        q4 = q3.convert(msys.getUOM(Unit.SQUARE_METRE))
+        self.assertAlmostEqual(q4.amount, 9.290304, None, None, TestUtils.DELTA6)
+
+        q3 = msys.quantityToPower(q1, 1)
+        self.assertTrue(q3.amount == q1.amount)
+        self.assertTrue(q3.uom.getBaseSymbol() == q1.uom.getBaseSymbol())
+
+        q3 = msys.quantityToPower(q1, 0)
+        self.assertTrue(q3.amount == 1.0)
+        self.assertTrue(q3.uom.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        q3 = msys.quantityToPower(q1, -1)
+        self.assertTrue(q3.amount == 0.1)
+        self.assertTrue(q3.uom == ft.invert())
+
+        q3 = msys.quantityToPower(q1, -2)
+        self.assertTrue(q3.amount == 0.01)
+        self.assertTrue(q3.uom== ft2.invert())
+        
+    def testSIUnits(self):
+        msys = MeasurementSystem.instance()
+
+        newton = msys.getUOM(Unit.NEWTON)
+        metre = msys.getUOM(Unit.METRE)
+        m2 = msys.getUOM(Unit.SQUARE_METRE)
+        cm = msys.createPrefixedUOM(Prefix.centi(), metre)
+        mps = msys.getUOM(Unit.METRE_PER_SEC)
+        joule = msys.getUOM(Unit.JOULE)
+        m3 = msys.getUOM(Unit.CUBIC_METRE)
+        farad = msys.getUOM(Unit.FARAD)
+        nm = msys.getUOM(Unit.NEWTON_METRE)
+        coulomb = msys.getUOM(Unit.COULOMB)
+        volt = msys.getUOM(Unit.VOLT)
+        watt = msys.getUOM(Unit.WATT)
+        cm2 = msys.createProductUOM(UnitType.AREA, None, "square centimetres", "cm" + "0x00B2", "", cm, cm)
+        cv = msys.createProductUOM(UnitType.ENERGY, None, "CxV", "CxV", "Coulomb times Volt", coulomb, volt)
+        ws = msys.createProductUOM(UnitType.ENERGY, None, "Wxs", "Wxs", "Watt times second", watt,
+            msys.getSecond())
+        ft3 = msys.getUOM(Unit.CUBIC_FOOT)
+        hz = msys.getUOM(Unit.HERTZ)
+
+        self.assertTrue(nm.getBaseSymbol() == joule.getBaseSymbol())
+        self.assertTrue(cv.getBaseSymbol() == joule.getBaseSymbol())
+        self.assertTrue(ws.getBaseSymbol() == joule.getBaseSymbol())
+
+        q1 = Quantity(10.0, newton)
+        q2 = Quantity(10.0, metre)
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom.getBaseSymbol() == nm.getBaseSymbol())
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+
+        q3 = q3.convert(joule)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == joule)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+
+        q3 = q3.convert(nm)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == nm)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+
+        q1 = Quantity(100.0, cm)
+        q2 = q1.convert(metre)
+        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q2.uom.unit == Unit.METRE)
+        self.assertAlmostEqual(q2.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+
+        q2 = q2.convert(cm)
+        self.assertAlmostEqual(q2.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.uom.scalingFactor, 0.01, None, None, TestUtils.DELTA6)
+
+        q2 = q1
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 10000, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 0.0001, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+
+        q4 = q3.convert(m2)
+        self.assertTrue(q4.uom == m2)
+        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        q3 = q3.convert(m2)
+        self.assertAlmostEqual(q3.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == m2)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+
+        q3 = q3.convert(cm2)
+        self.assertAlmostEqual(q3.amount, 10000, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom == cm2)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+
+        # power
+        onem3 = Quantity(1.0, m3)
+        cm3sym = "cm" + "0x00B3"
+        cm3 = msys.createPowerUOM(UnitType.VOLUME, None, cm3sym, cm3sym, None, cm, 3)
+        megcm3 = Quantity(1E+06, cm3)
+
+        qft3 = onem3.convert(ft3)
+        self.assertAlmostEqual(qft3.amount, 35.31466672148859, None, None, TestUtils.DELTA6)
+
+        qtym3 = qft3.convert(m3)
+        self.assertAlmostEqual(qtym3.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        qm3 = megcm3.convert(m3)
+        self.assertAlmostEqual(qm3.amount, 1.0, None, None, TestUtils.DELTA6)
+        qm3 = qm3.convert(cm3)
+        self.assertAlmostEqual(qm3.amount, 1E+06, None, None, TestUtils.DELTA6)
+
+        qcm3 = onem3.convert(cm3)
+        self.assertAlmostEqual(qcm3.amount, 1E+06, None, None, TestUtils.DELTA6)
+
+        # inversions
+        u = metre.invert()
+        sym = u.abscissaUnit.symbol
+        self.assertTrue(sym == msys.getUOM(Unit.DIOPTER).symbol)
+
+        u = mps.invert()
+        self.assertTrue(u.symbol == "s/m")
+
+        uom = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "1/F", "1/F", "one over farad", msys.getOne(),
+            farad)
+        self.assertTrue(uom.symbol == "1/F")
+
+        # hz to radians per sec
+        q1 = Quantity(10.0, msys.getUOM(Unit.HERTZ))
+        q2 = q1.convert(msys.getUOM(Unit.RAD_PER_SEC))
+        self.assertAlmostEqual(q2.amount, 20.0 * math.pi, None, None, TestUtils.DELTA6)
+
+        q3 = q2.convert(msys.getUOM(Unit.HERTZ))
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+
+        # rpm to radians per second
+        q1 = Quantity(10.0, msys.getUOM(Unit.REV_PER_MIN))
+        q2 = q1.convert(msys.getUOM(Unit.RAD_PER_SEC))
+        self.assertAlmostEqual(q2.amount, 1.04719755119, None, None, TestUtils.DELTA6)
+
+        q3 = q2.convert(msys.getUOM(Unit.REV_PER_MIN))
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+
+        q1 = Quantity(10.0, hz)
+        q2 = Quantity(1.0, msys.getMinute())
+        q3 = q1.multiply(q2).convert(msys.getOne())
+        self.assertAlmostEqual(q3.amount, 600, None, None, TestUtils.DELTA6)
+
+        q1 = Quantity(1.0, msys.getUOM(Unit.ELECTRON_VOLT))
+        q2 = q1.convert(msys.getUOM(Unit.JOULE))
+        self.assertAlmostEqual(q2.amount, 1.60217656535E-19, None, None, TestUtils.DELTA6)
