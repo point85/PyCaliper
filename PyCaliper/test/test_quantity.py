@@ -666,7 +666,7 @@ class TestQuantity(unittest.TestCase):
         self.assertAlmostEqual(katals.amount, 0.01666667, None, None, TestUtils.DELTA6)
         
         # The Stefan–Boltzmann law states that the power emitted per unit area
-        # of the surface of a black body is directly proportional to the fourth
+        # of the surface of a black body is directly proportional to the 4.0th
         # power of its absolute temperature: sigma * T^4
 
         # calculate at 1000 Kelvin
@@ -784,7 +784,7 @@ class TestQuantity(unittest.TestCase):
         self.assertAlmostEqual(q2.amount, 0.1666666666666667, None, None, TestUtils.DELTA6)
 
         # A beer bottling line is rated at 2000 12 ounce cans/hour (US) at the
-        # filler. The case packer packs four 6-packs of cans into a case.
+        # filler. The case packer packs 4.0 6-packs of cans into a case.
         # Assuming no losses, what should be the rating of the case packer in
         # cases per hour? And, what is the draw-down rate on the holding tank
         # in gallons/minute?
@@ -800,3 +800,56 @@ class TestQuantity(unittest.TestCase):
         # case production
         packer = filler.convert(caseph)
         self.assertAlmostEqual(packer.amount, 83.333333, None, None, TestUtils.DELTA6)
+
+    def testGenericQuantity(self):
+        msys = MeasurementSystem.instance()
+        
+        a = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "a", "aUOM", "A")
+
+        b = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "b", "b", "B")
+        b.setConversion(10.0, a)
+
+        self.assertTrue(Quantity.createAmountFromString("4.0") == 4.0)
+
+        # add
+        q1 = Quantity(4.0, a)
+
+        self.assertFalse(q1 is None)
+
+        q2 = Quantity(4.0, b)
+        q3 = q1.add(q2)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        
+        self.assertTrue(q3.uom.abscissaUnit == a)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 44.0, None, None, TestUtils.DELTA6)
+
+        # subtract
+        q3 = q1.subtract(q2)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q3.uom.abscissaUnit == a)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, -36.0, None, None, TestUtils.DELTA6)
+
+        # multiply
+        q3 = q1.multiply(q2)
+        self.assertAlmostEqual(q3.amount, 16.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+
+        a2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "a*2", "a*2", "A squared", a, 2)
+        q4 = q3.convert(a2)
+        self.assertAlmostEqual(q4.amount, 160.0, None, None, TestUtils.DELTA6)
+        self.assertTrue(q4.uom == a2)
+
+        q4 = q3.divide(q2)
+        self.assertTrue(q4 == q1)
+        self.assertAlmostEqual(q4.amount, 4.0, None, None, TestUtils.DELTA6)
+
+        # divide
+        q3 = q1.divide(q2)
+        self.assertAlmostEqual(q3.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 0.1, None, None, TestUtils.DELTA6)
+
+        q4 = q3.multiply(q2)
+        self.assertTrue(q4 == q1)
