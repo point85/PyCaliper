@@ -731,3 +731,72 @@ class TestQuantity(unittest.TestCase):
         ev = qpf.convert(evolt)
         self.assertAlmostEqual(ev.amount, 1.65, None, None, TestUtils.DELTA2)
 
+    def testPackaging(self):
+        msys = MeasurementSystem.instance()
+            
+        one16ozCan = msys.createScalarUOM(UnitType.VOLUME, None, "16 oz can", "16ozCan", "16 oz can")
+        one16ozCan.setConversion(16.0, msys.getUOM(Unit.US_FLUID_OUNCE))
+
+        q400 = Quantity(400.0, one16ozCan)
+        q50 = q400.convert(msys.getUOM(Unit.US_GALLON))
+        self.assertAlmostEqual(q50.amount, 50.0, None, None, TestUtils.DELTA6)
+        
+        # 1 12 oz can = 12 fl.oz.
+        one12ozCan = msys.createScalarUOM(UnitType.VOLUME, None, "12 oz can", "12ozCan", "12 oz can")
+        one12ozCan.setConversion(12.0, msys.getUOM(Unit.US_FLUID_OUNCE))
+
+        q48 = Quantity(48.0, one12ozCan)
+        q36 = q48.convert(one16ozCan)
+        self.assertAlmostEqual(q36.amount, 36.0, None, None, TestUtils.DELTA6)
+
+        # 6 12 oz cans = 1 6-pack of 12 oz cans
+        sixPackCan = msys.createScalarUOM(UnitType.VOLUME, None, "6-pack", "6PCan", "6-pack of 12 oz cans")
+        sixPackCan.setConversion(6.0, one12ozCan)
+
+        fourPackCase = msys.createScalarUOM(UnitType.VOLUME, None, "4 pack case", "4PCase", "case of 4 6-packs")
+        fourPackCase.setConversion(4.0, sixPackCan)
+
+        bd = fourPackCase.getConversionFactor(one12ozCan)
+        self.assertAlmostEqual(bd, 24.0, None, None, TestUtils.DELTA6)
+
+        bd = one12ozCan.getConversionFactor(fourPackCase)
+
+        bd = fourPackCase.getConversionFactor(sixPackCan)
+        bd = sixPackCan.getConversionFactor(fourPackCase)
+
+        bd = sixPackCan.getConversionFactor(one12ozCan)
+        bd = one12ozCan.getConversionFactor(sixPackCan)
+
+        tenCases = Quantity(10.0, fourPackCase)
+
+        q1 = tenCases.convert(one12ozCan)
+        self.assertAlmostEqual(q1.amount, 240.0, None, None, TestUtils.DELTA6)
+
+        q2 = q1.convert(fourPackCase)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+
+        fortyPacks = Quantity(40.0, sixPackCan)
+        q2 = fortyPacks.convert(one12ozCan)
+        self.assertAlmostEqual(q2.amount, 240.0, None, None, TestUtils.DELTA6)
+
+        oneCan = Quantity(1.0, one12ozCan)
+        q2 = oneCan.convert(sixPackCan)
+        self.assertAlmostEqual(q2.amount, 0.1666666666666667, None, None, TestUtils.DELTA6)
+
+        # A beer bottling line is rated at 2000 12 ounce cans/hour (US) at the
+        # filler. The case packer packs four 6-packs of cans into a case.
+        # Assuming no losses, what should be the rating of the case packer in
+        # cases per hour? And, what is the draw-down rate on the holding tank
+        # in gallons/minute?
+        canph = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "Cans/hr", "cph", "cans per hour", one12ozCan, msys.getHour())
+        caseph = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "Case/hr", "caph", "cases per hour", fourPackCase, msys.getHour())
+        gpm = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "gpm", "gpm", "gal per minute", msys.getUOM(Unit.US_GALLON), msys.getMinute())
+        filler = Quantity(2000.0, canph)
+
+        # draw-down
+        draw = filler.convert(gpm)
+        self.assertAlmostEqual(draw.amount, 3.125, None, None, TestUtils.DELTA6)
+
+        # case production
+        packer = filler.convert(caseph)
+        self.assertAlmostEqual(packer.amount, 83.333333, None, None, TestUtils.DELTA6)
