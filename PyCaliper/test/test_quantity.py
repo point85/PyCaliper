@@ -853,3 +853,43 @@ class TestQuantity(unittest.TestCase):
 
         q4 = q3.multiply(q2)
         self.assertTrue(q4 == q1)
+
+    def testExceptions(self):
+        msys = MeasurementSystem.instance()
+        
+        floz = msys.getUOM(Unit.BR_FLUID_OUNCE)
+
+        q1 = Quantity(10.0, msys.getDay())
+        q2 = Quantity(10.0, msys.getUOM(Unit.BR_FLUID_OUNCE))
+
+        try:
+            Quantity.createAmountFromString(None)
+            self.fail("create")
+        except:
+            pass
+
+        try:
+            q1.convert(floz)
+            self.fail("convert")
+        except:
+            pass
+
+        try:
+            q1.add(q2)
+            self.fail("add")
+        except:
+            pass
+
+        try:
+            q1.subtract(q2)
+            self.fail("subtract")
+        except:
+            pass
+
+        # OK
+        q1.multiply(q2)
+
+        # OK
+        q1.divide(q2)
+       
+        

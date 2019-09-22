@@ -1032,6 +1032,9 @@ class MeasurementSystem:
     def getHour(self):
         return self.getUOM(Unit.HOUR)
     
+    def getDay(self):
+        return self.getUOM(Unit.DAY)
+    
     def getRegisteredUnits(self):
         units = CacheManager.instance().getCachedUnits()
         return units.sort()
