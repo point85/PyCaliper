@@ -936,5 +936,43 @@ class TestQuantity(unittest.TestCase):
         q4 = q5.divide(q2)
         self.assertTrue(q4.uom.getBaseSymbol() == q2.uom.getBaseSymbol())
         self.assertTrue(q4 == q2)
+        
+    def testComparison(self):
+        msys = MeasurementSystem.instance()
 
-    
+        newton = msys.getUOM(Unit.NEWTON)
+        metre = msys.getUOM(Unit.METRE)
+        cm = msys.createPrefixedUOM(Prefix.centi(), metre)
+
+        qN = Quantity(10.0, newton)
+        qm10 = Quantity(10.0, metre)
+        qm1 = Quantity(1.0, metre)
+        qcm = Quantity(10.0, cm)
+
+        self.assertTrue(qN.compare(qN) == 0)
+        self.assertTrue(qm10.compare(qm1) == 1)
+        self.assertTrue(qm1.compare(qm10) == -1)
+        self.assertTrue(qcm.compare(qm1) == -1)
+        self.assertTrue(qm1.compare(qcm) == 1)
+
+        try:
+            qN.compare(qm10)
+            self.fail("not comparable)")
+        except:
+            pass
+
+        conc = Quantity(0.0025, msys.getUOM(Unit.MOLARITY))
+        pH = -math.log10(conc.amount)
+        self.assertAlmostEqual(pH, 2.60, None, None, TestUtils.DELTA2)
+
+    def testArithmetic(self):
+        msys = MeasurementSystem.instance()
+
+        inch = msys.getUOM(Unit.INCH)
+        cm = msys.createPrefixedUOM(Prefix.centi(), msys.getUOM(Unit.METRE))
+        qcm = Quantity(1.0, cm)
+        qin = Quantity(1.0, inch)
+        q1 = qcm.multiplyByAmount(2.54).convert(inch)
+        self.assertAlmostEqual(q1.amount, qin.amount, None, None, TestUtils.DELTA6)
+        q2 = q1.convert(cm)
+        self.assertAlmostEqual(q2.amount, 2.54, None, None, TestUtils.DELTA6)
