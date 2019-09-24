@@ -976,3 +976,131 @@ class TestQuantity(unittest.TestCase):
         self.assertAlmostEqual(q1.amount, qin.amount, None, None, TestUtils.DELTA6)
         q2 = q1.convert(cm)
         self.assertAlmostEqual(q2.amount, 2.54, None, None, TestUtils.DELTA6)
+
+    def testFinancial(self):
+        msys = MeasurementSystem.instance()
+        
+        q1 = Quantity(10.0, Unit.US_DOLLAR)
+        q2 = Quantity(12.0, Unit.US_DOLLAR)
+        q3 = q2.subtract(q1).divide(q1).convert(msys.getUOM(Unit.PERCENT))
+        self.assertAlmostEqual(q3.amount, 20.0, None, None, TestUtils.DELTA6)
+        
+    def testPowerProductConversions(self):
+        msys = MeasurementSystem.instance()
+        
+        one = msys.getOne()
+        mps = msys.getUOM(Unit.METRE_PER_SEC)
+        fps = msys.getUOM(Unit.FEET_PER_SEC)
+        nm = msys.getUOM(Unit.NEWTON_METRE)
+        ft = msys.getUOM(Unit.FOOT)
+        inch = msys.getUOM(Unit.INCH)
+        mi = msys.getUOM(Unit.MILE)
+        hr = msys.getUOM(Unit.HOUR)
+        m = msys.getUOM(Unit.METRE)
+        s = msys.getUOM(Unit.SECOND)
+        n = msys.getUOM(Unit.NEWTON)
+        lbf = msys.getUOM(Unit.POUND_FORCE)
+        m2 = msys.getUOM(Unit.SQUARE_METRE)
+        m3 = msys.getUOM(Unit.CUBIC_METRE)
+        ft2 = msys.getUOM(Unit.SQUARE_FOOT)
+
+        # test products and quotients
+        msys.unregisterUnit(msys.getUOM(Unit.FOOT_POUND_FORCE))
+        nmQ = Quantity(1.0, nm)
+        lbfinQ = nmQ.convertToPowerProduct(lbf, inch)
+        self.assertAlmostEqual(lbfinQ.amount, 8.850745791327183, None, None, TestUtils.DELTA6)
+        mpsQ = Quantity(1.0, mps)
+
+        fphQ = mpsQ.convertToPowerProduct(ft, hr)
+        self.assertAlmostEqual(fphQ.amount, 11811.02362204724, None, None, TestUtils.DELTA6)
+
+        mps2Q = fphQ.convertToPowerProduct(m, s)
+        self.assertAlmostEqual(mps2Q.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        mps3Q = mpsQ.convertToPowerProduct(m, s)
+        self.assertAlmostEqual(mps3Q.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        inlbfQ = nmQ.convertToPowerProduct(inch, lbf)
+        self.assertAlmostEqual(inlbfQ.amount, 8.850745791327183, None, None, TestUtils.DELTA6)
+
+        nm2Q = lbfinQ.convertToPowerProduct(n, m)
+        self.assertAlmostEqual(nm2Q.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        nm2Q = lbfinQ.convertToPowerProduct(m, n)
+        self.assertAlmostEqual(nm2Q.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        mQ = Quantity(1.0, m)
+        try:
+            mQ.convertToPowerProduct(ft, hr)
+            self.fail()
+        except:
+            pass
+
+        msys.unregisterUnit(msys.getUOM(Unit.SQUARE_FOOT))
+        m2Q = Quantity(1.0, m2)
+        ft2Q = m2Q.convertToPowerProduct(ft, ft)
+        self.assertAlmostEqual(ft2Q.amount, 20.0, None, None, TestUtils.DELTA6)
+
+        mmQ = ft2Q.convertToPowerProduct(m, m)
+        self.assertAlmostEqual(mmQ.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        try:
+            m2Q.convertToPowerProduct(m, one)
+            self.fail()
+        except:
+            pass
+
+        msys.unregisterUnit(msys.getUOM(Unit.CUBIC_FOOT))
+        m3Q = Quantity(1.0, m3)
+        ft3Q = m3Q.convertToPowerProduct(ft2, ft)
+        self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestUtils.DELTA6)
+
+        m3Q2 = m3Q.convertToPowerProduct(m2, m)
+        self.assertAlmostEqual(m3Q2.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        ft3Q = m3Q.convertToPowerProduct(ft, ft2)
+        self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestUtils.DELTA6)
+
+        perM = msys.getUOM(Unit.DIOPTER)
+        perMQ = Quantity(1.0, perM)
+        perInQ = perMQ.convertToPowerProduct(one, inch)
+        self.assertAlmostEqual(perInQ.amount, 0.0254, None, None, TestUtils.DELTA6)
+
+        try:
+            perMQ.convertToPowerProduct(inch, one)
+            self.fail()
+        except:
+            pass
+
+        try:
+            perMQ.convertToPowerProduct(inch, inch)
+            self.fail()
+        except:
+            pass
+
+        fpsQ = Quantity(1.0, fps)
+        mphQ = fpsQ.convertToPowerProduct(mi, hr)
+        self.assertAlmostEqual(mphQ.amount, 0.6818181818181818, None, None, TestUtils.DELTA6)
+
+        # test powers
+        in2Q = m2Q.convertToPower(inch)
+        self.assertAlmostEqual(in2Q.amount, 1550.003100006200, None, None, TestUtils.DELTA6)
+
+        m2Q2 = in2Q.convertToPower(m)
+        self.assertAlmostEqual(m2Q2.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        perInQ2 = perMQ.convertToPower(inch)
+        self.assertAlmostEqual(perInQ2.amount, 0.0254, None, None, TestUtils.DELTA6)
+
+        q1 = perInQ2.convertToPower(m)
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        inQ2 = mQ.convertToPower(inch)
+        self.assertAlmostEqual(inQ2.amount, 39.37007874015748, None, None, TestUtils.DELTA6)
+
+        q1 = inQ2.convertToPower(m)
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
+
+        one1 = Quantity(1.0, msys.getOne())
+        q1 = one1.convertToPower(msys.getOne())
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
