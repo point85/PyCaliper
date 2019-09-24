@@ -473,7 +473,7 @@ class TestQuantity(unittest.TestCase):
 
         q3 = msys.quantityToPower(q1, -2)
         self.assertTrue(q3.amount == 0.01)
-        self.assertTrue(q3.uom== ft2.invert())
+        self.assertTrue(q3.uom == ft2.invert())
         
     def testSIUnits(self):
         msys = MeasurementSystem.instance()
@@ -891,5 +891,50 @@ class TestQuantity(unittest.TestCase):
 
         # OK
         q1.divide(q2)
-       
-        
+
+    def testEquality(self):
+        msys = MeasurementSystem.instance()
+
+        newton = msys.getUOM(Unit.NEWTON)
+        metre = msys.getUOM(Unit.METRE)
+        nm = msys.getUOM(Unit.NEWTON_METRE)
+        m2 = msys.getUOM(Unit.SQUARE_METRE)
+        J = msys.getUOM(Unit.JOULE)
+
+        q1 = Quantity(10.0, newton)
+        q2 = Quantity(10.0, metre)
+        q3 = Quantity(10.0, nm)
+        q5 = Quantity(100.0, nm)
+
+        # unity
+        q4 = q5.divide(q3)
+        self.assertTrue(q4.uom.getBaseSymbol() == msys.getOne().symbol)
+        self.assertTrue(q4.amount == 10.0)
+
+        # Newton-metre (Joules)
+        q4 = q1.multiply(q2)
+        self.assertTrue(q5.uom.getBaseSymbol() == q4.uom.getBaseSymbol())
+        q6 = q5.convert(J)
+        self.assertTrue(q6.amount == q4.amount)
+
+        # Newton
+        q5 = q4.divide(q2)
+        self.assertTrue(q5.uom.getBaseSymbol() == q1.uom.getBaseSymbol())
+        self.assertTrue(q5 == q1)
+
+        # metre
+        q5 = q4.divide(q1)
+        self.assertTrue(q5.uom.getBaseSymbol() == q2.uom.getBaseSymbol())
+        self.assertTrue(q5 == q2)
+
+        # square metre
+        q4 = q2.multiply(q2)
+        q5 = Quantity(100.0, m2)
+        self.assertTrue(q5 == q4)
+
+        # metre
+        q4 = q5.divide(q2)
+        self.assertTrue(q4.uom.getBaseSymbol() == q2.uom.getBaseSymbol())
+        self.assertTrue(q4 == q2)
+
+    
