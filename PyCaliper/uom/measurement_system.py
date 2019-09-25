@@ -11,8 +11,7 @@ from PyCaliper.uom.enums import Unit
 from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.localizer import Localizer
-
-
+    
 class MeasurementSystem:    
     # single instance
     __unifiedSystem = None
@@ -1034,10 +1033,14 @@ class MeasurementSystem:
     
     def getDay(self):
         return self.getUOM(Unit.DAY)
+
+    @staticmethod
+    def getUOMKey(uom):
+        return uom.symbol
     
-    def getRegisteredUnits(self):
+    def getRegisteredUOMs(self):
         units = CacheManager.instance().getCachedUnits()
-        return units.sort()
+        return sorted(units, key = MeasurementSystem.getUOMKey)
     
     def getUnitsOfMeasure(self, unitType):
         units = []
