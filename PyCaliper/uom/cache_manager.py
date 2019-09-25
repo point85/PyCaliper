@@ -54,7 +54,7 @@ class CacheManager:
     def getEnumerationCache(self):
         return self.unitRegistry  
     
-    def unregisterUnit(self, uom):
+    def unregisterUOM(self, uom):
         if (uom is None):
             return
         
@@ -70,7 +70,7 @@ class CacheManager:
         if (key in self.baseRegistry):
             del self.baseRegistry[key]
         
-    def registerUnit(self, uom):
+    def registerUOM(self, uom):
         if (uom is None):
             return
         

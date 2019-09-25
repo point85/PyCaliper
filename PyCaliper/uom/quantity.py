@@ -71,14 +71,6 @@ class Quantity(Symbolic):
         # create the quantity now
         return Quantity(newAmount, toUOM)
     
-    """
-    def convertToUnit(self, unit):
-        return self.convert(MeasurementSystem.instance().getUOM(unit))
-    
-    def convertToPrefixUnit(self, prefix, unit):
-        return self.convert(MeasurementSystem.instance().getUOM(prefix, unit))
-    """
-    
     def convertToPowerProduct(self, uom1, uom2):
         newUOM = self.uom.clonePowerProduct(uom1, uom2)
         return self.convert(newUOM)

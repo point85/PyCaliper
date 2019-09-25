@@ -5,6 +5,7 @@ from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.enums import Unit, UnitType, Constant
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.prefix import Prefix
+from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.test.test_utils import TestUtils
 
 class TestQuantity(unittest.TestCase): 
@@ -980,12 +981,13 @@ class TestQuantity(unittest.TestCase):
     def testFinancial(self):
         msys = MeasurementSystem.instance()
         
-        q1 = Quantity(10.0, Unit.US_DOLLAR)
-        q2 = Quantity(12.0, Unit.US_DOLLAR)
+        q1 = Quantity(10.0, msys.getUOM(Unit.US_DOLLAR))     
+        q2 = Quantity(12.0, msys.getUOM(Unit.US_DOLLAR))
         q3 = q2.subtract(q1).divide(q1).convert(msys.getUOM(Unit.PERCENT))
         self.assertAlmostEqual(q3.amount, 20.0, None, None, TestUtils.DELTA6)
-        
+      
     def testPowerProductConversions(self):
+        CacheManager.instance().clearCache()
         msys = MeasurementSystem.instance()
         
         one = msys.getOne()
@@ -1005,7 +1007,6 @@ class TestQuantity(unittest.TestCase):
         ft2 = msys.getUOM(Unit.SQUARE_FOOT)
 
         # test products and quotients
-        msys.unregisterUnit(msys.getUOM(Unit.FOOT_POUND_FORCE))
         nmQ = Quantity(1.0, nm)
         lbfinQ = nmQ.convertToPowerProduct(lbf, inch)
         self.assertAlmostEqual(lbfinQ.amount, 8.850745791327183, None, None, TestUtils.DELTA6)
@@ -1036,11 +1037,13 @@ class TestQuantity(unittest.TestCase):
         except:
             pass
 
-        msys.unregisterUnit(msys.getUOM(Unit.SQUARE_FOOT))
+      
         m2Q = Quantity(1.0, m2)
+      
         ft2Q = m2Q.convertToPowerProduct(ft, ft)
-        self.assertAlmostEqual(ft2Q.amount, 20.0, None, None, TestUtils.DELTA6)
-
+  
+        self.assertAlmostEqual(ft2Q.amount, 10.76391041670972, None, None, TestUtils.DELTA6)
+ 
         mmQ = ft2Q.convertToPowerProduct(m, m)
         self.assertAlmostEqual(mmQ.amount, 1.0, None, None, TestUtils.DELTA6)
 
@@ -1049,8 +1052,7 @@ class TestQuantity(unittest.TestCase):
             self.fail()
         except:
             pass
-
-        msys.unregisterUnit(msys.getUOM(Unit.CUBIC_FOOT))
+        
         m3Q = Quantity(1.0, m3)
         ft3Q = m3Q.convertToPowerProduct(ft2, ft)
         self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestUtils.DELTA6)
@@ -1102,5 +1104,5 @@ class TestQuantity(unittest.TestCase):
         self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
 
         one1 = Quantity(1.0, msys.getOne())
-        q1 = one1.convertToPower(msys.getOne())
+        q1 = one1.convertToPower(one)
         self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)

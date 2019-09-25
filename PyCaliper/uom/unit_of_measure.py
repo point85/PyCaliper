@@ -363,7 +363,7 @@ class UnitOfMeasure(Symbolic):
                 raise Exception(msg)
 
         # unit has been previously cached, so first remove it, then cache again
-        CacheManager.instance().unregisterUnit(self)
+        CacheManager.instance().unregisterUOM(self)
         
         self.baseSymbol = None
         self.scalingFactor = scalingFactor
@@ -371,7 +371,7 @@ class UnitOfMeasure(Symbolic):
         self.offset = offset
 
         # re-cache
-        CacheManager.instance().registerUnit(self)
+        CacheManager.instance().registerUOM(self)
         
     def getPowerExponent(self):
         return self.exponent1

@@ -49,7 +49,7 @@ class MeasurementSystem:
     
     def createScalarUOM(self, unitType, unit, name, symbol, description):
         uom = self.createUOM(unitType, unit, name, symbol, description)
-        CacheManager.instance().registerUnit(uom)
+        CacheManager.instance().registerUOM(uom)
         return uom
     
     def createBaseSIUnit(self, unit):
@@ -956,7 +956,7 @@ class MeasurementSystem:
     def createPowerUOM(self, unitType, unit, name, symbol, description, base, exponent):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setPowerUnit(base, exponent)
-        CacheManager.instance().registerUnit(uom)
+        CacheManager.instance().registerUOM(uom)
         return uom
     
     def createUnclassifiedPowerUOM(self, base, exponent): 
@@ -971,7 +971,7 @@ class MeasurementSystem:
     def createProductUOM(self, unitType, unit, name, symbol, description, multiplier, multiplicand):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setProductUnits(multiplier, multiplicand)
-        CacheManager.instance().registerUnit(uom)
+        CacheManager.instance().registerUOM(uom)
         return uom
     
     def createUnclassifiedProductUOM(self, multiplier, multiplicand):
@@ -1001,7 +1001,7 @@ class MeasurementSystem:
     def createQuotientUOM(self, unitType, unit, name, symbol, description, dividend, divisor):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setQuotientUnits(dividend, divisor)
-        CacheManager.instance().registerUnit(uom)
+        CacheManager.instance().registerUOM(uom)
         return uom
 
     def createUOM(self, unitType, unit, name, symbol, description):
