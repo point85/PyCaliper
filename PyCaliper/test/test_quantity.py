@@ -6,7 +6,7 @@ from PyCaliper.uom.enums import Unit, UnitType, Constant
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.cache_manager import CacheManager
-from PyCaliper.test.test_utils import TestUtils
+from PyCaliper.test.test_utils import TestingUtils
 
 class TestQuantity(unittest.TestCase): 
     def testNamedQuantity(self):
@@ -24,35 +24,35 @@ class TestQuantity(unittest.TestCase):
         w = msys.getUOM(Unit.WATT)
         
         eNA = qe.multiply(na)
-        self.assertAlmostEqual(f.amount, eNA.amount, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(f.amount, 96485.332123, None, None, TestUtils.DELTA5)
+        self.assertAlmostEqual(f.amount, eNA.amount, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(f.amount, 96485.332123, None, None, TestingUtils.DELTA5)
 
         # epsilon 0
         fm = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "Farad per metre", "F/m", "Farad per metre",
             msys.getUOM(Unit.FARAD), msys.getUOM(Unit.METRE))
         eps0 = msys.getQuantity(Constant.ELECTRIC_PERMITTIVITY)
-        self.assertAlmostEqual(eps0.amount, 8.854187817E-12, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(eps0.convert(fm).amount, 8.854187817E-12, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(eps0.amount, 8.854187817E-12, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(eps0.convert(fm).amount, 8.854187817E-12, None, None, TestingUtils.DELTA6)
 
         # atomic masses
         u = Quantity(1.66053904020E-24, msys.getUOM(Unit.GRAM))
         me = msys.getQuantity(Constant.ELECTRON_MASS)
         bd = me.divide(u).amount
-        self.assertAlmostEqual(bd, 5.48579909016E-04, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(bd, 5.48579909016E-04, None, None, TestingUtils.DELTA6)
 
         mp = msys.getQuantity(Constant.PROTON_MASS)
         bd = mp.divide(u).amount
-        self.assertAlmostEqual(bd, 1.00727646687991, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(bd, 1.00727646687991, None, None, TestingUtils.DELTA6)
         
         # caesium
         cs = msys.getQuantity(Constant.CAESIUM_FREQUENCY)
         periods = cs.multiply(Quantity(1.0, s))
-        self.assertAlmostEqual(periods.amount, 9192631770.0, None, None, TestUtils.DELTA0)
+        self.assertAlmostEqual(periods.amount, 9192631770.0, None, None, TestingUtils.DELTA0)
         
         # luminous efficacy
         kcd = msys.getQuantity(Constant.LUMINOUS_EFFICACY)
         lum = kcd.multiply(Quantity(1.0, w))
-        self.assertAlmostEqual(lum.amount, 683.0, None, None, TestUtils.DELTA0)
+        self.assertAlmostEqual(lum.amount, 683.0, None, None, TestingUtils.DELTA0)
 
     def testAllUnits(self):
         msys = MeasurementSystem.instance()
@@ -76,24 +76,24 @@ class TestQuantity(unittest.TestCase):
         oneSec = Quantity(1.0, second)
         converted = oneMin.convert(second)
 
-        self.assertAlmostEqual(converted.amount, 60.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(converted.amount, 60.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(converted.uom == second)
 
         sixty = oneMin.divide(oneSec)
-        self.assertAlmostEqual(sixty.amount, 1.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(sixty.uom.scalingFactor, 60.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(sixty.amount, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(sixty.uom.scalingFactor, 60.0, None, None, TestingUtils.DELTA6)
 
         q1 = sixty.convert(msys.getOne())
         self.assertTrue(q1.uom == msys.getOne())
-        self.assertAlmostEqual(q1.amount, 60.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 60.0, None, None, TestingUtils.DELTA6)
 
         q1 = q1.multiply(oneSec)
         self.assertTrue(q1.convert(second).uom == second)
-        self.assertAlmostEqual(q1.amount, 60.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 60.0, None, None, TestingUtils.DELTA6)
 
         q1 = q1.convert(minute)
         self.assertTrue(q1.uom == minute)
-        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestingUtils.DELTA6)
 
     def testTemperature(self):
         msys = MeasurementSystem.instance()
@@ -105,41 +105,41 @@ class TestQuantity(unittest.TestCase):
 
         q1 = Quantity(212.0, F)
         q2 = q1.convert(C)
-        self.assertAlmostEqual(q2.amount, 100.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(F).amount, 212.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 100.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(F).amount, 212.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(32.0, F)
         q2 = q1.convert(C)
-        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(F).amount, 32.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(F).amount, 32.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(0.0, F)
         q2 = q1.convert(C)
-        self.assertAlmostEqual(q2.amount, -17.7777777777778, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(F).amount, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, -17.7777777777778, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(F).amount, 0.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(459.67, R)
         q2 = q1.convert(F)
-        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(R).amount, 459.67, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(R).amount, 459.67, None, None, TestingUtils.DELTA6)
 
         q2 = q1.convert(K)
-        self.assertAlmostEqual(q2.amount, 255.3722222222222, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(R).amount, 459.67, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 255.3722222222222, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(R).amount, 459.67, None, None, TestingUtils.DELTA6)
 
         q2 = q1.convert(C)
-        self.assertAlmostEqual(q2.amount, -17.7777777777778, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(R).amount, 459.67, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, -17.7777777777778, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(R).amount, 459.67, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(273.15, K)
         q2 = q1.convert(C)
-        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(K).amount, 273.15, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(K).amount, 273.15, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(0.0, K)
         q2 = q1.convert(R)
-        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(K).amount, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(K).amount, 0.0, None, None, TestingUtils.DELTA6)
         
     def testLength(self):
         msys = MeasurementSystem.instance()
@@ -161,60 +161,60 @@ class TestQuantity(unittest.TestCase):
 
         q1 = Quantity(1.0, ft2)
         q2 = q1.convert(in2)
-        self.assertAlmostEqual(q2.amount, 144.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(ft2).amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 144.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(ft2).amount, 1.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(1.0, msys.getUOM(Unit.SQUARE_METRE))
         q2 = q1.convert(ft2)
-        self.assertAlmostEqual(q2.amount, 10.76391041670972, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(m2).amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 10.76391041670972, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(m2).amount, 1.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(3, ft)
         q2 = q1.convert(yd)
-        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(ft).amount, 3.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(ft).amount, 3.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(1.0, ft)
         q2 = q1.convert(m)
-        self.assertAlmostEqual(q2.amount, 0.3048, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(ft).amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.3048, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(ft).amount, 1.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(100, cm)
         q2 = q1.convert(m)
-        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.convert(cm).amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.convert(cm).amount, 100.0, None, None, TestingUtils.DELTA6)
 
         # add
         q1 = Quantity(50.0, cm)
         q2 = Quantity(50.0, cm)
         q3 = q1.add(q2)
-        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.convert(m).amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.convert(m).amount, 1.0, None, None, TestingUtils.DELTA6)
 
         q4 = q2.add(q1)
-        self.assertAlmostEqual(q4.amount, 100.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q4.convert(m).amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 100.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q4.convert(m).amount, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3 == q4)
 
         # subtract
         q3 = q1.subtract(q2)
-        self.assertAlmostEqual(q3.amount, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.convert(m).amount, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.convert(m).amount, 0.0, None, None, TestingUtils.DELTA6)
 
         q4 = q2.subtract(q1)
-        self.assertAlmostEqual(q4.amount, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q4.convert(m).amount, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q4.convert(m).amount, 0.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3 == q4)
 
         # multiply
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 2500.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 2500.0, None, None, TestingUtils.DELTA6)
 
         q4 = q3.convert(cm2)
-        self.assertAlmostEqual(q4.amount, 2500.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 2500.0, None, None, TestingUtils.DELTA6)
 
         q4 = q3.convert(m2)
-        self.assertAlmostEqual(q4.amount, 0.25, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 0.25, None, None, TestingUtils.DELTA6)
 
         # divide
         q4 = q3.divide(q1)
@@ -230,12 +230,12 @@ class TestQuantity(unittest.TestCase):
 
         q1 = Quantity(10.0, gal)
         q2 = q1.convert(in3)
-        self.assertAlmostEqual(q2.amount, 2310.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 2310.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == in3)
 
         q1 = Quantity(128.0, floz)
         q2 = q1.convert(qt)
-        self.assertAlmostEqual(q2.amount, 4.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 4.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == qt)
 
         ft = msys.getUOM(Unit.FOOT)
@@ -250,23 +250,23 @@ class TestQuantity(unittest.TestCase):
         # British cup to US gallon
         q1 = Quantity(10.0, msys.getUOM(Unit.BR_CUP))
         q2 = q1.convert(msys.getUOM(Unit.US_GALLON))
-        self.assertAlmostEqual(q2.amount, 0.6, None, None, TestUtils.DELTA3)
+        self.assertAlmostEqual(q2.amount, 0.6, None, None, TestingUtils.DELTA3)
 
         # US ton to British ton
         q1 = Quantity(10.0, msys.getUOM(Unit.US_TON))
         q2 = q1.convert(msys.getUOM(Unit.BR_TON))
-        self.assertAlmostEqual(q2.amount, 8.928571428, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 8.928571428, None, None, TestingUtils.DELTA6)
 
         # troy ounce to ounce
         q1 = Quantity(10.0, msys.getUOM(Unit.TROY_OUNCE))
         q2 = q1.convert(msys.getUOM(Unit.OUNCE))
-        self.assertAlmostEqual(q2.amount, 10.971, None, None, TestUtils.DELTA3)
+        self.assertAlmostEqual(q2.amount, 10.971, None, None, TestingUtils.DELTA3)
 
         # deci-litre to quart
         dl = msys.createPrefixedUOM(Prefix.deci(), msys.getUOM(Unit.LITRE))
         q1 = Quantity(10.0, dl)
         q2 = q1.convert(msys.getUOM(Unit.US_QUART))
-        self.assertAlmostEqual(q2.amount, 1.0566882, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 1.0566882, None, None, TestingUtils.DELTA6)
         
     def testSIQuantity(self):
         msys = MeasurementSystem.instance()
@@ -286,11 +286,11 @@ class TestQuantity(unittest.TestCase):
 
         q1 = Quantity(10.0, litre)
         q2 = q1.convert(m3)
-        self.assertAlmostEqual(q2.amount, 0.01, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.01, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == m3)
 
         q2 = q1.convert(litre)
-        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == litre)
 
         # add
@@ -298,50 +298,50 @@ class TestQuantity(unittest.TestCase):
         q2 = Quantity(2.0, cm)
         q3 = q1.add(q2)
 
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom.abscissaUnit == m)
-        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.amount, 2.02, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 2.02, None, None, TestingUtils.DELTA6)
 
         q4 = q3.convert(cm)
-        self.assertAlmostEqual(q4.amount, 202, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 202, None, None, TestingUtils.DELTA6)
         self.assertTrue(q4.uom == cm)
 
         # subtract
         q3 = q3.subtract(q1)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom.abscissaUnit == m)
-        self.assertAlmostEqual(q3.amount, 0.02, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 0.02, None, None, TestingUtils.DELTA6)
 
         q4 = q3.convert(cm)
-        self.assertAlmostEqual(q4.amount, 2.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 2.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q4.uom == cm)
 
         # multiply
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 4.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 0.01, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 4.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 0.01, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom.getBaseSymbol() == m2.getBaseSymbol())
 
         q4 = q3.divide(q3)
-        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q4.uom == msys.getOne())
 
         q4 = q3.divide(q1)
         self.assertTrue(q4 == q2)
 
         q4 = q3.convert(m2)
-        self.assertAlmostEqual(q4.amount, 0.04, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 0.04, None, None, TestingUtils.DELTA6)
         self.assertTrue(q4.uom == m2)
 
         # divide
         q3 = q3.divide(q2)
-        self.assertAlmostEqual(q3.amount, 2.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 2.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == m)
         self.assertTrue(q3 == q1)
 
         q3 = q3.convert(m)
-        self.assertAlmostEqual(q3.amount, 2.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 2.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(0.0, litre)
 
@@ -352,25 +352,25 @@ class TestQuantity(unittest.TestCase):
             pass
 
         q1 = q3.convert(cm).divideByAmount(10.0)
-        self.assertAlmostEqual(q1.amount, 20.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 20.0, None, None, TestingUtils.DELTA6)
 
         # invert
         q1 = Quantity(10.0, mps)
         q2 = q1.invert()
-        self.assertAlmostEqual(q2.amount, 0.1, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.1, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == secPerM)
 
         q2 = q2.invert()
-        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == mps)
 
         q1 = Quantity(10.0, cm)
         q2 = q1.invert()
-        self.assertAlmostEqual(q2.amount, 0.1, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.1, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == oneOverCm)
 
         q2 = q2.convert(m.invert())
-        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == oneOverM)
 
         self.assertTrue(str(q2) != None)
@@ -379,14 +379,14 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(10.0, msys.getUOM(Unit.NEWTON_METRE))
         q2 = Quantity(1.0, msys.getUOM(Unit.METRE))
         q3 = q1.divide(q2)
-        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == msys.getUOM(Unit.NEWTON))
 
         # length multiplied by force
         q1 = Quantity(10.0, msys.getUOM(Unit.NEWTON))
         q2 = Quantity(1.0, msys.getUOM(Unit.METRE))
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestingUtils.DELTA6)
         nm2 = msys.getUOM(Unit.NEWTON_METRE)
         self.assertTrue(q3.uom.getBaseSymbol() == nm2.getBaseSymbol())
         q4 = q3.convert(msys.getUOM(Unit.JOULE))
@@ -396,14 +396,14 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(10.0, fperm)
         q2 = Quantity(1.0, m)
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == msys.getUOM(Unit.FARAD))
 
         # amps
         q1 = Quantity(10.0, msys.getUOM(Unit.AMPERE_PER_METRE))
         q2 = Quantity(1.0, m)
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == msys.getUOM(Unit.AMPERE))
 
         # Boltzmann and Avogadro
@@ -411,13 +411,13 @@ class TestQuantity(unittest.TestCase):
         avogadro = msys.getQuantity(Constant.AVAGADRO_CONSTANT)
         gas = msys.getQuantity(Constant.GAS_CONSTANT)
         qR = boltzmann.multiply(avogadro)
-        self.assertAlmostEqual(qR.uom.scalingFactor, gas.uom.scalingFactor, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(qR.uom.scalingFactor, gas.uom.scalingFactor, None, None, TestingUtils.DELTA6)
 
         # Sieverts
         q1 = Quantity(20.0, msys.createPrefixedUOM(Prefix.milli(), msys.getUOM(Unit.SIEVERTS_PER_HOUR)))
         q2 = Quantity(24.0, msys.getHour())
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 480.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 480.0, None, None, TestingUtils.DELTA6)
         
         # If the concentration of a sulfuric acid solution is c(H2SO4) = 1 mol/L and the equivalence factor is 0.5, what is the normality?
         mol = msys.getUOM(Unit.MOLE)
@@ -427,7 +427,7 @@ class TestQuantity(unittest.TestCase):
         feq = Quantity(0.5, molPerL)
         
         N = Quantity(1.0, molPerL).divide(feq)
-        self.assertAlmostEqual(N.amount, 2.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(N.amount, 2.0, None, None, TestingUtils.DELTA6)
         
     def testPowers(self):
         msys = MeasurementSystem.instance()
@@ -441,11 +441,11 @@ class TestQuantity(unittest.TestCase):
         q3 = Quantity(10.0, p4)
 
         q4 = q3.divide(q1)
-        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q4.uom.getBaseUOM() == m2)
 
         q2 = q1.convert(p2)
-        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom.getBaseUOM() == m2)
 
         # power method
@@ -454,11 +454,11 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(10.0, ft)
 
         q3 = msys.quantityToPower(q1, 2)
-        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom.getBaseSymbol() == ft2.getBaseSymbol())
 
         q4 = q3.convert(msys.getUOM(Unit.SQUARE_METRE))
-        self.assertAlmostEqual(q4.amount, 9.290304, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 9.290304, None, None, TestingUtils.DELTA6)
 
         q3 = msys.quantityToPower(q1, 1)
         self.assertTrue(q3.amount == q1.amount)
@@ -505,50 +505,50 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(10.0, newton)
         q2 = Quantity(10.0, metre)
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom.getBaseSymbol() == nm.getBaseSymbol())
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestingUtils.DELTA6)
 
         q3 = q3.convert(joule)
-        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == joule)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
 
         q3 = q3.convert(nm)
-        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 100.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == nm)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(100.0, cm)
         q2 = q1.convert(metre)
-        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom.unit == Unit.METRE)
-        self.assertAlmostEqual(q2.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
 
         q2 = q2.convert(cm)
-        self.assertAlmostEqual(q2.amount, 100.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q2.uom.scalingFactor, 0.01, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 100.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q2.uom.scalingFactor, 0.01, None, None, TestingUtils.DELTA6)
 
         q2 = q1
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 10000, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 0.0001, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10000, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 0.0001, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestingUtils.DELTA6)
 
         q4 = q3.convert(m2)
         self.assertTrue(q4.uom == m2)
-        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         q3 = q3.convert(m2)
-        self.assertAlmostEqual(q3.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == m2)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
 
         q3 = q3.convert(cm2)
-        self.assertAlmostEqual(q3.amount, 10000, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10000, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom == cm2)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
 
         # power
         onem3 = Quantity(1.0, m3)
@@ -557,18 +557,18 @@ class TestQuantity(unittest.TestCase):
         megcm3 = Quantity(1E+06, cm3)
 
         qft3 = onem3.convert(ft3)
-        self.assertAlmostEqual(qft3.amount, 35.31466672148859, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(qft3.amount, 35.31466672148859, None, None, TestingUtils.DELTA6)
 
         qtym3 = qft3.convert(m3)
-        self.assertAlmostEqual(qtym3.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(qtym3.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         qm3 = megcm3.convert(m3)
-        self.assertAlmostEqual(qm3.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(qm3.amount, 1.0, None, None, TestingUtils.DELTA6)
         qm3 = qm3.convert(cm3)
-        self.assertAlmostEqual(qm3.amount, 1E+06, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(qm3.amount, 1E+06, None, None, TestingUtils.DELTA6)
 
         qcm3 = onem3.convert(cm3)
-        self.assertAlmostEqual(qcm3.amount, 1E+06, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(qcm3.amount, 1E+06, None, None, TestingUtils.DELTA6)
 
         # inversions
         u = metre.invert()
@@ -585,27 +585,27 @@ class TestQuantity(unittest.TestCase):
         # hz to radians per sec
         q1 = Quantity(10.0, msys.getUOM(Unit.HERTZ))
         q2 = q1.convert(msys.getUOM(Unit.RAD_PER_SEC))
-        self.assertAlmostEqual(q2.amount, 20.0 * math.pi, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 20.0 * math.pi, None, None, TestingUtils.DELTA6)
 
         q3 = q2.convert(msys.getUOM(Unit.HERTZ))
-        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestingUtils.DELTA6)
 
         # rpm to radians per second
         q1 = Quantity(10.0, msys.getUOM(Unit.REV_PER_MIN))
         q2 = q1.convert(msys.getUOM(Unit.RAD_PER_SEC))
-        self.assertAlmostEqual(q2.amount, 1.04719755119, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 1.04719755119, None, None, TestingUtils.DELTA6)
 
         q3 = q2.convert(msys.getUOM(Unit.REV_PER_MIN))
-        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 10.0, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(10.0, hz)
         q2 = Quantity(1.0, msys.getMinute())
         q3 = q1.multiply(q2).convert(msys.getOne())
-        self.assertAlmostEqual(q3.amount, 600, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 600, None, None, TestingUtils.DELTA6)
 
         q1 = Quantity(1.0, msys.getUOM(Unit.ELECTRON_VOLT))
         q2 = q1.convert(msys.getUOM(Unit.JOULE))
-        self.assertAlmostEqual(q2.amount, 1.60217656535E-19, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 1.60217656535E-19, None, None, TestingUtils.DELTA6)
         
     def testEquations(self):
         msys = MeasurementSystem.instance()
@@ -614,13 +614,13 @@ class TestQuantity(unittest.TestCase):
         height = Quantity(2.0, msys.getUOM(Unit.METRE))
         mass = Quantity(100.0, msys.getUOM(Unit.KILOGRAM))
         bmi = mass.divide(height.multiply(height))
-        self.assertAlmostEqual(bmi.amount, 25.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(bmi.amount, 25.0, None, None, TestingUtils.DELTA6)
 
         # E = mc^2
         c = msys.getQuantity(Constant.LIGHT_VELOCITY)
         m = Quantity(1.0, msys.getUOM(Unit.KILOGRAM))
         e = m.multiply(c).multiply(c)
-        self.assertAlmostEqual(e.amount, 8.987551787368176E+16, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(e.amount, 8.987551787368176E+16, None, None, TestingUtils.DELTA6)
         
         # Ideal Gas Law, PV = nRT
         # A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 C.
@@ -629,22 +629,22 @@ class TestQuantity(unittest.TestCase):
         v = Quantity(50.0, msys.getUOM(Unit.LITRE)).convert(msys.getUOM(Unit.CUBIC_METRE))
         t = Quantity(127.0, msys.getUOM(Unit.CELSIUS)).convert(msys.getUOM(Unit.KELVIN))
         n = p.multiply(v).divide(msys.getQuantity(Constant.GAS_CONSTANT).multiply(t))
-        self.assertAlmostEqual(n.amount, 28.018664, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(n.amount, 28.018664, None, None, TestingUtils.DELTA6)
            
         # energy of red light photon = Planck's constant times the frequency
         frequency = Quantity(400.0, msys.createPrefixedUOM(Prefix.tera(), msys.getUOM(Unit.HERTZ)))
         ev = msys.getQuantity(Constant.PLANCK_CONSTANT).multiply(frequency).convert(msys.getUOM(Unit.ELECTRON_VOLT))
-        self.assertAlmostEqual(ev.amount, 1.65, None, None, TestUtils.DELTA2)
+        self.assertAlmostEqual(ev.amount, 1.65, None, None, TestingUtils.DELTA2)
         
         # wavelength of red light in nanometres
         nm = msys.createPrefixedUOM(Prefix.nano(), msys.getUOM(Unit.METRE))
         wavelength = msys.getQuantity(Constant.LIGHT_VELOCITY).divide(frequency).convert(nm)
-        self.assertAlmostEqual(wavelength.amount, 749.48, None, None, TestUtils.DELTA2)
+        self.assertAlmostEqual(wavelength.amount, 749.48, None, None, TestingUtils.DELTA2)
 
         # Newton's second law of motion (F = ma). Weight of 1 kg in lbf
         mkg = Quantity(1.0, msys.getUOM(Unit.KILOGRAM))
         f = mkg.multiply(msys.getQuantity(Constant.GRAVITY)).convert(msys.getUOM(Unit.POUND_FORCE))
-        self.assertAlmostEqual(f.amount, 2.20462, None, None, TestUtils.DELTA5)
+        self.assertAlmostEqual(f.amount, 2.20462, None, None, TestingUtils.DELTA5)
 
         # units per volume of solution, C = A x (m/V)
         # create the "A" unit of measure
@@ -660,11 +660,11 @@ class TestQuantity(unittest.TestCase):
         grams = Quantity(1.0, g).convert(mg)
         volume = Quantity(1.0, ml)
         concentration = activity.multiply(grams.divide(volume))
-        self.assertAlmostEqual(concentration.amount, 1000.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(concentration.amount, 1000.0, None, None, TestingUtils.DELTA6)
 
         katal = msys.getUOM(Unit.KATAL)
         katals = concentration.multiply(Quantity(1.0, litre)).convert(katal)
-        self.assertAlmostEqual(katals.amount, 0.01666667, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(katals.amount, 0.01666667, None, None, TestingUtils.DELTA6)
         
         # The Stefan–Boltzmann law states that the power emitted per unit area
         # of the surface of a black body is directly proportional to the 4.0th
@@ -674,13 +674,13 @@ class TestQuantity(unittest.TestCase):
         temp = Quantity(1000.0, msys.getUOM(Unit.KELVIN))
         t4 = msys.quantityToPower(temp, 4)
         intensity = msys.getQuantity(Constant.STEFAN_BOLTZMANN).multiply(t4)
-        self.assertAlmostEqual(intensity.amount, 56703.67, None, None, TestUtils.DELTA2)
+        self.assertAlmostEqual(intensity.amount, 56703.67, None, None, TestingUtils.DELTA2)
         
         # Hubble's law, v = H0 x D. Let D = 10 Mpc
         d = Quantity(10.0, msys.createPrefixedUOM(Prefix.mega(), msys.getUOM(Unit.PARSEC)))
         h0 = msys.getQuantity(Constant.HUBBLE_CONSTANT)
         velocity = h0.multiply(d)
-        self.assertAlmostEqual(velocity.amount, 719, None, None, TestUtils.DELTA3)
+        self.assertAlmostEqual(velocity.amount, 719, None, None, TestingUtils.DELTA3)
         
         # Ideal Gas Law, PV = nRT
         # A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 C.
@@ -689,7 +689,7 @@ class TestQuantity(unittest.TestCase):
         v = Quantity(50.0, msys.getUOM(Unit.LITRE)).convert(msys.getUOM(Unit.CUBIC_METRE))
         t = Quantity(127.0, msys.getUOM(Unit.CELSIUS)).convert(msys.getUOM(Unit.KELVIN))
         n = p.multiply(v).divide(msys.getQuantity(Constant.GAS_CONSTANT).multiply(t))
-        self.assertAlmostEqual(n.amount, 28.018664, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(n.amount, 28.018664, None, None, TestingUtils.DELTA6)
         
         # Arrhenius equation
         # A device has an activation energy of 0.5 and a characteristic life of
@@ -720,7 +720,7 @@ class TestQuantity(unittest.TestCase):
         # calculate longer life at expected use temperature
         life85 = Quantity(2750.0, msys.getHour())
         life150 = life85.multiplyByAmount(AF)
-        self.assertAlmostEqual(life150.amount, 33121.4, None, None, TestUtils.DELTA1)
+        self.assertAlmostEqual(life150.amount, 33121.4, None, None, TestingUtils.DELTA1)
 
         # energy of red light photon = Planck's constant times the frequency
         hz = msys.getUOM(Unit.HERTZ)
@@ -730,7 +730,7 @@ class TestQuantity(unittest.TestCase):
         evolt = msys.getUOM(Unit.ELECTRON_VOLT)
         qpf = qp.multiply(frequency)
         ev = qpf.convert(evolt)
-        self.assertAlmostEqual(ev.amount, 1.65, None, None, TestUtils.DELTA2)
+        self.assertAlmostEqual(ev.amount, 1.65, None, None, TestingUtils.DELTA2)
 
     def testPackaging(self):
         msys = MeasurementSystem.instance()
@@ -740,7 +740,7 @@ class TestQuantity(unittest.TestCase):
 
         q400 = Quantity(400.0, one16ozCan)
         q50 = q400.convert(msys.getUOM(Unit.US_GALLON))
-        self.assertAlmostEqual(q50.amount, 50.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q50.amount, 50.0, None, None, TestingUtils.DELTA6)
         
         # 1 12 oz can = 12 fl.oz.
         one12ozCan = msys.createScalarUOM(UnitType.VOLUME, None, "12 oz can", "12ozCan", "12 oz can")
@@ -748,7 +748,7 @@ class TestQuantity(unittest.TestCase):
 
         q48 = Quantity(48.0, one12ozCan)
         q36 = q48.convert(one16ozCan)
-        self.assertAlmostEqual(q36.amount, 36.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q36.amount, 36.0, None, None, TestingUtils.DELTA6)
 
         # 6 12 oz cans = 1 6-pack of 12 oz cans
         sixPackCan = msys.createScalarUOM(UnitType.VOLUME, None, "6-pack", "6PCan", "6-pack of 12 oz cans")
@@ -758,7 +758,7 @@ class TestQuantity(unittest.TestCase):
         fourPackCase.setConversion(4.0, sixPackCan)
 
         bd = fourPackCase.getConversionFactor(one12ozCan)
-        self.assertAlmostEqual(bd, 24.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(bd, 24.0, None, None, TestingUtils.DELTA6)
 
         bd = one12ozCan.getConversionFactor(fourPackCase)
 
@@ -771,18 +771,18 @@ class TestQuantity(unittest.TestCase):
         tenCases = Quantity(10.0, fourPackCase)
 
         q1 = tenCases.convert(one12ozCan)
-        self.assertAlmostEqual(q1.amount, 240.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 240.0, None, None, TestingUtils.DELTA6)
 
         q2 = q1.convert(fourPackCase)
-        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
 
         fortyPacks = Quantity(40.0, sixPackCan)
         q2 = fortyPacks.convert(one12ozCan)
-        self.assertAlmostEqual(q2.amount, 240.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 240.0, None, None, TestingUtils.DELTA6)
 
         oneCan = Quantity(1.0, one12ozCan)
         q2 = oneCan.convert(sixPackCan)
-        self.assertAlmostEqual(q2.amount, 0.1666666666666667, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 0.1666666666666667, None, None, TestingUtils.DELTA6)
 
         # A beer bottling line is rated at 2000 12 ounce cans/hour (US) at the
         # filler. The case packer packs 4.0 6-packs of cans into a case.
@@ -796,11 +796,11 @@ class TestQuantity(unittest.TestCase):
 
         # draw-down
         draw = filler.convert(gpm)
-        self.assertAlmostEqual(draw.amount, 3.125, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(draw.amount, 3.125, None, None, TestingUtils.DELTA6)
 
         # case production
         packer = filler.convert(caseph)
-        self.assertAlmostEqual(packer.amount, 83.333333, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(packer.amount, 83.333333, None, None, TestingUtils.DELTA6)
 
     def testGenericQuantity(self):
         msys = MeasurementSystem.instance()
@@ -819,38 +819,38 @@ class TestQuantity(unittest.TestCase):
 
         q2 = Quantity(4.0, b)
         q3 = q1.add(q2)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
         
         self.assertTrue(q3.uom.abscissaUnit == a)
-        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.amount, 44.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 44.0, None, None, TestingUtils.DELTA6)
 
         # subtract
         q3 = q1.subtract(q2)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q3.uom.abscissaUnit == a)
-        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.amount, -36.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, -36.0, None, None, TestingUtils.DELTA6)
 
         # multiply
         q3 = q1.multiply(q2)
-        self.assertAlmostEqual(q3.amount, 16.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 16.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.offset, 0.0, None, None, TestingUtils.DELTA6)
 
         a2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "a*2", "a*2", "A squared", a, 2)
         q4 = q3.convert(a2)
-        self.assertAlmostEqual(q4.amount, 160.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 160.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q4.uom == a2)
 
         q4 = q3.divide(q2)
         self.assertTrue(q4 == q1)
-        self.assertAlmostEqual(q4.amount, 4.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q4.amount, 4.0, None, None, TestingUtils.DELTA6)
 
         # divide
         q3 = q1.divide(q2)
-        self.assertAlmostEqual(q3.amount, 1.0, None, None, TestUtils.DELTA6)
-        self.assertAlmostEqual(q3.uom.scalingFactor, 0.1, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(q3.uom.scalingFactor, 0.1, None, None, TestingUtils.DELTA6)
 
         q4 = q3.multiply(q2)
         self.assertTrue(q4 == q1)
@@ -964,7 +964,7 @@ class TestQuantity(unittest.TestCase):
 
         conc = Quantity(0.0025, msys.getUOM(Unit.MOLARITY))
         pH = -math.log10(conc.amount)
-        self.assertAlmostEqual(pH, 2.60, None, None, TestUtils.DELTA2)
+        self.assertAlmostEqual(pH, 2.60, None, None, TestingUtils.DELTA2)
 
     def testArithmetic(self):
         msys = MeasurementSystem.instance()
@@ -974,9 +974,9 @@ class TestQuantity(unittest.TestCase):
         qcm = Quantity(1.0, cm)
         qin = Quantity(1.0, inch)
         q1 = qcm.multiplyByAmount(2.54).convert(inch)
-        self.assertAlmostEqual(q1.amount, qin.amount, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, qin.amount, None, None, TestingUtils.DELTA6)
         q2 = q1.convert(cm)
-        self.assertAlmostEqual(q2.amount, 2.54, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q2.amount, 2.54, None, None, TestingUtils.DELTA6)
 
     def testFinancial(self):
         msys = MeasurementSystem.instance()
@@ -984,7 +984,7 @@ class TestQuantity(unittest.TestCase):
         q1 = Quantity(10.0, msys.getUOM(Unit.US_DOLLAR))     
         q2 = Quantity(12.0, msys.getUOM(Unit.US_DOLLAR))
         q3 = q2.subtract(q1).divide(q1).convert(msys.getUOM(Unit.PERCENT))
-        self.assertAlmostEqual(q3.amount, 20.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q3.amount, 20.0, None, None, TestingUtils.DELTA6)
       
     def testPowerProductConversions(self):
         CacheManager.instance().clearCache()
@@ -1009,26 +1009,26 @@ class TestQuantity(unittest.TestCase):
         # test products and quotients
         nmQ = Quantity(1.0, nm)
         lbfinQ = nmQ.convertToPowerProduct(lbf, inch)
-        self.assertAlmostEqual(lbfinQ.amount, 8.850745791327183, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(lbfinQ.amount, 8.850745791327183, None, None, TestingUtils.DELTA6)
         mpsQ = Quantity(1.0, mps)
 
         fphQ = mpsQ.convertToPowerProduct(ft, hr)
-        self.assertAlmostEqual(fphQ.amount, 11811.02362204724, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(fphQ.amount, 11811.02362204724, None, None, TestingUtils.DELTA6)
 
         mps2Q = fphQ.convertToPowerProduct(m, s)
-        self.assertAlmostEqual(mps2Q.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(mps2Q.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         mps3Q = mpsQ.convertToPowerProduct(m, s)
-        self.assertAlmostEqual(mps3Q.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(mps3Q.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         inlbfQ = nmQ.convertToPowerProduct(inch, lbf)
-        self.assertAlmostEqual(inlbfQ.amount, 8.850745791327183, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(inlbfQ.amount, 8.850745791327183, None, None, TestingUtils.DELTA6)
 
         nm2Q = lbfinQ.convertToPowerProduct(n, m)
-        self.assertAlmostEqual(nm2Q.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(nm2Q.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         nm2Q = lbfinQ.convertToPowerProduct(m, n)
-        self.assertAlmostEqual(nm2Q.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(nm2Q.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         mQ = Quantity(1.0, m)
         try:
@@ -1042,10 +1042,10 @@ class TestQuantity(unittest.TestCase):
       
         ft2Q = m2Q.convertToPowerProduct(ft, ft)
   
-        self.assertAlmostEqual(ft2Q.amount, 10.76391041670972, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(ft2Q.amount, 10.76391041670972, None, None, TestingUtils.DELTA6)
  
         mmQ = ft2Q.convertToPowerProduct(m, m)
-        self.assertAlmostEqual(mmQ.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(mmQ.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         try:
             m2Q.convertToPowerProduct(m, one)
@@ -1055,18 +1055,18 @@ class TestQuantity(unittest.TestCase):
         
         m3Q = Quantity(1.0, m3)
         ft3Q = m3Q.convertToPowerProduct(ft2, ft)
-        self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestingUtils.DELTA6)
 
         m3Q2 = m3Q.convertToPowerProduct(m2, m)
-        self.assertAlmostEqual(m3Q2.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(m3Q2.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         ft3Q = m3Q.convertToPowerProduct(ft, ft2)
-        self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(ft3Q.amount, 35.31466672148858, None, None, TestingUtils.DELTA6)
 
         perM = msys.getUOM(Unit.DIOPTER)
         perMQ = Quantity(1.0, perM)
         perInQ = perMQ.convertToPowerProduct(one, inch)
-        self.assertAlmostEqual(perInQ.amount, 0.0254, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(perInQ.amount, 0.0254, None, None, TestingUtils.DELTA6)
 
         try:
             perMQ.convertToPowerProduct(inch, one)
@@ -1082,30 +1082,30 @@ class TestQuantity(unittest.TestCase):
 
         fpsQ = Quantity(1.0, fps)
         mphQ = fpsQ.convertToPowerProduct(mi, hr)
-        self.assertAlmostEqual(mphQ.amount, 0.6818181818181818, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(mphQ.amount, 0.6818181818181818, None, None, TestingUtils.DELTA6)
 
         # test powers
         in2Q = m2Q.convertToPower(inch)
-        self.assertAlmostEqual(in2Q.amount, 1550.003100006200, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(in2Q.amount, 1550.003100006200, None, None, TestingUtils.DELTA6)
 
         m2Q2 = in2Q.convertToPower(m)
-        self.assertAlmostEqual(m2Q2.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(m2Q2.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         perInQ2 = perMQ.convertToPower(inch)
-        self.assertAlmostEqual(perInQ2.amount, 0.0254, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(perInQ2.amount, 0.0254, None, None, TestingUtils.DELTA6)
 
         q1 = perInQ2.convertToPower(m)
-        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         inQ2 = mQ.convertToPower(inch)
-        self.assertAlmostEqual(inQ2.amount, 39.37007874015748, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(inQ2.amount, 39.37007874015748, None, None, TestingUtils.DELTA6)
 
         q1 = inQ2.convertToPower(m)
-        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestingUtils.DELTA6)
 
         one1 = Quantity(1.0, msys.getOne())
         q1 = one1.convertToPower(one)
-        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(q1.amount, 1.0, None, None, TestingUtils.DELTA6)
 
     def testEnergy(self):
         msys = MeasurementSystem.instance()
@@ -1114,7 +1114,7 @@ class TestQuantity(unittest.TestCase):
         kJ = msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.JOULE))
         kcal = msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.CALORIE))
         kcalQ = Quantity(1718.0, kJ).convert(kcal)
-        self.assertAlmostEqual(kcalQ.amount, 410.6, None, None, TestUtils.DELTA1)
+        self.assertAlmostEqual(kcalQ.amount, 410.6, None, None, TestingUtils.DELTA1)
         
         # A Tesla Model S battery has a capacity of 100 KwH.  
         # When fully charged, how many electrons are in the battery?
@@ -1128,7 +1128,7 @@ class TestQuantity(unittest.TestCase):
         
         electrons = kwhQ.divide(c).divide(c).divide(me)
         d = electrons.amount / 1.221E12
-        self.assertAlmostEqual(d, 1.0, None, None, TestUtils.DELTA1)
+        self.assertAlmostEqual(d, 1.0, None, None, TestingUtils.DELTA1)
    
     def testClassification(self):
         msys = MeasurementSystem.instance()

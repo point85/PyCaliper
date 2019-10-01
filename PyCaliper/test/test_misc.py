@@ -5,7 +5,7 @@ from PyCaliper.uom.enums import Unit
 from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.enums import Constant
 from PyCaliper.uom.quantity import Quantity
-from PyCaliper.test.test_utils import TestUtils
+from PyCaliper.test.test_utils import TestingUtils
 
 
 class TestFinancial(unittest.TestCase): 
@@ -23,7 +23,7 @@ class TestFinancial(unittest.TestCase):
         googl.setConversion(838.96, usd)
         portfolio = Quantity(100.0, googl)
         value = portfolio.convert(euro)
-        self.assertAlmostEqual(value.amount, 78862.24, None, None, TestUtils.DELTA6)
+        self.assertAlmostEqual(value.amount, 78862.24, None, None, TestingUtils.DELTA6)
         
     def testNamedQuantity(self):
         msys = MeasurementSystem.instance()

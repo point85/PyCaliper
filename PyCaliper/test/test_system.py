@@ -1,7 +1,9 @@
 import unittest
+import uuid
 
 from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.enums import Unit, UnitType, Constant
+from PyCaliper.uom.cache_manager import CacheManager
 
 class TestSystem(unittest.TestCase):
     def testUnifiedSystem(self):
@@ -51,3 +53,27 @@ class TestSystem(unittest.TestCase):
         # constants
         for c in Constant:
             self.assertIsNotNone(msys.getQuantity(c))
+
+    def testCache(self):
+        msys = MeasurementSystem.instance()
+        
+        # unit cache
+        msys.getOne()
+
+        before = len(msys.getRegisteredUOMs())
+
+        for _i in range(0, 10):
+            msys.createScalarUOM(UnitType.UNCLASSIFIED, None, None, str(uuid.uuid1()), None)
+
+        after = len(msys.getRegisteredUOMs())
+
+        self.assertTrue(after == (before + 10))
+
+    def testGetUnits(self):
+        msys = MeasurementSystem.instance()
+        
+        for unitType in UnitType:
+            uoms = msys.getUnitsOfMeasure(unitType)
+            
+            if (unitType != UnitType.UNCLASSIFIED):
+                self.assertTrue(len(uoms) > 0)

@@ -1306,6 +1306,8 @@ class MeasurementSystem:
             units.append(self.getUOM(Unit.CUBIC_METRE_PER_SEC))
             units.append(self.getUOM(Unit.CUBIC_FEET_PER_SEC))
             
+        return units
+            
     def getUOMBySymbol(self, symbol):
         return CacheManager.instance().getUOMBySymbol(symbol)
     
