@@ -218,3 +218,59 @@ class TestUnits(unittest.TestCase):
             self.fail()
         except:
             pass
+        
+    def testOne(self):
+        msys = MeasurementSystem.instance()
+
+        metre = msys.getUOM(Unit.METRE)
+
+        u = metre.multiply(msys.getOne())
+        self.assertTrue(u == metre)
+
+        u = metre.divide(msys.getOne())
+        self.assertTrue(u == metre)
+
+        oneOverM = metre.invert()
+        u = oneOverM.invert()
+        self.assertTrue(u == metre)
+
+        u = oneOverM.multiply(metre)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        u = metre.divide(metre)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        u = msys.getOne().divide(metre).multiply(metre)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        uom = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "1/1", "1/1", "")
+        uom.setConversion(1.0, msys.getOne(), 1.0)
+
+        self.assertAlmostEqual(uom.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(uom.abscissaUnit == msys.getOne())
+        self.assertAlmostEqual(uom.offset, 1.0, None, None, TestingUtils.DELTA6)
+
+        u = msys.getOne().invert()
+        self.assertTrue(u.abscissaUnit.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        one = msys.getOne()
+        self.assertTrue(one.getBaseSymbol() == "1")
+        self.assertTrue(one == one)
+
+        uno = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "", ".1", "", one, one)
+        self.assertTrue(uno.getBaseSymbol() == one.getBaseSymbol())
+
+        p = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "", "..1", "", one, one)
+        self.assertTrue(p.getBaseSymbol() == one.getBaseSymbol())
+
+        p3 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "", "...1", "", one, 3)
+        self.assertTrue(p3.getBaseSymbol() == one.getBaseSymbol())
+
+        p3 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "", "...1", "", one, -1)
+        self.assertTrue(p3.getBaseSymbol() == one.getBaseSymbol())
+
+        a1 = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "a1", "a1", "A1")
+        self.assertTrue(a1.getBaseSymbol() == "a1")
+
+        uno = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "one", "one", "", a1, a1)
+        self.assertTrue(uno.getBaseSymbol() == one.getBaseSymbol())
