@@ -6,6 +6,7 @@ from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.test.testing_utils import TestingUtils
 from PyCaliper.uom.cache_manager import CacheManager
+from PyCaliper.uom.unit_of_measure import Reducer
 
 class TestUnits(unittest.TestCase):
     def testBaseUnits(self):
@@ -51,7 +52,7 @@ class TestUnits(unittest.TestCase):
 
         try:
             msys.createUnclassifiedPowerUOM(None, 0)
-            self.self.fail()
+            self.fail()
         except:
             pass
 
@@ -274,3 +275,167 @@ class TestUnits(unittest.TestCase):
 
         uno = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "one", "one", "", a1, a1)
         self.assertTrue(uno.getBaseSymbol() == one.getBaseSymbol())
+    
+    def testGeneric(self):
+        msys = MeasurementSystem.instance()
+
+        b = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "b", "beta", "Beta")
+        self.assertFalse(b == None)
+
+        # scalar
+        ab1 = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "a=2b+1", "a=2b+1", "custom")
+        ab1.setConversion(2.0, b, 1.0)
+
+        self.assertAlmostEqual(ab1.scalingFactor, 2.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(ab1.abscissaUnit == b)
+        self.assertAlmostEqual(ab1.offset, 1.0, None, None, TestingUtils.DELTA6)
+
+        # quotient
+        a = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "a", "alpha", "Alpha")
+        self.assertTrue(a.abscissaUnit == a)
+
+        aOverb = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "a/b", "a/b", "", a, b)
+        aOverb.scalingFactor = 2.0
+
+        self.assertAlmostEqual(aOverb.scalingFactor, 2.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(aOverb.getDividend() == a)
+        self.assertTrue(aOverb.getDivisor() == b)
+        self.assertAlmostEqual(aOverb.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(aOverb.abscissaUnit == aOverb)
+
+        bOvera = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "b/a", "b/a", "", b, a)
+        bOveraI = bOvera.invert()
+        self.assertTrue(bOveraI.getBaseSymbol() == aOverb.getBaseSymbol())
+
+        # multiply2
+        uom = aOverb.multiply(b)
+        self.assertTrue(uom.abscissaUnit.getBaseSymbol() == a.getBaseSymbol())
+        self.assertAlmostEqual(uom.scalingFactor, 2.0, None, None, TestingUtils.DELTA6)
+        bd = uom.getConversionFactor(a)
+        self.assertAlmostEqual(bd, 2.0, None, None, TestingUtils.DELTA6)
+
+        # divide2
+        uom2 = uom.divide(b)
+        self.assertAlmostEqual(uom2.scalingFactor, 2.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(uom2.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(uom2.getBaseSymbol() == aOverb.getBaseSymbol())
+
+        # invert
+        uom3 = uom2.invert()
+        u = uom3.multiply(uom2)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        # product
+        ab = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "name", "symbol", "custom", a, b)
+        ab.offset = 1.0
+
+        self.assertAlmostEqual(ab.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(ab.getMultiplier() == a)
+        self.assertTrue(ab.getMultiplicand() == b)
+        self.assertAlmostEqual(ab.offset, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(ab.abscissaUnit == ab)
+
+        ab.offset = 0.0
+
+        uom4 = ab.divide(a)
+        self.assertAlmostEqual(uom4.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(uom4.abscissaUnit.getBaseSymbol() == b.getBaseSymbol())
+
+        uom5 = uom4.multiply(a)
+        self.assertAlmostEqual(uom5.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        u = uom5.abscissaUnit
+        self.assertTrue(u.getBaseSymbol() == ab.getBaseSymbol())
+
+        # invert
+        uom6 = ab.invert()
+        self.assertAlmostEqual(uom6.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(uom6.getDividend() == msys.getOne())
+        self.assertTrue(uom6.getDivisor() == ab)
+        self.assertAlmostEqual(uom6.offset, 0.0, None, None, TestingUtils.DELTA6)
+
+        # power
+        a2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "name", "a**2", "custom", a, 2)
+        self.assertAlmostEqual(a2.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(a2.getPowerBase() == a)
+        self.assertTrue(a2.getPowerExponent() == 2)
+        self.assertAlmostEqual(a2.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(a2.abscissaUnit == a2)
+
+        uom8 = a2.divide(a)
+        self.assertAlmostEqual(uom8.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(uom.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(uom8.abscissaUnit.getBaseSymbol() == a.getBaseSymbol())
+
+        uom9 = uom8.multiply(a)
+        self.assertAlmostEqual(uom9.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(uom9.offset, 0.0, None, None, TestingUtils.DELTA6)
+        u = uom9.abscissaUnit
+        self.assertTrue(u.getBaseSymbol() == a2.getBaseSymbol())
+
+        u = CacheManager.instance().getUOMBySymbol(a.symbol)
+        self.assertFalse(uom == None)
+
+        # again
+        c = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "c", "cUnit", "C")
+        x = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "x", "xUnit", "X")
+        e = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "e", "eUnit", "E")
+
+        aTimesa = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "", "aUnit*2", "", a, a)
+        u = aTimesa.divide(a)
+        self.assertTrue(u.getBaseSymbol() == a.getBaseSymbol())
+
+        u = aOverb.multiply(b)
+        self.assertTrue(u.getBaseSymbol() == a.getBaseSymbol())
+
+        cOverx = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "", "c/x", "", c, x)
+        alpha = aOverb.divide(cOverx)
+        beta = alpha.multiply(cOverx)
+        self.assertTrue(beta.getBaseSymbol() == aOverb.getBaseSymbol())
+
+        u = aOverb.multiply(cOverx).divide(cOverx)
+        self.assertTrue(u.abscissaUnit.getBaseSymbol() == aOverb.getBaseSymbol())
+
+        axb = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "", "a.b", "", a, b)
+        u = CacheManager.instance().getUOMBySymbol(axb.symbol)
+        self.assertTrue(u == axb)
+        u = axb.divide(a)
+        self.assertTrue(u.getBaseSymbol() == b.getBaseSymbol())
+
+        symbol = axb.symbol + "." + axb.symbol
+        axbsq = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "", symbol, "", axb, axb)
+        u = axbsq.divide(axb)
+        self.assertTrue(u.getBaseSymbol() == axb.getBaseSymbol())
+
+        b2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "b2", "b*2", "", b, 2)
+
+        symbol = axb.getBaseSymbol()
+        u = CacheManager.instance().getBaseUOM(symbol)
+        self.assertTrue(u is not None)
+
+        axb2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "axb2", "(a.b)*2", "", axb, 2)
+        u = axb2.divide(axb)
+        self.assertTrue(u.getBaseSymbol() == axb.getBaseSymbol())
+
+        aOverb2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "aOverb2", "(a/b)*2", "", aOverb, 2)
+        u = aOverb2.multiply(b2)
+        self.assertTrue(u.getBaseSymbol() == aTimesa.getBaseSymbol())
+
+        symbol = axb.symbol + "^-2"
+        axbm2 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "", symbol, "", axb, -2)
+        uom = axbm2.multiply(axb2)
+        self.assertTrue(uom.getBaseSymbol() == msys.getOne().symbol)
+        cxd = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "", "c.D", "", c, x)
+        s = "cUnit" + Reducer.MULT + "xUnit"
+        cxbase = cxd.getBaseSymbol()
+        self.assertTrue(cxbase.index(s) != -1)
+
+        abdivcd = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "", "(a.b)/(c.D)", "", axb, cxd)
+        self.assertTrue(abdivcd.getDividend() == axb)
+        self.assertTrue(abdivcd.getDivisor() == cxd)
+
+        cde = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "", "(c.D)/(e)", "", cxd, e)
+        s = "cUnit" + Reducer.MULT + "xUnit/eUnit"
+        self.assertTrue(cde.getBaseSymbol().index(s) != -1)
+
+        u = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, None, "not None", None)
+        self.assertTrue(str(u) is not None)
