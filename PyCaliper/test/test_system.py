@@ -3,7 +3,6 @@ import uuid
 
 from PyCaliper.uom.measurement_system import MeasurementSystem
 from PyCaliper.uom.enums import Unit, UnitType, Constant
-from PyCaliper.uom.cache_manager import CacheManager
 
 class TestSystem(unittest.TestCase):
     def testUnifiedSystem(self):

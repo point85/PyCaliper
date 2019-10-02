@@ -109,13 +109,6 @@ class Quantity(Symbolic):
     def multiplyByAmount(self, multiplier):
         return Quantity(self.amount * multiplier, self.uom)
     
-    """
-    def power(self, exponent: int):
-        amount = math.pow(self.amount, exponent)
-        newUOM = MeasurementSystem.instance().createPowerUOM(self.uom, exponent)
-        return Quantity(amount, newUOM) 
-    """
-    
     def invert(self):
         amount = 1.0 / self.amount
         uom = self.uom.invert()

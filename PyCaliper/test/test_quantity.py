@@ -6,7 +6,7 @@ from PyCaliper.uom.enums import Unit, UnitType, Constant
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.cache_manager import CacheManager
-from PyCaliper.test.test_utils import TestingUtils
+from PyCaliper.test.testing_utils import TestingUtils
 
 class TestQuantity(unittest.TestCase): 
     def testNamedQuantity(self):

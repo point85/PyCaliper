@@ -3,7 +3,7 @@ class Prefix:
     The Prefix class defines SI unit of measure prefixes as well as those found in computer science.
     """
     
-    __prefixes = []
+    prefixes = []
         
     @classmethod
     def yotta(cls):
@@ -136,7 +136,7 @@ class Prefix:
         self.symbol = symbol
         self.factor = factor
 
-        Prefix.__prefixes.append(self)
+        Prefix.prefixes.append(self)
     
     @classmethod    
     def fromName(cls, name):
@@ -148,7 +148,7 @@ class Prefix:
         return Prefix
         """
         
-        for p in cls.__prefixes:
+        for p in cls.prefixes:
             if p.name == name:
                 prefix = p
                 break
@@ -158,7 +158,7 @@ class Prefix:
     @classmethod
     def fromFactor(cls, factor):
         
-        for p in cls.__prefixes:
+        for p in cls.prefixes:
             if p.factor == factor:
                 prefix = p
                 break
