@@ -1,7 +1,7 @@
 import unittest
 
 from PyCaliper.uom.measurement_system import MeasurementSystem
-from PyCaliper.uom.enums import Unit, UnitType
+from PyCaliper.uom.enums import Unit, UnitType, Constant
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.test.testing_utils import TestingUtils
@@ -516,4 +516,139 @@ class TestUnits(unittest.TestCase):
 
         bd = m3.getConversionFactor(impOz)
         self.assertAlmostEqual(bd, 35195.07972785405, None, None, TestingUtils.DELTA6)
+
+    def testOperations(self):
+        msys = MeasurementSystem.instance()
+        _allCached = CacheManager.instance().getCachedUOMs()
+
+        hour = msys.getHour()
+        metre = msys.getUOM(Unit.METRE)
+        m2 = msys.getUOM(Unit.SQUARE_METRE)
+
+        # multiply2
+        velocity = msys.createScalarUOM(UnitType.VELOCITY, None, "meter/hr", "meter/hr", "")
+        sf = 1.0 / 3600.0
+        velocity.setConversion(sf, msys.getUOM(Unit.METRE_PER_SEC))
+
+        self.assertAlmostEqual(velocity.scalingFactor, sf, None, None, TestingUtils.DELTA6)
+        self.assertTrue(velocity.abscissaUnit == msys.getUOM(Unit.METRE_PER_SEC))
+        self.assertAlmostEqual(velocity.offset, 0.0, None, None, TestingUtils.DELTA6)
+
+        u = velocity.multiply(hour)
+        bd = u.getConversionFactor(metre)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        u = hour.multiply(velocity)
+        bd = u.getConversionFactor(metre)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        u = metre.multiply(metre)
+        bd = u.getConversionFactor(m2)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(u.getBaseSymbol() == m2.getBaseSymbol())
+
+        # divide2
+        u = metre.divide(hour)
+        bd = u.getConversionFactor(velocity)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        u = u.multiply(hour)
+        self.assertTrue(u.getBaseSymbol() == metre.getBaseSymbol())
+
+        # invert
+        vinvert = velocity.invert()
+        sf = vinvert.scalingFactor
+        self.assertTrue(sf == 1.0)
+
+        # max symbol length
+        mpc = msys.createPrefixedUOM(Prefix.mega(), msys.getUOM(Unit.PARSEC))
+        d = Quantity(10.0, mpc)
+        h0 = msys.getQuantity(Constant.HUBBLE_CONSTANT)
+
+        for _i in range(3):
+            v = h0.multiply(d)
+            d = v.divide(h0)
+            h = v.divide(d)
+
+        sym = h.uom.symbol 
+        self.assertTrue(len(sym) > 0)
+
+        # conflict with 1/s
+        CacheManager.instance().unregisterUOM(h0.uom)
+        
+    def testTime(self):
+        msys = MeasurementSystem.instance()
+
+        s2 = msys.getUOM(Unit.SQUARE_SECOND)
+        second = msys.getSecond()
+        minute = msys.getMinute()
+        hour = msys.getHour()
+        msec = msys.createPrefixedUOM(Prefix.milli(), second)
+        min2 = msys.createPowerUOM(UnitType.TIME_SQUARED, None, "sqMin", "min^2", None, minute, 2)
+
+        factor = second.getConversionFactor(msec)
+        self.assertAlmostEqual(factor, 1000.0, None, None, TestingUtils.DELTA6)
+
+        self.assertAlmostEqual(second.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(second.abscissaUnit == second)
+        self.assertAlmostEqual(second.offset, 0.0, None, None, TestingUtils.DELTA6)
+
+        bd = hour.getConversionFactor(second)
+        self.assertAlmostEqual(bd, 3600.0, None, None, TestingUtils.DELTA6)
+        
+        u = second.multiply(second)
+
+        self.assertAlmostEqual(u.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(u.offset, 0.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(u == s2)
+
+        u = second.divide(second)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        q1 = Quantity(1.0, u)
+        q2 = q1.convert(msys.getOne())
+        self.assertAlmostEqual(q2.amount, 1.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(q2.uom == msys.getOne())
+
+        u = second.invert()
+
+        self.assertTrue(u.getDividend() == msys.getOne())
+        self.assertTrue(u.getDivisor() == second)
+
+        u = minute.divide(second)
+        factor = u.getConversionFactor(msys.getOne())
+        self.assertAlmostEqual(factor, 60.0, None, None, TestingUtils.DELTA6)
+        self.assertAlmostEqual(u.offset, 0.0, None, None, TestingUtils.DELTA6)
+
+        uom = u.multiply(second)
+        bd = uom.getConversionFactor(minute)
+        self.assertTrue(uom.getBaseSymbol() == minute.getBaseSymbol())
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        q1 = Quantity(10.0, u)
+        q2 = q1.convert(msys.getOne())
+        self.assertAlmostEqual(q2.amount, 600.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(q2.uom == msys.getOne())
+
+        # multiply2
+        u = minute.multiply(minute)
+        self.assertAlmostEqual(u.scalingFactor, 3600.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(u.abscissaUnit.getBaseSymbol() == s2.getBaseSymbol())
+        self.assertAlmostEqual(u.offset, 0.0, None, None, TestingUtils.DELTA6)
+
+        q1 = Quantity(10.0, u)
+        q2 = q1.convert(s2)
+        self.assertAlmostEqual(q2.amount, 36000.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(q2.uom == s2)
+
+        q2 = q2.convert(min2)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
+
+        u = minute.multiply(second)
+        self.assertAlmostEqual(u.scalingFactor, 60.0, None, None, TestingUtils.DELTA6)
+        self.assertTrue(u.abscissaUnit.getBaseSymbol() == s2.getBaseSymbol())
+
+        u = second.multiply(minute)
+        bd = u.getConversionFactor(s2)
+        self.assertAlmostEqual(bd, 60.0, None, None, TestingUtils.DELTA6)
 

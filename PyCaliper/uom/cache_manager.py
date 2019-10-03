@@ -42,7 +42,7 @@ class CacheManager:
         self.baseRegistry.clear()
         self.unitRegistry.clear()
           
-    def getCachedUnits(self):
+    def getCachedUOMs(self):
         return self.symbolRegistry.values()
     
     def getSymbolCache(self):

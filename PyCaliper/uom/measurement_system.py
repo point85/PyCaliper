@@ -32,15 +32,10 @@ class MeasurementSystem:
         self.getUOM(Unit.METRE)
         
     def getUOM(self, unit):
-        #print("-->Check cache for " + str(unit))
         uom = CacheManager.instance().getUOMByUnit(unit)
 
         if (uom is None):
-            #print("    Creating uom for  " + str(unit))
-            uom = self.createUOMForUnit(unit)
-        #else:
-            #TODO
-            #print("    Found UOM in cache")    
+            uom = self.createUOMForUnit(unit) 
         return uom
         
     def getOne(self):
@@ -1039,7 +1034,7 @@ class MeasurementSystem:
         return uom.symbol
     
     def getRegisteredUOMs(self):
-        units = CacheManager.instance().getCachedUnits()
+        units = CacheManager.instance().getCachedUOMs()
         return sorted(units, key = MeasurementSystem.getUOMKey)
     
     def getUnitsOfMeasure(self, unitType):
