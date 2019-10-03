@@ -652,3 +652,147 @@ class TestUnits(unittest.TestCase):
         bd = u.getConversionFactor(s2)
         self.assertAlmostEqual(bd, 60.0, None, None, TestingUtils.DELTA6)
 
+    def testSymbolCache(self):
+        msys = MeasurementSystem.instance()
+        
+        uom = msys.getUOM(Unit.KILOGRAM)
+        other = msys.getUOMBySymbol(uom.symbol)
+        self.assertTrue(uom == other)
+
+        other = msys.getUOMBySymbol(uom.getBaseSymbol())
+        self.assertTrue(uom == other)
+
+        uom = msys.createPrefixedUOM(Prefix.centi(), msys.getUOM(Unit.METRE))
+        other = msys.getUOMBySymbol(uom.symbol)
+        self.assertTrue(uom == other)
+
+        other = msys.getUOMBySymbol(uom.getBaseSymbol())
+        self.assertTrue(uom.getBaseSymbol() == other.getBaseSymbol())
+
+        uom = msys.getUOM(Unit.NEWTON)
+        other = msys.getUOMBySymbol(uom.symbol)
+        self.assertTrue(uom == other)
+
+        other = CacheManager.instance().getBaseUOM(uom.getBaseSymbol())
+        self.assertTrue(uom == other)
+
+    def testBaseSymbols(self):
+        msys = MeasurementSystem.instance()
+        
+        deg = "deg"
+        times = "\xB7"
+        sq = "\xB2"
+        cu = "\xB3"
+
+        metre = msys.getUOM(Unit.METRE)
+
+        symbol = msys.getOne().getBaseSymbol()
+        self.assertTrue(symbol == "1")
+
+        symbol = msys.getSecond().getBaseSymbol()
+        self.assertTrue(symbol == "s")
+
+        symbol = metre.getBaseSymbol()
+        self.assertTrue(symbol == "m")
+
+        mm = msys.createPrefixedUOM(Prefix.milli(), metre)
+        self.assertTrue(Prefix.milli().factor > 0.0)
+        self.assertTrue(mm.symbol == "mm")
+
+        symbol = mm.getBaseSymbol()
+        self.assertTrue(symbol == "m")
+
+        symbol = msys.getUOM(Unit.SQUARE_METRE).getBaseSymbol()
+        self.assertTrue(symbol == "m" + sq)
+
+        symbol = msys.getUOM(Unit.CUBIC_METRE).getBaseSymbol()
+        self.assertTrue(symbol == "m" + cu)
+
+        symbol = msys.getUOM(Unit.KELVIN).getBaseSymbol()
+        self.assertTrue(symbol == deg + "K")
+
+        symbol = msys.getUOM(Unit.CELSIUS).getBaseSymbol()
+        self.assertTrue(symbol == deg + "K")
+
+        symbol = msys.getUOM(Unit.CELSIUS).symbol
+        self.assertTrue(symbol == deg + "C")
+
+        symbol = msys.getUOM(Unit.GRAM).getBaseSymbol()
+        self.assertTrue(symbol == "kg")
+
+        kg = msys.getUOM(Unit.KILOGRAM)
+        self.assertTrue(kg.symbol == "kg")
+
+        symbol = kg.getBaseSymbol()
+        self.assertTrue(symbol == "kg")
+
+        symbol = msys.getUOM(Unit.CUBIC_METRE).getBaseSymbol()
+        self.assertTrue(symbol == "m" + cu)
+
+        symbol = msys.getUOM(Unit.LITRE).getBaseSymbol()
+        self.assertTrue(symbol == "m" + cu)
+
+        symbol = msys.getUOM(Unit.NEWTON).getBaseSymbol()
+        self.assertTrue(symbol == "kg" + times + "m/s" + sq)
+
+        symbol = msys.getUOM(Unit.WATT).getBaseSymbol()
+        self.assertTrue(symbol == "kg" + times + "m" + sq + "/s" + cu)
+
+        symbol = msys.getUOM(Unit.NEWTON_METRE).getBaseSymbol()
+        self.assertTrue(symbol == "kg" + times + "m" + sq + "/s" + sq)
+
+        symbol = msys.getUOM(Unit.VOLT).getBaseSymbol()
+        sym = "kg" + times + "m" + sq + "/(A" + times + "s" + cu + ")"
+        self.assertTrue(symbol == sym)
+
+        symbol = msys.getUOM(Unit.OHM).getBaseSymbol()
+        sym = "kg" + times + "m" + sq + "/(A" + sq + times + "s" + cu + ")"
+        self.assertTrue(symbol == sym)
+
+        symbol = msys.getUOM(Unit.WEBER).getBaseSymbol()
+        sym = "kg" + times + "m" + sq + "/(A" + times + "s" + sq + ")"
+        self.assertTrue(symbol == sym)
+
+        symbol = msys.getUOM(Unit.MOLE).symbol
+        self.assertTrue(symbol == "mol")
+
+        symbol = msys.getUOM(Unit.RADIAN).symbol
+        self.assertTrue(symbol == "rad")
+
+        symbol = msys.getUOM(Unit.RADIAN).getBaseSymbol()
+        self.assertTrue(symbol == "1")
+
+        symbol = msys.getUOM(Unit.STERADIAN).symbol
+        self.assertTrue(symbol == "sr")
+
+        symbol = msys.getUOM(Unit.STERADIAN).getBaseSymbol()
+        self.assertTrue(symbol == "1")
+
+        symbol = msys.getUOM(Unit.CANDELA).getBaseSymbol()
+        self.assertTrue(symbol == "cd")
+
+        symbol = msys.getUOM(Unit.LUMEN).getBaseSymbol()
+        self.assertTrue(symbol == "cd")
+
+        symbol = msys.getUOM(Unit.LUMEN).symbol
+        self.assertTrue(symbol == "lm")
+
+        symbol = msys.getUOM(Unit.LUX).getBaseSymbol()
+        self.assertTrue(symbol == "cd/m" + sq)
+        
+        symbol = msys.getUOM(Unit.HERTZ).getBaseSymbol()
+        self.assertTrue(symbol == "1/s")
+
+        symbol = msys.getUOM(Unit.BECQUEREL).getBaseSymbol()
+        self.assertTrue(symbol == "1/s")
+
+        symbol = msys.getUOM(Unit.BECQUEREL).symbol
+        self.assertTrue(symbol == "Bq")
+
+        symbol = msys.getUOM(Unit.GRAY).getBaseSymbol()
+        sym = "m" + sq + "/s" + sq
+        self.assertTrue(symbol == sym)
+
+        self.assertTrue(msys.getUOM(Unit.KATAL).getBaseSymbol() == "mol/s")
+
+        
