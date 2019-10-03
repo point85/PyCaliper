@@ -204,13 +204,13 @@ class PathParameters:
 class UnitOfMeasure(Symbolic):  
     __MAX_SYMBOL_LENGTH = 16
              
-    def __init__(self, unitType = None, name = None, symbol = None, description = None):
+    def __init__(self, unitType = UnitType.UNCLASSIFIED, name = None, symbol = None, description = None):
         super().__init__(name, symbol, description)
         
         self.conversionRegistry = {}
         self.category = Localizer.instance().langStr("default.category.text")
         self.unit = None
-        self.unitType = UnitType.UNCLASSIFIED     
+        self.unitType = unitType    
         self.abscissaUnit = self
         self.scalingFactor = 1.0
         self.offset = 0.0
@@ -607,7 +607,7 @@ class UnitOfMeasure(Symbolic):
         resultReducer.terms = resultMap
 
         # product or quotient
-        result = UnitOfMeasure(None, None, None, None)
+        result = UnitOfMeasure()
 
         if (not invert):
             result.setProductUnits(self, other)

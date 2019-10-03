@@ -84,25 +84,25 @@ class TestUnits(unittest.TestCase):
             pass
 
         try:
-            msys.createQuotientUOM(UnitType.UNCLASSIFIED, "uom4", "uom4", "", msys.getUOM(Unit.METRE), None)
+            msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "uom4", "uom4", "", msys.getUOM(Unit.METRE), None)
             self.fail()
         except:
             pass
 
         try:
-            msys.createQuotientUOM(UnitType.UNCLASSIFIED, "uom4", "uom4", "", None, msys.getUOM(Unit.METRE))
+            msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "uom4", "uom4", "", None, msys.getUOM(Unit.METRE))
             self.fail()
         except:
             pass
 
         try:
-            msys.createProductUOM(UnitType.UNCLASSIFIED, "uom4", "uom4", "", msys.getUOM(Unit.METRE), None)
+            msys.createProductUOM(UnitType.UNCLASSIFIED, None, "uom4", "uom4", "", msys.getUOM(Unit.METRE), None)
             self.fail()
         except:
             pass
 
         try:
-            msys.createProductUOM(UnitType.UNCLASSIFIED, "uom4", "uom4", "", None, msys.getUOM(Unit.METRE))
+            msys.createProductUOM(UnitType.UNCLASSIFIED, None, "uom4", "uom4", "", None, msys.getUOM(Unit.METRE))
             self.fail()
         except:
             pass
@@ -117,13 +117,13 @@ class TestUnits(unittest.TestCase):
         CacheManager.instance().unregisterUOM(None)
 
         try:
-            msys.createScalarUOM(UnitType.UNCLASSIFIED, "456", None, "description")
+            msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "456", None, "description")
             self.fail("no symbol")
         except:
             pass
 
         try:
-            msys.createScalarUOM(UnitType.UNCLASSIFIED, "456", "", "description")
+            msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "456", "", "description")
             self.fail("no symbol")
         except:
             pass
@@ -147,14 +147,14 @@ class TestUnits(unittest.TestCase):
             pass
 
         try:
-            msys.createScalarUOM(None, "1/1", "1/1", "")
+            msys.createScalarUOM(None, None, "1/1", "1/1", "")
             self.fail("no type")
         except:
             pass
 
         try:
-            msys.createScalarUOM(UnitType.UNCLASSIFIED, "", None, "")
-            msys.createScalarUOM(UnitType.UNCLASSIFIED, "", "", "")
+            msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "", None, "")
+            msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "", "", "")
             self.fail("already created")
         except:
             pass
@@ -794,5 +794,3 @@ class TestUnits(unittest.TestCase):
         self.assertTrue(symbol == sym)
 
         self.assertTrue(msys.getUOM(Unit.KATAL).getBaseSymbol() == "mol/s")
-
-        
