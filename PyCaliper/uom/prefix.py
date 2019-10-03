@@ -136,7 +136,8 @@ class Prefix:
         self.symbol = symbol
         self.factor = factor
 
-        Prefix.prefixes.append(self)
+        if self not in Prefix.prefixes:
+            Prefix.prefixes.append(self)
     
     @classmethod    
     def fromName(cls, name):
@@ -167,3 +168,21 @@ class Prefix:
     
     def __str__(self):
         return self.name + ", " + self.symbol + ", " + str(self.factor)
+    
+    def __eq__(self, other):
+        # same name
+        if (other is None or self.name != other.name):
+            return False
+        
+        # same symbol
+        if (self.symbol != other.symbol):
+            return False
+
+        # same factor
+        if (self.factor != other.factor):
+            return False
+        
+        return True
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)

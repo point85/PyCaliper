@@ -32,12 +32,15 @@ class TestUnits(unittest.TestCase):
         _kilo = Prefix.kilo()
         _nano = Prefix.nano()
         
+        _allPrefixes = Prefix.prefixes
+        
         for prefix in Prefix.prefixes:
             self.assertTrue(len(prefix.name) > 0)
             self.assertTrue(len(prefix.symbol) > 0)
             self.assertTrue(prefix.factor != 1.0)
             self.assertTrue(len(str(prefix)) > 0)
-            self.assertTrue(Prefix.fromName(prefix.name) == prefix)
+            fromName = Prefix.fromName(prefix.name)
+            self.assertTrue(fromName == prefix)
             
     def testExceptions(self):
         msys = MeasurementSystem.instance()
@@ -439,3 +442,78 @@ class TestUnits(unittest.TestCase):
 
         u = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, None, "not None", None)
         self.assertTrue(str(u) is not None)
+
+    def testUSUnits(self):
+        msys = MeasurementSystem.instance()
+
+        foot = msys.getUOM(Unit.FOOT)
+        gal = msys.getUOM(Unit.US_GALLON)
+        flush = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "flush", "flush", "")
+        gpf = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "gal per flush", "gpf", "", gal, flush)
+        velocity = msys.getUOM(Unit.FEET_PER_SEC)
+
+        litre = msys.getUOM(Unit.LITRE)
+        lpf = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "litre per flush", "lpf", "", litre, flush)
+
+        bd = gpf.getConversionFactor(lpf)
+        self.assertAlmostEqual(bd, 3.785411784, None, None, TestingUtils.DELTA6)
+
+        bd = lpf.getConversionFactor(gpf)
+        self.assertAlmostEqual(bd, 0.2641720523581484, None, None, TestingUtils.DELTA6)
+
+        # inversions
+        u = foot.invert()
+        self.assertTrue(u.symbol == "1/ft")
+
+        u = u.multiply(foot)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        u = velocity.invert()
+        self.assertTrue(u.symbol == "s/ft")
+
+        u = u.multiply(velocity)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+    def testImperialUnits(self):
+        msys = MeasurementSystem.instance()
+
+        impGal = msys.getUOM(Unit.BR_GALLON)
+        impPint = msys.getUOM(Unit.BR_PINT)
+        impOz = msys.getUOM(Unit.BR_FLUID_OUNCE)
+
+        usGal = msys.getUOM(Unit.US_GALLON)
+        usPint = msys.getUOM(Unit.US_PINT)
+
+        litre = msys.getUOM(Unit.LITRE)
+        m3 = msys.getUOM(Unit.CUBIC_METRE)
+
+        bd = impGal.getConversionFactor(litre)
+        self.assertAlmostEqual(bd, 4.54609, None, None, TestingUtils.DELTA6)
+
+        bd = litre.getConversionFactor(impGal)
+        self.assertAlmostEqual(bd, 0.2199692482990878, None, None, TestingUtils.DELTA6)
+
+        bd = impGal.getConversionFactor(usGal)
+        self.assertAlmostEqual(bd, 1.200949925504855, None, None, TestingUtils.DELTA6)
+
+        bd = usGal.getConversionFactor(impGal)
+        self.assertAlmostEqual(bd, 0.8326741846289888, None, None, TestingUtils.DELTA6)
+
+        bd = impGal.getConversionFactor(impPint)
+        self.assertAlmostEqual(bd, 8, None, None, TestingUtils.DELTA6)
+
+        bd = impPint.getConversionFactor(impGal)
+        self.assertAlmostEqual(bd, 0.125, None, None, TestingUtils.DELTA6)
+
+        bd = usGal.getConversionFactor(usPint)
+        self.assertAlmostEqual(bd, 8, None, None, TestingUtils.DELTA6)
+
+        bd = usPint.getConversionFactor(usGal)
+        self.assertAlmostEqual(bd, 0.125, None, None, TestingUtils.DELTA6)
+
+        bd = impOz.getConversionFactor(m3)
+        self.assertAlmostEqual(bd, 28.4130625E-06, None, None, TestingUtils.DELTA6)
+
+        bd = m3.getConversionFactor(impOz)
+        self.assertAlmostEqual(bd, 35195.07972785405, None, None, TestingUtils.DELTA6)
+
