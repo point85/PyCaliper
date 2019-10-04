@@ -541,3 +541,159 @@ class TestUnits2(unittest.TestCase):
         qmB = Quantity(1.0, miB)
         qkB = qmB.convert(kiB)
         self.assertAlmostEqual(qkB.amount, 1024.0, None, None, TestingUtils.DELTA5)
+        
+    def testPowers(self):
+        msys = MeasurementSystem.instance()
+
+        minute = msys.getMinute()
+        s = msys.getSecond()
+        sm1 = s.invert()
+        s2 = msys.getUOM(Unit.SQUARE_SECOND)
+        min2 = msys.createPowerUOM(UnitType.TIME_SQUARED, None, "sqMin", "min'2", None, minute, 2)
+        sqs = msys.createPowerUOM(UnitType.TIME_SQUARED, None, "sqSec", "s'2", None, s, 2)
+        sminus1 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None,"sminus1", "s'-1", None, s, -1)
+        minminus1Q = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "minminus1Q", "minQ'-1", None, msys.getOne(), minute)
+        minminus1 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "minminus1", "min'-1", None, minute, -1)
+        newton = msys.getUOM(Unit.NEWTON)
+        newtonm1 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "Nminus1", "N'-1", None, newton, -1)
+        inch = msys.getUOM(Unit.INCH)
+        ft = msys.getUOM(Unit.FOOT)
+        ftm1 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "ftm1", "ft'-1", None, ft, -1)
+        inm1 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "inm1", "in'-1", None, inch, -1)
+        ui = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "ui", "ui", "")
+        uj = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "uj", "uj", "")
+        ixj = msys.createProductUOM(UnitType.UNCLASSIFIED, None, "ixj", "ixj", "", ui, uj)
+        oneOveri = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "oneOveri", "oneOveri", "", msys.getOne(), ui)
+        oneOverj = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "oneOverj", "oneOverj", "", msys.getOne(), uj)
+        ixjm1 = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "ixjm1", "ixjm1", "", ixj, -1)
+        hz = msys.getUOM(Unit.HERTZ)
+
+        ij = oneOveri.multiply(oneOverj)
+        self.assertTrue(ij.getBaseSymbol() == ixjm1.getBaseSymbol())
+
+        bd = min2.getConversionFactor(s2)
+        self.assertAlmostEqual(bd, 3600.0, None, None, TestingUtils.DELTA6)
+
+        bd = s2.getConversionFactor(min2)
+        self.assertAlmostEqual(bd, 2.777777777777778E-4, None, None, TestingUtils.DELTA6)
+
+        u = CacheManager.instance().getBaseUOM(sm1.symbol)
+        self.assertTrue(u is not None)
+        u = msys.getUOMBySymbol(sm1.getBaseSymbol())
+
+        u = msys.getOne().divide(minute)
+        bd = u.scalingFactor
+        self.assertAlmostEqual(bd, 1.0/60.0, None, None, TestingUtils.DELTA6)
+        
+        bd = u.getConversionFactor(sm1)
+        self.assertAlmostEqual(bd, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = ftm1.multiply(ft)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        u = ft.multiply(inm1)
+        self.assertAlmostEqual(u.scalingFactor, 12.0, None, None, TestingUtils.DELTA6)
+
+        u = inm1.multiply(ft)
+        self.assertAlmostEqual(u.scalingFactor, 12.0, None, None, TestingUtils.DELTA6)
+
+        u = s.multiply(minminus1)
+        self.assertAlmostEqual(u.scalingFactor, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = minminus1.multiply(s)
+        self.assertAlmostEqual(u.scalingFactor, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = s.multiply(minminus1Q)
+        self.assertAlmostEqual(u.scalingFactor, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = minminus1Q.multiply(s)
+        self.assertAlmostEqual(u.scalingFactor, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = ftm1.multiply(inch)
+        self.assertAlmostEqual(u.scalingFactor, 1.0/12.0, None, None, TestingUtils.DELTA6)
+
+        u = inch.multiply(ftm1)
+        self.assertAlmostEqual(u.scalingFactor, 1.0/12.0, None, None, TestingUtils.DELTA6)
+
+        u = newtonm1.multiply(newton)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        u = newton.multiply(newtonm1)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        u = minminus1.multiply(s)
+        self.assertAlmostEqual(u.scalingFactor, 1.0/60.0, None, None, TestingUtils.DELTA6)
+
+        CacheManager.instance().unregisterUOM(msys.getUOM(Unit.HERTZ))
+        min1 = minute.invert()
+        bd = min1.scalingFactor
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = sqs.scalingFactor
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        u = sminus1.multiply(s)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        u = msys.getOne().divide(minute)
+        bd = u.scalingFactor
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+        bd = u.getConversionFactor(sm1)
+        self.assertAlmostEqual(bd, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = msys.getOne().multiply(minute)
+        bd = u.getConversionFactor(s)
+
+        u = min2.divide(minute)
+        t = u.unitType
+        self.assertTrue(t == UnitType.TIME)
+
+        u = minute.multiply(minute)
+        self.assertAlmostEqual(u.scalingFactor, 3600.0, None, None, TestingUtils.DELTA6)
+        
+        self.assertTrue(u.abscissaUnit.getBaseSymbol() == s2.getBaseSymbol())
+        self.assertAlmostEqual(u.offset, 0.0, None, None, TestingUtils.DELTA6)
+        t = u.unitType
+        self.assertTrue(t == UnitType.TIME_SQUARED)
+
+        u2 = msys.getOne().divide(minute)
+        self.assertAlmostEqual(u2.scalingFactor, 1.0, None, None, TestingUtils.DELTA6)
+
+        q1 = Quantity(1.0, u2)
+        q2 = q1.convert(hz)
+
+        self.assertAlmostEqual(q2.amount, 0.0166666666666667, None, None, TestingUtils.DELTA6)
+
+        u = u2.multiply(u2)
+        self.assertAlmostEqual(u.scalingFactor, 2.777777777777778E-4, None, None, TestingUtils.DELTA6)
+
+        q1 = Quantity(1.0, u)
+        q2 = q1.convert(s2.invert())
+        self.assertAlmostEqual(q2.amount, 2.777777777777778E-4, None, None, TestingUtils.DELTA6)
+
+        u2 = u2.divide(minute)
+        q1 = Quantity(1.0, u2)
+        q2 = q1.convert(s2.invert())
+        self.assertAlmostEqual(q2.amount, 2.777777777777778E-4, None, None, TestingUtils.DELTA6)
+
+        u2 = u2.invert()
+        self.assertTrue(u2.getBaseSymbol() == min2.getBaseSymbol())
+
+        q1 = Quantity(10.0, u2)
+        bd = u2.getConversionFactor(s2)
+        self.assertAlmostEqual(bd, 3600.0, None, None, TestingUtils.DELTA6)
+
+        q2 = q1.convert(s2)
+        self.assertTrue(q2.uom == s2)
+        self.assertAlmostEqual(q2.amount, 36000.0, None, None, TestingUtils.DELTA6)
+
+        bd = minute.getConversionFactor(msys.getSecond())
+        self.assertAlmostEqual(bd, 60.0, None, None, TestingUtils.DELTA6)
+
+        u = q2.uom
+        bd = u.getConversionFactor(min2)
+        self.assertAlmostEqual(bd, 2.777777777777778E-4, None, None, TestingUtils.DELTA6)
+
+        q2 = q2.convert(min2)
+        self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
+

@@ -6,7 +6,7 @@ from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.test.testing_utils import TestingUtils
 from PyCaliper.uom.cache_manager import CacheManager
-from PyCaliper.uom.unit_of_measure import Reducer
+from PyCaliper.uom.unit_of_measure import Reducer, UnitOfMeasure
 
 class TestUnits(unittest.TestCase):
     def testBaseUnits(self):
@@ -571,7 +571,7 @@ class TestUnits(unittest.TestCase):
             h = v.divide(d)
 
         sym = h.uom.symbol 
-        self.assertTrue(len(sym) > 0)
+        self.assertTrue(len(sym) <= UnitOfMeasure.MAX_SYMBOL_LENGTH)
 
         # conflict with 1/s
         CacheManager.instance().unregisterUOM(h0.uom)

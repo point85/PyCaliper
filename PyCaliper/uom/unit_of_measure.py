@@ -202,7 +202,7 @@ class PathParameters:
 
           
 class UnitOfMeasure(Symbolic):  
-    __MAX_SYMBOL_LENGTH = 16
+    MAX_SYMBOL_LENGTH = 16
              
     def __init__(self, unitType = UnitType.UNCLASSIFIED, name = None, symbol = None, description = None):
         super().__init__(name, symbol, description)
@@ -401,8 +401,8 @@ class UnitOfMeasure(Symbolic):
     
     @staticmethod    
     def generateIntermediateSymbol():
-        ms = time.time_ns()
-        return str(ms)
+        ns = str(time.time_ns())
+        return ns[:UnitOfMeasure.MAX_SYMBOL_LENGTH]
 
     @staticmethod 
     def generatePowerSymbol(base, exponent):
@@ -617,7 +617,7 @@ class UnitOfMeasure(Symbolic):
             result.symbol = self.generateQuotientSymbol(result.getDividend(), result.getDivisor())
             
         # constrain symbol to a maximum length
-        if (len(result.symbol) > UnitOfMeasure.__MAX_SYMBOL_LENGTH):
+        if (len(result.symbol) > UnitOfMeasure.MAX_SYMBOL_LENGTH):
             result.symbol = self.generateIntermediateSymbol()
             
         baseSymbol = resultReducer.buildBaseString()
