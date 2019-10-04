@@ -697,3 +697,86 @@ class TestUnits2(unittest.TestCase):
         q2 = q2.convert(min2)
         self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
 
+    def testInversions(self):
+        msys = MeasurementSystem.instance()
+        
+        metre = msys.getUOM(Unit.METRE)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, -3)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, 2)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, -2)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, 2)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, 1)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, -1)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, -2)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+
+        uom = msys.createUnclassifiedPowerUOM(metre, -4)
+        inverted = uom.invert()
+        u = uom.multiply(inverted)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().symbol)
+        
+    def testMedicalUnits(self):
+        msys = MeasurementSystem.instance()
+        
+        # Equivalent
+        eq = msys.getUOM(Unit.EQUIVALENT)
+        litre = msys.getUOM(Unit.LITRE)
+        mEqPerL = msys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, None, "milliNormal", "mEq/L",
+            "solute per litre of solvent ", msys.createPrefixedUOM(Prefix.milli(), eq), litre)
+        testResult = Quantity(4.9, mEqPerL)
+        self.assertAlmostEqual(testResult.amount, 4.9, None, None, TestingUtils.DELTA6)
+
+
+        # Unit
+        u = msys.getUOM(Unit.UNIT)
+        katal = msys.getUOM(Unit.KATAL)
+        q1 = Quantity(1.0, u)
+        q2 = q1.convert(msys.createPrefixedUOM(Prefix.nano(), katal))
+        self.assertAlmostEqual(q2.amount, 16.6666667, None, None, TestingUtils.DELTA6)
+
+        # blood cell counts
+        k = msys.createPrefixedUOM(Prefix.kilo(), msys.getOne())
+        uL = msys.createPrefixedUOM(Prefix.micro(), msys.getUOM(Unit.LITRE))
+        kul = msys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, None, "K/uL", "K/uL",
+            "thousands per microlitre", k, uL)
+        testResult = Quantity(6.6, kul)
+        self.assertAlmostEqual(testResult.amount, 6.6, None, None, TestingUtils.DELTA6)
+
+        fL = msys.createPrefixedUOM(Prefix.femto(), msys.getUOM(Unit.LITRE))
+        testResult = Quantity(90.0, fL)
+        self.assertAlmostEqual(testResult.amount, 90.0, None, None, TestingUtils.DELTA6)
+
+        # TSH
+        uIU = msys.createPrefixedUOM(Prefix.micro(), msys.getUOM(Unit.INTERNATIONAL_UNIT))
+        mL = msys.createPrefixedUOM(Prefix.milli(), msys.getUOM(Unit.LITRE))
+        uiuPerml = msys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, None, "uIU/mL", "uIU/mL",
+            "micro IU per millilitre", uIU, mL)
+        testResult = Quantity(2.11, uiuPerml)
+        self.assertAlmostEqual(testResult.amount, 2.11, None, None, TestingUtils.DELTA6)
