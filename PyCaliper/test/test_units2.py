@@ -323,4 +323,221 @@ class TestUnits2(unittest.TestCase):
         bd = joule.getConversionFactor(btu)
         self.assertAlmostEqual(bd, 9.478171203133172E-04, None, None, TestingUtils.DELTA6)
 
+    def testConversions3(self):
+        msys = MeasurementSystem.instance()
 
+        weber = msys.getUOM(Unit.WEBER)
+        coulomb = msys.getUOM(Unit.COULOMB)
+        second = msys.getSecond()
+        volt = msys.getUOM(Unit.VOLT)
+        watt = msys.getUOM(Unit.WATT)
+        amp = msys.getUOM(Unit.AMPERE)
+        farad = msys.getUOM(Unit.FARAD)
+        ohm = msys.getUOM(Unit.OHM)
+        henry = msys.getUOM(Unit.HENRY)
+        sr = msys.getUOM(Unit.STERADIAN)
+        cd = msys.getUOM(Unit.CANDELA)
+        lumen = msys.getUOM(Unit.LUMEN)
+        gray = msys.getUOM(Unit.GRAY)
+        sievert = msys.getUOM(Unit.SIEVERT)
+
+        weberPerSec = msys.createQuotientUOM(UnitType.ELECTROMOTIVE_FORCE, None, "W/s", "W/s", None, weber,
+                second)
+        weberPerAmp = msys.createQuotientUOM(UnitType.ELECTRIC_INDUCTANCE, None, "W/A", "W/A", None, weber, amp)
+        fTimesV = msys.createProductUOM(UnitType.ELECTRIC_CHARGE, None, "FxV", "FxV", None, farad, volt)
+        WPerAmp = msys.createQuotientUOM(UnitType.ELECTROMOTIVE_FORCE, None, "Watt/A", "Watt/A", None, watt,
+                amp)
+        VPerA = msys.createQuotientUOM(UnitType.ELECTRIC_RESISTANCE, None, "V/A", "V/A", None, volt, amp)
+        CPerV = msys.createQuotientUOM(UnitType.ELECTRIC_CAPACITANCE, None, "C/V", "C/V", None, coulomb, volt)
+        VTimesSec = msys.createProductUOM(UnitType.MAGNETIC_FLUX, None, "Vxs", "Vxs", None, volt, second)
+        cdTimesSr = msys.createProductUOM(UnitType.LUMINOUS_FLUX, None, "cdxsr", "cdxsr", None, cd, sr)
+
+        bd = fTimesV.getConversionFactor(coulomb)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = coulomb.getConversionFactor(fTimesV)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = weberPerSec.getConversionFactor(volt)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = volt.getConversionFactor(weberPerSec)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = volt.getConversionFactor(WPerAmp)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = WPerAmp.getConversionFactor(volt)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = ohm.getConversionFactor(VPerA)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = VPerA.getConversionFactor(ohm)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = farad.getConversionFactor(CPerV)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = CPerV.getConversionFactor(farad)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = weber.getConversionFactor(VTimesSec)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = VTimesSec.getConversionFactor(weber)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = henry.getConversionFactor(weberPerAmp)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = weberPerAmp.getConversionFactor(henry)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = lumen.getConversionFactor(cdTimesSr)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = cdTimesSr.getConversionFactor(lumen)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        try:
+            bd = gray.getConversionFactor(sievert)
+            self.fail("No conversion")
+        except:
+            pass
+
+        try:
+            bd = sievert.getConversionFactor(gray)
+            self.fail("No conversion")
+        except:
+            pass
+
+    def testConversions4(self):
+        msys = MeasurementSystem.instance()
+
+        K = msys.getUOM(Unit.KELVIN)
+        C = msys.getUOM(Unit.CELSIUS)
+
+        R = msys.getUOM(Unit.RANKINE)
+        F = msys.getUOM(Unit.FAHRENHEIT)
+
+        fiveNinths = 5.0 / 9.0
+        nineFifths = 1.8
+
+        # K to C
+        bd = K.getConversionFactor(C)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = C.getConversionFactor(K)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        # R to F
+        bd = R.getConversionFactor(F)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        bd = F.getConversionFactor(R)
+        self.assertAlmostEqual(bd, 1.0, None, None, TestingUtils.DELTA6)
+
+        # C to F
+        bd = F.getConversionFactor(C)
+        self.assertAlmostEqual(bd, fiveNinths, None, None, TestingUtils.DELTA6)
+
+        bd = C.getConversionFactor(F)
+        self.assertAlmostEqual(bd, nineFifths, None, None, TestingUtils.DELTA6)
+
+        # K to R
+        bd = K.getConversionFactor(R)
+        self.assertAlmostEqual(bd, nineFifths, None, None, TestingUtils.DELTA6)
+
+        bd = F.getConversionFactor(K)
+        self.assertAlmostEqual(bd, fiveNinths, None, None, TestingUtils.DELTA6)
+
+        # invert diopters to metre
+        qFrom = Quantity(10.0, msys.getUOM(Unit.DIOPTER))
+        inverted = qFrom.invert()
+        self.assertAlmostEqual(inverted.amount, 0.1, None, None, TestingUtils.DELTA6)
+
+        u = msys.createPowerUOM(UnitType.UNCLASSIFIED, None, "t*4", "t*4", "", K, 4)
+        self.assertTrue(u is not None)
+
+        try:
+            u = C.multiply(C)
+            self.fail("Can't multiply Celcius")
+        except:
+            pass
+
+        u = K.divide(K)
+        self.assertTrue(u.getBaseSymbol() == msys.getOne().getBaseSymbol())
+
+        # hectare to acre
+        ha = msys.getUOM(Unit.HECTARE)
+        qFrom = Quantity(1.0, ha)
+        to = qFrom.convert(msys.getUOM(Unit.ACRE))
+        self.assertAlmostEqual(to.amount, 2.47105, None, None, TestingUtils.DELTA5)
+
+    def testPerformance(self):
+        msys = MeasurementSystem.instance()
+        its = 500
+
+        metre = msys.getUOM(Unit.METRE)
+        cm = msys.createPrefixedUOM(Prefix.centi(), msys.getUOM(Unit.METRE))
+        ft = msys.getUOM(Unit.FOOT)
+
+        q1 = Quantity(10.0, metre)
+        q2 = Quantity(2.0, cm)
+
+        for _i in range(its):
+            q1.add(q2)
+
+        for _i in range(its):
+            q1.subtract(q2)
+
+        for _i in range(its):
+            q1.multiply(q2)
+
+        for _i in range(its):
+            q1.divide(q2)
+
+        for _i in range(its):
+            q1.convert(ft)
+
+    def testScaledUnits(self):
+        msys = MeasurementSystem.instance()
+
+        m = msys.getUOM(Unit.METRE)
+
+        # mega metre
+        mm = msys.createPrefixedUOM(Prefix.mega(), m)
+
+        qmm = Quantity(1.0, mm)
+        qm = qmm.convert(m)
+        self.assertAlmostEqual(qm.amount, 1.0E+06, None, None, TestingUtils.DELTA5)
+
+        mm2 = msys.createPrefixedUOM(Prefix.mega(), m)
+        self.assertTrue(mm == mm2)
+
+        # centilitre
+        litre = msys.getUOM(Unit.LITRE)
+        cL = msys.createPrefixedUOM(Prefix.centi(), litre)
+        qL = Quantity(1.0, litre)
+        qcL = qL.convert(cL)
+        self.assertAlmostEqual(qcL.amount, 100.0, None, None, TestingUtils.DELTA5)
+
+        # a mega buck
+        buck = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, "buck", "$", "one US dollar")
+        megabuck = msys.createPrefixedUOM(Prefix.mega(), buck)
+        qmb = Quantity(10.0, megabuck)
+        qb = qmb.convert(buck)
+        self.assertAlmostEqual(qb.amount, 1.0E+07, None, None, TestingUtils.DELTA5)
+
+        # kilogram vs. scaled gram
+        kgm = msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.GRAM))
+        kg = msys.getUOM(Unit.KILOGRAM)
+        self.assertTrue(kgm == kg)
+
+        # kilo and megabytes
+        kiB = msys.createPrefixedUOM(Prefix.kibi(), msys.getUOM(Unit.BYTE))
+        miB = msys.createPrefixedUOM(Prefix.mebi(), msys.getUOM(Unit.BYTE))
+        qmB = Quantity(1.0, miB)
+        qkB = qmB.convert(kiB)
+        self.assertAlmostEqual(qkB.amount, 1024.0, None, None, TestingUtils.DELTA5)
