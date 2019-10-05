@@ -1,7 +1,7 @@
 import unittest
 
 from PyCaliper.uom.measurement_system import MeasurementSystem
-from PyCaliper.uom.enums import Unit, UnitType, Constant
+from PyCaliper.uom.enums import Unit, UnitType, Constant, MeasurementType
 from PyCaliper.uom.prefix import Prefix
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.test.testing_utils import TestingUtils
@@ -753,7 +753,6 @@ class TestUnits2(unittest.TestCase):
         testResult = Quantity(4.9, mEqPerL)
         self.assertAlmostEqual(testResult.amount, 4.9, None, None, TestingUtils.DELTA6)
 
-
         # Unit
         u = msys.getUOM(Unit.UNIT)
         katal = msys.getUOM(Unit.KATAL)
@@ -780,3 +779,157 @@ class TestUnits2(unittest.TestCase):
             "micro IU per millilitre", uIU, mL)
         testResult = Quantity(2.11, uiuPerml)
         self.assertAlmostEqual(testResult.amount, 2.11, None, None, TestingUtils.DELTA6)
+
+    def testCategory(self):
+        msys = MeasurementSystem.instance()
+        
+        category = "category"
+        m = msys.getUOM(Unit.METRE)
+        m.category = category
+        self. assertTrue(m.category == category)
+    
+    def testMeasurementTypes(self):
+        msys = MeasurementSystem.instance()
+        
+        m = msys.getUOM(Unit.METRE)
+        mps = msys.getUOM(Unit.METRE_PER_SEC)
+        n = msys.getUOM(Unit.NEWTON_METRE)
+        a = msys.getUOM(Unit.SQUARE_METRE)
+
+        self.assertTrue(m.getMeasurementType() == MeasurementType.SCALAR)
+        self.assertTrue(mps.getMeasurementType() == MeasurementType.QUOTIENT)
+        self.assertTrue(n.getMeasurementType() == MeasurementType.PRODUCT)
+        self.assertTrue(a.getMeasurementType() == MeasurementType.POWER)
+
+    def testScaling(self):
+        msys = MeasurementSystem.instance()
+        
+        # test scaling factors
+        second = msys.getSecond()
+        minute = msys.getMinute()
+        s2 = msys.getUOM(Unit.SQUARE_SECOND)
+        msec = msys.createPrefixedUOM(Prefix.milli(), second)
+        k = msys.getUOM(Unit.KELVIN)
+        r = msys.getUOM(Unit.RANKINE)
+        m = msys.getUOM(Unit.METRE)
+        km = msys.createPrefixedUOM(Prefix.kilo(), m)
+
+        sf = m.getConversionFactor(km)
+        self.assertAlmostEqual(sf, 0.001, None, None, TestingUtils.DELTA6)
+
+        kinv = k.invert()
+        sf = kinv.scalingFactor
+        self.assertTrue(sf == 1.0)
+
+        sf = r.getConversionFactor(k)
+        self.assertAlmostEqual(sf, 5.0 / 9.0, None, None, TestingUtils.DELTA6)
+
+        sf = k.getConversionFactor(r)
+        self.assertAlmostEqual(sf, 1.8, None, None, TestingUtils.DELTA6)
+
+        sf = second.getConversionFactor(msec)
+        self.assertAlmostEqual(sf, 1000.0, None, None, TestingUtils.DELTA6)
+
+        sf = minute.scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        # inversions
+        mininv = minute.invert()
+        sf = mininv.scalingFactor
+        self.assertTrue(sf == 1.0)
+        sf = mininv.getConversionFactor(msys.getUOM(Unit.HERTZ))
+        self.assertTrue(sf == 1.0 / 60.0)
+
+        # quotient UOM
+        q = msys.createUnclassifiedQuotientUOM(msys.getOne(), minute)
+        sf = q.scalingFactor
+        self.assertTrue(sf == 1.0)
+
+        # power UOM
+        p = msys.createUnclassifiedPowerUOM(minute, -1)
+        sf = p.scalingFactor
+        self.assertTrue(sf == 1.0)
+
+        sf = p.getConversionFactor(msys.getUOM(Unit.HERTZ))
+        self.assertTrue(sf == 1.0 / 60.0)
+
+        u = p.invert()
+        sf = u.scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        sf = minute.getConversionFactor(u)
+        self.assertAlmostEqual(sf, 1.0, None, None, TestingUtils.DELTA6)
+
+        sf = u.getConversionFactor(minute)
+        self.assertAlmostEqual(sf, 1.0, None, None, TestingUtils.DELTA6)
+
+        min2 = mininv.invert()
+        sf = min2.scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        # divisions
+        perMin = msys.getOne().divide(minute)
+
+        num = perMin.getDividend()
+        denom = perMin.getDivisor()
+        min2 = denom.divide(num)
+        sf = min2.scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        sf = perMin.scalingFactor
+        self.assertTrue(sf == 1.0 / 60.0)
+
+        perMin1 = perMin.divide(msys.getOne())
+        self.assertTrue(perMin1 == perMin)
+
+        min2 = perMin.invert()
+        sf = min2.scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        min2 = msys.getOne().divide(perMin)
+        sf = min2.scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        count = 4
+        inversions = [None]*(count + 1)
+        divides = [None]*(count + 1)
+
+        inversions[0] = minute
+        divides[0] = minute
+        for i in range(count):
+            inversions[i + 1] = inversions[i].invert()
+            divides[i + 1] = msys.getOne().divide(divides[i])
+    
+        sf = inversions[count].scalingFactor
+        self.assertTrue(sf == 60.0)
+
+        for i in range(count, 0, -1):
+            last = divides[i].invert()
+        
+        self.assertTrue(last == minute)
+
+        # multiply
+        minsq = minute.multiply(minute)
+        sf = minsq.scalingFactor
+        self.assertTrue(sf == 3600.0)
+
+        sf = minsq.getConversionFactor(s2)
+        self.assertAlmostEqual(sf, 3600.0, None, None, TestingUtils.DELTA6)
+
+        sf = s2.getConversionFactor(minsq)
+        self.assertAlmostEqual(sf, 1.0 / 3600.0, None, None, TestingUtils.DELTA6)
+
+        # power of 2
+        p2 = msys.createUnclassifiedPowerUOM(minute, 2)
+        sf = p2.scalingFactor
+        self.assertTrue(sf == 1.0)
+
+        sf = p2.getConversionFactor(s2)
+        self.assertTrue(sf == 3600.0)
+
+        sf = p2.getConversionFactor(minsq)
+        self.assertTrue(sf == 1.0)
+
+        sf = minsq.getConversionFactor(p2)
+        self.assertTrue(sf == 1.0)
+
