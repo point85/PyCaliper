@@ -1,8 +1,8 @@
-class Prefix:
-    """
-    The Prefix class defines SI unit of measure prefixes as well as those found in computer science.
-    """
-    
+##
+# The Prefix class defines SI unit of measure prefixes as well as those found in computer science.
+#
+class Prefix:  
+    # list of cached prefixes  
     prefixes = []
         
     @classmethod
@@ -120,18 +120,18 @@ class Prefix:
     @classmethod
     def gibi(cls):
         return cls("gibi", "Gi", 1.073741824E+09)       
-    
+
+    ##
+    # Construct a prefix
+    # 
+    # @param name
+    #            Name
+    # @param symbol
+    #            Symbol
+    # @param factor
+    #            Numerical factor
+    #
     def __init__(self, name, symbol, factor): 
-        """
-        Construct a prefix
-         
-        parameter name
-                    Name
-        parameter symbol
-                    Symbol
-        parameter factor
-                    Numerical factor
-        """
         self.name = name
         self.symbol = symbol
         self.factor = factor
@@ -139,16 +139,15 @@ class Prefix:
         if self not in Prefix.prefixes:
             Prefix.prefixes.append(self)
     
+    ##
+    # Find the prefix with the specified name
+    # 
+    # @param name
+    #            Name of prefix
+    # @return {@link Prefix}  
+    # 
     @classmethod    
     def fromName(cls, name):
-        """
-        Find the prefix with the specified name
-        
-        parameter name
-                   Name of prefix
-        return Prefix
-        """
-        
         for p in cls.prefixes:
             if p.name == name:
                 prefix = p
@@ -156,6 +155,13 @@ class Prefix:
 
         return prefix
     
+    ##
+    # Find the prefix with the specified scaling factor
+    # 
+    # @param factor
+    #            Scaling factor
+    # @return {@link Prefix}
+    #    
     @classmethod
     def fromFactor(cls, factor):
         

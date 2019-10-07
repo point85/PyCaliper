@@ -11,26 +11,67 @@ from PyCaliper.uom.enums import Unit
 from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.localizer import Localizer
-    
-class MeasurementSystem:    
+
+##
+# A MeasurementSystem is a collection of units of measure that have a linear
+# relationship to each other: y = ax + b where x is the unit to be converted, y
+# is the converted unit, a is the scaling factor and b is the offset. <br>
+# See
+# <ul>
+# <li>Wikipedia: <i><a href=
+# "https://en.wikipedia.org/wiki/International_System_of_Units">International
+# System of Units</a></i></li>
+# <li>Table of conversions:
+# <i><a href="https://en.wikipedia.org/wiki/Conversion_of_units">Conversion of
+# Units</a></i></li>
+# <li>Unified Code for Units of Measure :
+# <i><a href="http://unitsofmeasure.org/trac">UCUM</a></i></li>
+# <li>SI derived units:
+# <i><a href="https://en.wikipedia.org/wiki/SI_derived_unit">SI Derived
+# Units</a></i></li>
+# <li>US system:
+# <i><a href="https://en.wikipedia.org/wiki/United_States_customary_units">US
+# Units</a></i></li>
+# <li>British Imperial system:
+# <i><a href="https://en.wikipedia.org/wiki/Imperial_units">British Imperial
+# Units</a></i></li>
+# <li>JSR 363: <i><a href=
+# "https://java.net/downloads/unitsofmeasurement/JSR363Specification_EDR.pdf">JSR
+# 363 Specification</a></i></li>
+# </ul>
+# <br>
+# The MeasurementSystem class creates:
+# <ul>
+# <li>7 SI fundamental units of measure</li>
+# <li>20 SI units derived from these fundamental units</li>
+# <li>other units in the International Customary, US and British Imperial
+# systems</li>
+# <li>any number of custom units of measure</li>
+# </ul>
+class MeasurementSystem:   
     # single instance
-    __unifiedSystem = None
+    unifiedSystem = None
     
     def __init__(self):
-        MeasurementSystem.__unifiedSystem = self
+        MeasurementSystem.unifiedSystem = self
         self.primeUomCache()
         
     @staticmethod
     def instance():
-        if (MeasurementSystem.__unifiedSystem is None):
+        if (MeasurementSystem.unifiedSystem is None):
             MeasurementSystem()
-        return MeasurementSystem.__unifiedSystem 
+        return MeasurementSystem.unifiedSystem 
     
     def primeUomCache(self):
         self.getUOM(Unit.ONE)
         self.getUOM(Unit.SECOND)
         self.getUOM(Unit.METRE)
-        
+    
+    ##
+    # Get the unit of measure with this unique enumerated type
+    # 
+    # @param unit {@link Unit}
+    # @return {@link UnitOfMeasure}   
     def getUOM(self, unit):
         uom = CacheManager.instance().getUOMByUnit(unit)
 
@@ -41,6 +82,15 @@ class MeasurementSystem:
     def getOne(self):
         return self.getUOM(Unit.ONE)
     
+    ##
+    # Create a unit of measure that is not a power, product or quotient
+    # 
+    # @param unitType    {@link UnitType}
+    # @param unit        {@link Unit}
+    # @param name        Name of unit of measure
+    # @param symbol      Symbol (must be unique)
+    # @param description Description of unit of measure
+    # @return {@link UnitOfMeasure}
     def createScalarUOM(self, unitType, unit, name, symbol, description):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         CacheManager.instance().registerUOM(uom)
@@ -819,6 +869,11 @@ class MeasurementSystem:
 
         return uom
     
+    ##
+    # Get the quantity defined as a constant value
+    # 
+    # @param constant {@link Constant}
+    # @return {@link Quantity}
     def getQuantity(self, constant):
         named = None
 
@@ -895,7 +950,7 @@ class MeasurementSystem:
         elif (constant == Constant.MAGNETIC_PERMEABILITY):
             # mu0
             hm = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.HENRY), self.getUOM(Unit.METRE))
-            fourPi = 4.0 * math.pi * 1.0E-07
+            fourPi = 4.0# math.pi# 1.0E-07
             named = Quantity(fourPi, hm)
             named.name = Localizer.instance().langStr("mu0.name")
             named.symbol = Localizer.instance().langStr("mu0.symbol")
@@ -946,13 +1001,30 @@ class MeasurementSystem:
             named.description = Localizer.instance().langStr("kcd.desc")
 
         return named
-    
+
+    ##
+    # Create a unit of measure with a base raised to an integral power
+    # 
+    # @param unitType    {@link UnitType}
+    # @param unit        {@link Unit}
+    # @param name        Name of unit of measure
+    # @param symbol      Symbol (must be unique)
+    # @param description Description of unit of measure
+    # @param base        {@link UnitOfMeasure}
+    # @param exponent    Exponent
+    # @return {@link UnitOfMeasure}    
     def createPowerUOM(self, unitType, unit, name, symbol, description, base, exponent):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setPowerUnit(base, exponent)
         CacheManager.instance().registerUOM(uom)
         return uom
-    
+
+    ##
+    # Create an anonymous unit of measure with a base raised to an integral power
+    #  
+    # @param base        {@link UnitOfMeasure}
+    # @param exponent    Exponent
+    # @return {@link UnitOfMeasure}    
     def createUnclassifiedPowerUOM(self, base, exponent): 
         if (base is None):          
             msg = Localizer.instance().messageStr("base.cannot.be.null")
@@ -961,13 +1033,30 @@ class MeasurementSystem:
         # create symbol
         symbol = UnitOfMeasure.generatePowerSymbol(base, exponent)
         return self.createPowerUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, base, exponent)
-    
+
+    ##
+    # Create a unit of measure that is the product of two other units of measure
+    # 
+    # @param unitType     {@link UnitType}
+    # @param unit         {@link Unit}
+    # @param name         Name of unit of measure
+    # @param symbol       Symbol (must be unique)
+    # @param description  Description of unit of measure
+    # @param multiplier   {@link UnitOfMeasure} multiplier
+    # @param multiplicand {@link UnitOfMeasure} multiplicand
+    # @return {@link UnitOfMeasure}   
     def createProductUOM(self, unitType, unit, name, symbol, description, multiplier, multiplicand):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setProductUnits(multiplier, multiplicand)
         CacheManager.instance().registerUOM(uom)
         return uom
-    
+
+    ##
+    # Create an anonymous unit of measure that is the product of two other units of measure
+    # 
+    # @param multiplier   {@link UnitOfMeasure} multiplier
+    # @param multiplicand {@link UnitOfMeasure} multiplicand
+    # @return {@link UnitOfMeasure}      
     def createUnclassifiedProductUOM(self, multiplier, multiplicand):
         if (multiplier is None):          
             msg = Localizer.instance().messageStr("multiplier.cannot.be.null")
@@ -979,7 +1068,13 @@ class MeasurementSystem:
         
         symbol = UnitOfMeasure.generateProductSymbol(multiplier, multiplicand)
         return self.createProductUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, multiplier, multiplicand)
-    
+
+    ##
+    # Create a unit of measure that is a UOM divided by another UOM
+    #   
+    # @param dividend    {@link UnitOfMeasure}
+    # @param divisor     {@link UnitOfMeasure}
+    # @return {@link UnitOfMeasure}  
     def createUnclassifiedQuotientUOM(self, dividend, divisor):
         if (dividend is None):
             msg = Localizer.instance().messageStr("dividend.cannot.be.null")
@@ -991,7 +1086,18 @@ class MeasurementSystem:
         
         symbol = UnitOfMeasure.generateQuotientSymbol(dividend, divisor)
         return self.createQuotientUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, dividend, divisor)
-    
+
+    ##
+    # Create a unit of measure that is a UOM divided by another UOM
+    # 
+    # @param unitType    {@link UnitType}
+    # @param unit        {@link Unit}
+    # @param name        Name of unit of measure
+    # @param symbol      Symbol (must be unique)
+    # @param description Description of unit of measure
+    # @param dividend    {@link UnitOfMeasure}
+    # @param divisor     {@link UnitOfMeasure}
+    # @return {@link UnitOfMeasure}    
     def createQuotientUOM(self, unitType, unit, name, symbol, description, dividend, divisor):
         uom = self.createUOM(unitType, unit, name, symbol, description)
         uom.setQuotientUnits(dividend, divisor)
@@ -1033,10 +1139,19 @@ class MeasurementSystem:
     def getUOMKey(uom):
         return uom.symbol
     
+    ##
+    # Get all units currently cached by this measurement system
+    # 
+    # @return List of {@link UnitOfMeasure}
     def getRegisteredUOMs(self):
         units = CacheManager.instance().getCachedUOMs()
         return sorted(units, key = MeasurementSystem.getUOMKey)
-    
+
+    ##
+    # Get all the units of measure of the specified type
+    # 
+    # @param unitType {@link UnitType}
+    # @return List of {@link UnitOfMeasure}   
     def getUnitsOfMeasure(self, unitType):
         units = []
         
@@ -1305,7 +1420,14 @@ class MeasurementSystem:
             
     def getUOMBySymbol(self, symbol):
         return CacheManager.instance().getUOMBySymbol(symbol)
-    
+
+    ##
+    # Create a unit of measure linearly scaled by the {@link Prefix}
+    # against the target unit of measure.
+    # 
+    # @param prefix    {@link Prefix} Scaling prefix with the scaling factor, e.g. 1000
+    # @param uom abscissa {@link UnitOfMeasure}
+    # @return {@link UnitOfMeasure}  
     def createPrefixedUOM(self, prefix, uom):
         symbol = prefix.symbol + uom.symbol
         scaled = self.getUOMBySymbol(symbol)
@@ -1317,7 +1439,7 @@ class MeasurementSystem:
             description = str(prefix.factor) + " " + uom.name
 
             # scaling factor
-            scalingFactor = uom.scalingFactor * prefix.factor
+            scalingFactor = uom.scalingFactor# prefix.factor
 
             # create the unit of measure and set conversion
             scaled = self.createScalarUOM(uom.unitType, None, name, symbol, description)
@@ -1337,13 +1459,48 @@ class MeasurementSystem:
         amount = Quantity.createAmountFromString(strAmount)
         uom = MeasurementSystem.instance().getUOM(unit)
         return Quantity(amount, uom)
-    
+
+    /**
+     * Convert this quantity to the target unit
+     * 
+     * @param quantity
+     *            {@link Quantity}
+     * @param unit
+     *            {@link Unit}
+     * @return {@link Quantity}
+     * @throws Exception
+     *             Exception
+     */    
     def convertQuantityToUnit(self, quantity, unit):
         return quantity.convert(MeasurementSystem.instance().getUOM(unit))
     
+    /**
+     * Convert this quantity to the target unit with the specified prefix
+     * 
+     * @param quantity
+     *            {@link Quantity}
+     * @param prefix
+     *            {@link Prefix}
+     * @param unit
+     *            {@link Unit}
+     * @return {@link Quantity}
+     * @throws Exception
+     *             Exception
+     */    
     def convertQuantityToPrefixUnit(self, quantity, prefix, unit):
         return quantity.convert(MeasurementSystem.instance().createPrefixedUOM(prefix, unit))
-    
+
+    /**
+     * Raise this quantity to the specified power
+     * 
+     * @param quantity
+     *            Quantity
+     * @param exponent
+     *            Exponent
+     * @return new Quantity
+     * @throws Exception
+     *             Exception
+     */    
     def quantityToPower(self, quantity, exponent):
         amount = math.pow(quantity.amount, exponent)
         uom = MeasurementSystem.instance().createUnclassifiedPowerUOM(quantity.uom, exponent)

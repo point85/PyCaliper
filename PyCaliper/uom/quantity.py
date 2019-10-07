@@ -3,8 +3,19 @@ from builtins import staticmethod
 from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.localizer import Localizer
 
-
+##
+# The Quantity class represents an amount and {@link UnitOfMeasure}. A constant
+# quantity can be named and given a symbol, e.g. the speed of light.
+# 
 class Quantity(Symbolic):
+    ##
+    # Create a quantity with an amount and unit of measure
+    # 
+    # @param amount
+    #            Amount
+    # @param uom
+    #            {@link UnitOfMeasure}
+    #
     def __init__(self, amount, uom):
         super().__init__(None, None, None)
         
@@ -25,7 +36,15 @@ class Quantity(Symbolic):
         
     def __str__(self):
         return str(self.amount) + ", [" + str(self.uom) + "] " + super().__str__()
-   
+
+    ##
+    # Create an amount of a quantity that adheres to precision and rounding
+    # settings from a Number
+    # 
+    # @param number
+    #            Value
+    # @return Amount
+    #   
     @staticmethod
     def createAmountFromString(value):
         if (value is None):
@@ -33,27 +52,14 @@ class Quantity(Symbolic):
             raise Exception(msg) 
 
         return float(value)
-    """    
-    def fromPrefixedUnit(self, amount, prefix, unit):
-        uom = MeasurementSystem.instance().getUOM(prefix, unit)
-        self(amount, uom)
-    """
-    """    
-    def fromStringUOM(self, amount, uom):
-        value = Quantity.createAmountFromString(amount)
-        self(value, uom)
-    """
-    """    
-    def fromUnit(self, amount, unit): 
-        uom = MeasurementSystem.instance().getUOM(unit)
-        self(amount, uom)
-        
-    def fromStringUnit(self, strAmount, unit):
-        value = Quantity.createAmountFromString(strAmount)
-        uom = MeasurementSystem.instance().getUOM(unit)
-        self(value, uom)
-    """
-        
+
+    ##
+    # Convert this quantity to the target UOM
+    # 
+    # @param toUOM
+    #            {@link UnitOfMeasure}
+    # @return Converted quantity
+    #        
     def convert(self, toUOM):
         multiplier = self.uom.getConversionFactor(toUOM)
         thisOffset = self.uom.offset
@@ -70,25 +76,66 @@ class Quantity(Symbolic):
 
         # create the quantity now
         return Quantity(newAmount, toUOM)
-    
+
+    ##
+    # Convert this quantity with a product or quotient unit of measure to the
+    # specified units of measure.
+    # 
+    # @param uom1
+    #            Multiplier or dividend {@link UnitOfMeasure}
+    # @param uom2
+    #            Multiplicand or divisor {@link UnitOfMeasure}
+    # @return Converted quantity
+    #    
     def convertToPowerProduct(self, uom1, uom2):
         newUOM = self.uom.clonePowerProduct(uom1, uom2)
         return self.convert(newUOM)
-    
+
+    ##
+    # Convert this quantity of a power unit using the specified base unit of
+    # measure.
+    # 
+    # @param uom
+    #            Base {@link UnitOfMeasure}
+    # @return Converted quantity
+    #    
     def convertToPower(self, uom):
         newUOM = self.uom.clonePower(uom)
         return self.convert(newUOM)
-        
+
+    ##
+    # Subtract a quantity from this quantity
+    # 
+    # @param other
+    #            quantity
+    # @return New quantity
+    # @throws Exception
+    #             Exception
+    #        
     def subtract(self, other):
         toSubtract = other.convert(self.uom)
         amount = self.amount - toSubtract.amount
         return Quantity(amount, self.uom)
-    
+
+    ##
+    # Add two quantities
+    # 
+    # @param other
+    #            {@link Quantity}
+    # @return Sum {@link Quantity}
+    #    
     def add(self, other):
         toAdd = other.convert(self.uom)
         amount = self.amount + toAdd.amount
         return Quantity(amount, self.uom)
-    
+
+    ##
+    # Divide two quantities to create a third quantity
+    # 
+    # @param other
+    #            {@link Quantity}
+    # @return Quotient {@link Quantity}
+    #    
     def divide(self, other):
         if (other.amount == 0.0):
             msg = Localizer.instance().messageStr("divisor.cannot.be.zero")
@@ -97,23 +144,57 @@ class Quantity(Symbolic):
         amount = self.amount / other.amount
         newUOM = self.uom.divide(other.uom)
         return Quantity(amount, newUOM)
-    
+
+    ##
+    # Divide this quantity by the specified amount
+    # 
+    # @param divisor
+    #            Amount
+    # @return Quantity {@link Quantity}
+    #    
     def divideByAmount(self, divisor):
         return Quantity(self.amount / divisor, self.uom)
-    
+
+    ##
+    # Multiply this quantity by another quantity to create a third quantity
+    # 
+    # @param other
+    #            Quantity
+    # @return Multiplied quantity
+    #    
     def multiply(self, other):
         amount = self.amount * other.amount
         newUOM = self.uom.multiply(other.uom)
         return Quantity(amount, newUOM)
-    
+
+    ##
+    # Multiply this quantity by the specified amount
+    # 
+    # @param multiplier
+    #            Amount
+    # @return Quantity {@link Quantity}
+    #     
     def multiplyByAmount(self, multiplier):
         return Quantity(self.amount * multiplier, self.uom)
     
+    ##
+    # Invert this quantity, i.e. 1 divided by this quantity to create another
+    # quantity
+    # 
+    # @return {@link Quantity}
+    #    
     def invert(self):
         amount = 1.0 / self.amount
         uom = self.uom.invert()
         return Quantity(amount, uom)  
-    
+
+    ##
+    # Compare this quantity to the other quantity
+    # 
+    # @param other
+    #            Quantity
+    # @return -1 if less than, 0 if equal and 1 if greater than
+    #    
     def compare(self, other):
         toCompare = other
         
@@ -128,6 +209,11 @@ class Quantity(Symbolic):
         else:
             return 1
 
+    ##
+    # Find a matching unit type for the quantity's unit of measure.
+    # 
+    # @return {@link Quantity}
+    #
     def classify(self):
         self.uom.classify()
         return self    

@@ -1,6 +1,7 @@
 from PyCaliper.uom.enums import UnitType
 
-
+##
+# This class manages the various caches for units of measure to improve performance.
 class CacheManager:
     # single instance
     manager = None
@@ -19,24 +20,41 @@ class CacheManager:
             CacheManager()
         return CacheManager.manager 
     
+    ##
+    # Get the unit of measure with this unique symbol
+    # 
+    # @param symbol Symbol
+    # @return {@link UnitOfMeasure}
     def getUOMBySymbol(self, symbol):
         uom = None
         if (symbol in self.symbolRegistry):
             uom = self.symbolRegistry[symbol]
         return uom
-        
+    
+    ##
+    # Get the unit of measure with this Unit enumeration
+    # 
+    # @param unit {@link Unit}
+    # @return {@link UnitOfMeasure}    
     def getUOMByUnit(self, unit):
         uom = None
         if (unit in self.unitRegistry):
             uom = self.unitRegistry[unit]
         return uom
     
+    ##
+    # Get the unit of measure with this base symbol
+    # 
+    # @param baseSymbol Base symbol
+    # @return {@link UnitOfMeasure}
     def getBaseUOM(self, baseSymbol):
         uom = None
         if (baseSymbol in self.baseRegistry):
             uom = self.baseRegistry[baseSymbol]
         return uom
     
+    ##
+    # Remove all cached units of measure
     def clearCache(self):
         self.symbolRegistry.clear()
         self.baseRegistry.clear()
@@ -45,15 +63,31 @@ class CacheManager:
     def getCachedUOMs(self):
         return self.symbolRegistry.values()
     
+    ##
+    # Get the units of measure cached by their symbol
+    # 
+    # @return Symbol cache  
     def getSymbolCache(self):
         return self.symbolRegistry
-        
+
+    ##
+    # Get the units of measure cached by their base symbol
+    # 
+    # @return Base symbol cache       
     def getBaseSymbolCache(self):
         return self.baseRegistry
-    
+
+    ##
+    # Get the units of measure cached by their {@link Unit} enumeration
+    # 
+    # @return Enumeration cache    
     def getEnumerationCache(self):
         return self.unitRegistry  
-    
+
+    ##
+    # Remove a UOM from the cache
+    # 
+    # @param uom {@link UnitOfMeasure} to remove   
     def unregisterUOM(self, uom):
         if (uom is None):
             return
@@ -69,7 +103,11 @@ class CacheManager:
         key = uom.getBaseSymbol()
         if (key in self.baseRegistry):
             del self.baseRegistry[key]
-        
+
+    ##
+    # Cache this unit of measure
+    # 
+    # @param uom {@link UnitOfMeasure} to cache        
     def registerUOM(self, uom):
         if (uom is None):
             return
@@ -81,7 +119,6 @@ class CacheManager:
             # already cached
             return
 
-        #print("+++registering uom " + uom.symbol)
         # cache it by symbol
         self.symbolRegistry[uom.symbol] = uom
 
@@ -89,7 +126,7 @@ class CacheManager:
         if (uom.unit is not None):
             self.unitRegistry[uom.unit] = uom
 
-        # TODO finally cache by base symbol
+        # finally cache by base symbol
         key = uom.getBaseSymbol()
         
         if (key not in self.baseRegistry):

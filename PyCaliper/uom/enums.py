@@ -1,21 +1,18 @@
 from enum import Enum, auto
 
-
+##
+# An enumeration of the basic types of units of measure
+#
 class MeasurementType(Enum):
-    """
-    An enumeration of the basic types of units of measure
-    """
     SCALAR = auto() 
     PRODUCT = auto() 
     QUOTIENT = auto() 
     POWER = auto()
     
-    
+##
+#This enumeration contains the values for fundamental constants commonly used in science, technology, engineering and math.
+#   
 class Constant(Enum):
-    """
-    This enumeration contains the values for fundamental constants commonly used
-         in science, technology, engineering and math.
-    """
     LIGHT_VELOCITY = auto()
     LIGHT_YEAR = auto() 
     GRAVITY = auto() 
@@ -37,7 +34,9 @@ class Constant(Enum):
     def __str__(self):
         return self.name + ", " + str(self.value)
 
-
+##
+# An enumeration of the types of units of measure
+#
 class UnitType(Enum):
     # dimension-less "1"
     UNITY = auto()
@@ -98,12 +97,11 @@ class UnitType(Enum):
     # unclassified.  Reserved for use when creating custom units of measure.
     UNCLASSIFIED = auto()
 
-
+##
+# Unit is an enumeration of common units of measure in the International,
+# Customary, SI, US and British Imperial systems.
+#
 class Unit(Enum):
-    """
-    Unit is an enumeration of common units of measure in the International
-    Customary = auto() SI = auto() US and British Imperial systems.
-    """
     # dimension-less "1" or unity
     ONE = auto() 
     PERCENT = auto()
