@@ -1,5 +1,5 @@
 # PyCaliper
-The PyCaliper library project manages units of measure and conversions between them.  PyCaliper is designed to be lightweight and simple to use, yet comprehensive.  It includes a large number of pre-defined units of measure commonly found in science, engineering, technology, finance and the household.  These recognized systems of measurement include the International System of Units (SI), International Customary, United States and British Imperial.  Custom units of measure can also be created in the PyCaliper unified measurement system.  Custom units are specific to a trade or industry such as industrial packaging where units of can, bottle, case and pallet are typical.  Custom units can be added to the unified system for units that are not pre-defined.  The PyCaliper library is also available in java and C# at https://github.com/point85/Caliper and CaliperSharp.
+The PyCaliper library project manages units of measure and conversions between them.  PyCaliper is designed to be lightweight and simple to use, yet comprehensive.  It includes a large number of pre-defined units of measure commonly found in science, engineering, technology, finance and the household.  These recognized systems of measurement include the International System of Units (SI), International Customary, United States and British Imperial.  Custom units of measure can also be created in the PyCaliper unified measurement system.  Custom units are specific to a trade or industry such as industrial packaging where units of can, bottle, case and pallet are typical.  Custom units can be added to the unified system for units that are not pre-defined.  The PyCaliper library is also available in Java at https://github.com/point85/Caliper and in C# at https://github.com/point85/PyCaliperSharp.
 
 A PyCaliper measurement system is a collection of units of measure where each pair has a linear relationship, i.e. y = ax + b where 'x' is the abscissa unit to be converted, 'y' (the ordinate) is the converted unit, 'a' is the scaling factor and 'b' is the offset.  In the absence of a defined conversion, a unit will always have a conversion to itself.  A bridge unit conversion is defined to convert between the fundamental SI and International customary units of mass (i.e. kilogram to pound mass), length (i.e. metre to foot) and temperature (i.e. Kelvin to Rankine).  These three bridge conversions permit unit of measure conversions between the two systems.  A custom unit can define any bridge conversion such as a bottle to US fluid ounces or litres.
  
@@ -51,155 +51,154 @@ From the two power products, a unit of measure can then be recursively reduced t
 ## Code Examples
 The singleton unified MeasurementSystem is obtained by calling:
 ```java
-MeasurementSystem sys = MeasurementSystem.getSystem();
+msys = MeasurementSystem.instance()
 ```
-The Unit.properties file defines the name, symbol, description and UCUM symbol for each of the predefined units in the following code examples.  The Unit.properties file is localizable.  For example, 'metres' can be changed to use the US spelling 'meters' or descriptions can be translated to another language.
+
+The units.po file in the /locales/<locale>/LC_MESSAGES folder defines the name, symbol and description for each of the predefined units of measure.  The units.po file is localizable.  It is read by a Singleton instance of the Localizer class.For example, 'metres' can be changed to use the US spelling 'meters' or descriptions can be translated to another language by placing the corresponding .mo file in the appropriate locale folder.
 
 The metre scalar UOM is created by the MeasurementSystem as follows:
 ```java
-UnitOfMeasure uom = createScalarUOM(UnitType.LENGTH, Unit.METRE, symbols.getString("m.name"),
-	symbols.getString("m.symbol"), symbols.getString("m.desc"));
+uom = msys.createScalarUOM(UnitType.LENGTH, Unit.METRE, Localizer.instance().langStr("m.name"), Localizer.instance().langStr("m.symbol"),
+    Localizer.instance().langStr("m.desc"))
 ``` 
 
 The square metre power UOM is created by the MeasurementSystem as follows: 
 ```java
-UnitOfMeasure uom = createPowerUOM(UnitType.AREA, Unit.SQUARE_METRE, symbols.getString("m2.name"),
-	symbols.getString("m2.symbol"), symbols.getString("m2.desc"), getUOM(Unit.METRE), 2);
+uom = msys.createPowerUOM(UnitType.AREA, Unit.SQUARE_METRE, Localizer.instance().langStr("m2.name"),
+    Localizer.instance().langStr("m2.symbol"), Localizer.instance().langStr("m2.desc"), msys.getUOM(Unit.METRE), 2)
 ```
 
 The metre per second quotient UOM is created by the MeasurementSystem as follows: 
 ```java
-UnitOfMeasure uom = createQuotientUOM(UnitType.VELOCITY, Unit.METRE_PER_SEC, 
-	symbols.getString("mps.name"), symbols.getString("mps.symbol"), symbols.getString("mps.desc"),  
-	getUOM(Unit.METRE), getSecond());
+uom = msys.createQuotientUOM(UnitType.VELOCITY, Unit.METRE_PER_SEC, Localizer.instance().langStr("mps.name"),
+    Localizer.instance().langStr("mps.symbol"), Localizer.instance().langStr("mps.desc"), msys.getUOM(Unit.METRE), msys.getSecond())
 ```
 
 The Newton product UOM is created by the MeasurementSystem as follows: 
 ```java
-UnitOfMeasure uom = createProductUOM(UnitType.FORCE, Unit.NEWTON, symbols.getString("newton.name"),
-	symbols.getString("newton.symbol"), symbols.getString("newton.desc"),
-	getUOM(Unit.KILOGRAM), getUOM(Unit.METRE_PER_SECOND_SQUARED));
+uom = msys.createProductUOM(UnitType.FORCE, unit, Localizer.instance().langStr("newton.name"),
+    Localizer.instance().langStr("newton.symbol"), Localizer.instance().langStr("newton.desc"), msys.getUOM(Unit.KILOGRAM),
+    msys.getUOM(Unit.METRE_PER_SEC_SQUARED))
 ```
 
 A millisecond is 1/1000th of a second with a defined prefix and created as:
 
-```java
-UnitOfMeasure second = sys.getSecond();
-UnitOfMeasure msec = sys.getUOM(Prefix.MILLI, second);
+```java 
+msec = msys.createPrefixedUOM(Prefix.milli(), msys.getSecond())
 ```
 
 For a second example, a US gallon = 231 cubic inches:
 ```java			
-UnitOfMeasure uom = createScalarUOM(UnitType.VOLUME, Unit.US_GALLON, symbols.getString("us_gallon.name"),
-	symbols.getString("us_gallon.symbol"), symbols.getString("us_gallon.desc"));
-uom.setConversion(231d, getUOM(Unit.CUBIC_INCH));
+uom = msys.createScalarUOM(UnitType.VOLUME, Unit.US_GALLON,
+    Localizer.instance().langStr("us_gallon.name"), Localizer.instance().langStr("us_gallon.symbol"), Localizer.instance().langStr("us_gallon.desc"))
+    uom.setConversion(231.0, msys.getUOM(Unit.CUBIC_INCH), 0.0)
 ```
 
 When creating the foot unit of measure in the unified measurement system, a bridge conversion to metre is defined (1 foot = 0.3048m):
 ```java
-UnitOfMeasure uom = createScalarUOM(UnitType.LENGTH, Unit.FOOT, symbols.getString("foot.name"),
-	symbols.getString("foot.symbol"), symbols.getString("foot.desc"));
-
-// bridge to SI
-uom.setBridgeConversion(0.3048, getUOM(Unit.METRE), 0);
+uom = msys.createScalarUOM(UnitType.LENGTH, Unit.FOOT, Localizer.instance().langStr("foot.name"),
+    Localizer.instance().langStr("foot.symbol"), Localizer.instance().langStr("foot.desc"))
+    
+    # bridge to SI
+    uom.setBridgeConversion(0.3048, self.getUOM(Unit.METRE), 0.0)
 ```
 
-Custom units and conversions can also be created:
+Custom units of measure (with no pre-defined Unit) and conversions can also be created:
 ```java
-// gallons per hour
-UnitOfMeasure gph = sys.createQuotientUOM(UnitType.VOLUMETRIC_FLOW, "gph", "gal/hr", "gallons per hour", 
-	sys.getUOM(Unit.US_GALLON), sys.getHour());
+# gallons per hour
+gph = msys.createQuotientUOM(UnitType.VOLUMETRIC_FLOW, None, "gph", "gal/hr", "gallons per hour", 
+    msys.getUOM(Unit.US_GALLON), msys.getHour())
 
-// 1 16 oz can = 16 fl. oz.
-UnitOfMeasure one16ozCan = sys.createScalarUOM(UnitType.VOLUME, "16 oz can", "16ozCan", "16 oz can");
-one16ozCan.setConversion(16d, sys.getUOM(Unit.US_FLUID_OUNCE));
+# 1 16 oz can = 16 fl. oz.
+one16ozCan = msys.createScalarUOM(UnitType.VOLUME, None, "16 oz can", "16ozCan", "16 oz can")
+one16ozCan.setConversion(16.0, msys.getUOM(Unit.US_FLUID_OUNCE))
 
-// 400 cans = 50 US gallons
-Quantity q400 = new Quantity(400d, one16ozCan);
-Quantity q50 = q400.convert(sys.getUOM(Unit.US_GALLON));
+# 400 cans = 50 US gallons
+q400 = Quantity(400.0, one16ozCan)
+q50 = q400.convert(msys.getUOM(Unit.US_GALLON))
 
-// 1 12 oz can = 12 fl.oz.
-UnitOfMeasure one12ozCan = sys.createScalarUOM(UnitType.VOLUME, "12 oz can", "12ozCan", "12 oz can");
-one12ozCan.setConversion(12d, sys.getUOM(Unit.US_FLUID_OUNCE));
+# 1 12 oz can = 12 fl.oz.
+one12ozCan = msys.createScalarUOM(UnitType.VOLUME, None, "12 oz can", "12ozCan", "12 oz can")
+one12ozCan.setConversion(12.0, msys.getUOM(Unit.US_FLUID_OUNCE))
 
-// 48 12 oz cans = 36 16 oz cans
-Quantity q48 = new Quantity(48d, one12ozCan);
-Quantity q36 = q48.convert(one16ozCan);
+# 48 12 oz cans = 36 16 oz cans
+q48 = Quantity(48.0, one12ozCan)
+q36 = q48.convert(one16ozCan)
 
-// 6 12 oz cans = 1 6-pack of 12 oz cans
-UnitOfMeasure sixPackCan = sys.createScalarUOM(UnitType.VOLUME, "6-pack", "6PCan", "6-pack of 12 oz cans");
-sixPackCan.setConversion(6d, one12ozCan);	
+# 6 12 oz cans = 1 6-pack of 12 oz cans
+sixPackCan = msys.createScalarUOM(UnitType.VOLUME, None, "6-pack", "6PCan", "6-pack of 12 oz cans")
+sixPackCan.setConversion(6.0, one12ozCan)    
 
-// 1 case = 4 6-packs
-UnitOfMeasure fourPackCase = sys.createScalarUOM(UnitType.VOLUME, "6-pack case", "4PCase", "four 6-packs");
-fourPackCase.setConversion(4d, sixPackCan);
-		
-// A beer bottling line is rated at 2000 12 ounce cans/hour (US) at the
-// filler. The case packer packs four 6-packs of cans into a case.
-// Assuming no losses, what should be the rating of the case packer in
-// cases per hour? And, what is the draw-down rate on the holding tank
-// in gallons/minute?
-UnitOfMeasure canph = sys.createQuotientUOM(one12ozCan, sys.getHour());
-UnitOfMeasure caseph = sys.createQuotientUOM(fourPackCase, sys.getHour());
-UnitOfMeasure gpm = sys.createQuotientUOM(sys.getUOM(Unit.US_GALLON), sys.getMinute());
-		
-// filler production rate
-Quantity filler = new Quantity(2000d, canph);
+# 1 case = 4 6-packs
+fourPackCase = msys.createScalarUOM(UnitType.VOLUME, None, "6-pack case", "4PCase", "four 6-packs")
+fourPackCase.setConversion(4.0, sixPackCan)
+        
+# A beer bottling line is rated at 2000 12 ounce cans/hour (US) at the
+# filler. The case packer packs four 6-packs of cans into a case.
+# Assuming no losses, what should be the rating of the case packer in
+# cases per hour? And, what is the draw-down rate on the holding tank
+# in gallons/minute?
+canph = msys.createUnclassifiedQuotientUOM(one12ozCan, msys.getHour())
+caseph = msys.createUnclassifiedQuotientUOM(fourPackCase, msys.getHour())
+gpm = msys.createUnclassifiedQuotientUOM(msys.getUOM(Unit.US_GALLON), msys.getMinute())
+        
+# filler production rate
+filler = Quantity(2000.0, canph)
 
-// tank draw-down
-Quantity draw = filler.convert(gpm);
+# tank draw-down
+draw = filler.convert(gpm)
 
-// case packer production
-Quantity packer = filler.convert(caseph);
+# case packer production
+packer = filler.convert(caseph)
 ```
 
 Quantities can be added, subtracted and converted:
 ```java
-UnitOfMeasure m = sys.getUOM(Unit.METRE);
-UnitOfMeasure cm = sys.getUOM(Prefix.CENTI, m);
-		
-Quantity q1 = new Quantity(2d, m);
-Quantity q2 = new Quantity(2d, cm);
-		
-// add two quantities.  q3 is 2.02 metre
-Quantity q3 = q1.add(q2);
-		
-// q4 is 202 cm
-Quantity q4 = q3.convert(cm);
-		
-// subtract q1 from q3 to get 0.02 metre
-q3 = q3.subtract(q1);
+m = msys.getUOM(Unit.METRE)
+cm = msys.createPrefixedUOM(Prefix.centi(), m)
+        
+q1 = Quantity(2.0, m)
+q2 = Quantity(2.0, cm)
+        
+# add two quantities.  q3 is 2.02 metre
+q3 = q1.add(q2)
+        
+# q4 is 202 cm
+q4 = q3.convert(cm)
+        
+# subtract q1 from q3 to get 0.02 metre
+q3 = q3.subtract(q1)
 ```
 
 as well as multiplied and divided:
 ```java
-Quantity q1 = new Quantity(50d, cm);
-Quantity q2 = new Quantity(50d, cm);
-		
-// q3 = 2500 cm^2
-Quantity q3 = q1.multiply(q2);
-		
-// q4 = 50 cm
-Quantity q4 = q3.divide(q1);
+q1 = Quantity(50.0, cm)
+q2 = Quantity(50.0, cm)
+        
+# q3 = 2500 cm^2
+q3 = q1.multiply(q2)
+        
+# q4 = 50 cm
+q4 = q3.divide(q1)
 ```
 
 and inverted:
 ```java
-UnitOfMeasure mps = sys.getUOM(Unit.METRE_PER_SECOND); 
-Quantity q1 = new Quantity(10d, mps);
-		
-// q2 = 0.1 sec/m
-Quantity q2 = q1.invert();
+mps = msys.getUOM(Unit.METRE_PER_SEC) 
+q1 = Quantity(10.0, mps)
+        
+# q2 = 0.1 sec/m
+q2 = q1.invert()
 ```
 
-To make working with linearly scaled units of measure (with no offset) easier, the MeasurementSystem's getUOM() using a Prefix can be used.  This method accepts a Prefix enum and the unit of measure that it is scaled against.  The resulting unit of measure has a name concatented with the Prefix's name and target unit name.  The symbol is formed similarly.  For example, a centilitre (cL) is created from the pre-defined litre by:
+To make working with linearly scaled units of measure (with no offset) easier, the MeasurementSystem's createPrefixedUOMUOM() method that uses a Prefix can be used.  This method accepts a Prefix enum and the unit of measure that it is scaled against.  The resulting unit of measure has a name concatented with the Prefix's name and target unit name.  The symbol is formed similarly.  For example, a centilitre (cL) is created from the pre-defined litre by:
 ```java
-UnitOfMeasure litre = sys.getUOM(Unit.LITRE);
-UnitOfMeasure cL = sys.getUOM(Prefix.CENTI, litre);
+litre = msys.getUOM(Unit.LITRE)
+cL = msys.createPrefixedUOM(Prefix.centi(), litre)
 ```
 and, a megabyte (MB = 2^20 bytes) is created by:
 ```java
-UnitOfMeasure mB = sys.getUOM(Prefix.MEBI, Unit.BYTE);
+mB = msys.createPrefixedUOM(Prefix.mebi(), msys.getUOM(Unit.BYTE))
 ```
 
 *Implicit Conversions*
@@ -207,17 +206,17 @@ UnitOfMeasure mB = sys.getUOM(Prefix.MEBI, Unit.BYTE);
 A quantity can be converted to another unit of measure without requiring the target UOM to first be created.  If the quantity has a product or quotient UOM, use the convertToPowerProduct() method.  For example:
 
 ```java
-// convert 1 newton-metre to pound force-inches
-Quantity nmQ = new Quantity(1.0, sys.getUOM(Unit.NEWTON_METRE));
-Quantity lbfinQ = nmQ.convertToPowerProduct(sys.getUOM(Unit.POUND_FORCE), sys.getUOM(Unit.INCH));
+# convert 1 newton-metre to pound force-inches
+nmQ = Quantity(1.0, msys.getUOM(Unit.NEWTON_METRE))
+lbfinQ = nmQ.convertToPowerProduct(msys.getUOM(Unit.POUND_FORCE), msys.getUOM(Unit.INCH))
 ```
 
 If the quantity has power UOM, use the convertToPower() method.  For example:
 
 ```java
-// convert 1 square metre to square inches
-Quantity m2Q = new Quantity(1.0, sys.getUOM(Unit.SQUARE_METRE));
-Quantity in2Q = m2Q.convertToPower(sys.getUOM(Unit.INCH));
+# convert 1 square metre to square inches
+m2Q = Quantity(1.0, msys.getUOM(Unit.SQUARE_METRE))
+in2Q = m2Q.convertToPower(msys.getUOM(Unit.INCH))
 ```
 
 Other UOMs can be converted using the convert() method.
@@ -227,93 +226,98 @@ Other UOMs can be converted using the convert() method.
 During arithmetic operations, the final type of the unit may not be known.  In this case, invoking the classify() method will attempt to find a matching unit type.  For example, the calculated unit of measure below has a type of UnitType.ELECTRIC_CAPACITANCE:
 
 ```java
-UnitOfMeasure s = sys.getSecond();
-UnitOfMeasure m = sys.getUOM(Unit.METRE);
-UnitOfMeasure kg = sys.getUOM(Unit.KILOGRAM);
-UnitOfMeasure amp = sys.getUOM(Unit.AMPERE);
-		
-UnitOfMeasure cap = s.power(-3).multiply(amp.power(-2)).multiply(m.power(2)).divide(kg).classify();
+s = msys.getSecond()
+m = msys.getUOM(Unit.METRE)
+kg = msys.getUOM(Unit.KILOGRAM)
+amp = msys.getUOM(Unit.AMPERE)
+sm3 = msys.createUnclassifiedPowerUOM(s, -3)
+am2 = msys.createUnclassifiedPowerUOM(amp, -2)
+m2 = msys.createUnclassifiedPowerUOM(m, 2)
+        
+cap = sm3.multiply(am2).multiply(m2).divide(kg).classify()
 ```
 
 A quantity resulting from an arithmetic operation can also be classified.  For example, the "density" quantity has UnitType.DENSITY:
 
 ```java
-Quantity mass = new Quantity(1035, Unit.KILOGRAM);
-Quantity volume = new Quantity(1000, Unit.LITRE);
-Quantity density = mass.divide(volume).classify();
+mass = Quantity(1035, msys.getUOM(Unit.KILOGRAM))
+volume = Quantity(1000, msys.getUOM(Unit.LITRE))
+density = mass.divide(volume).classify()
 ```
 
 ## Physical Unit Examples
 
 Water boils at 100 degrees Celcius.  What is this temperature in Fahrenheit?
 ```java
-Quantity qC = new Quantity(100.0, Unit.CELSIUS);
-Quantity qF = qC.convert(Unit.FAHRENHEIT);
+qC = Quantity(100.0, msys.getUOM(Unit.CELSIUS))
+qF = qC.convert(msys.getUOM(Unit.FAHRENHEIT))
 ```
 
 A nutrition label states the energy content is 1718 KJ.  What is this amount in kilo-calories?
 ```java
-Quantity kcal = new Quantity(1718, Prefix.KILO, Unit.JOULE).convert(Prefix.KILO, Unit.CALORIE);
+kcal = msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.CALORIE)) 
+kJ =  msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.JOULE))
+qkcal = Quantity(1718, kJ).convert(kcal)
 ```
 
 One's Body Mass Index (BMI) can be calculated as:
 ```java
-Quantity height = new Quantity(2d, Unit.METRE);
-Quantity mass = new Quantity(100d, Unit.KILOGRAM);
-Quantity bmi = mass.divide(height.multiply(height));
+height = Quantity(2, msys.getUOM(Unit.METRE))
+mass = Quantity(100, msys.getUOM(Unit.KILOGRAM))
+bmi = mass.divide(height.multiply(height))
 ```
 
 Einstein's famous E = mc^2:
 ```java
-Quantity c = sys.getQuantity(Constant.LIGHT_VELOCITY);
-Quantity m = new Quantity(1.0, Unit.KILOGRAM);
-Quantity e = m.multiply(c).multiply(c);
+c = msys.getQuantity(Constant.LIGHT_VELOCITY)
+m = Quantity(1.0, msys.getUOM(Unit.KILOGRAM))
+e = m.multiply(c).multiply(c)
 ```
 
 ```java
 // A Tesla Model S battery has a capacity of 100 KwH.  
 // When fully charged, how many electrons are in the battery?
-Quantity c = sys.getQuantity(Constant.LIGHT_VELOCITY);
-Quantity me = sys.getQuantity(Constant.ELECTRON_MASS);	
-Quantity kwh = new Quantity(100, Prefix.KILO, Unit.WATT_HOUR);
-Quantity electrons = kwh.divide(c).divide(c).divide(me);
+c = msys.getQuantity(Constant.LIGHT_VELOCITY)
+me = msys.getQuantity(Constant.ELECTRON_MASS)    
+kwh = Quantity(100, msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.WATT_HOUR)))
+electrons = kwh.divide(c).divide(c).divide(me)
 ```
 
 Ideal Gas Law, PV = nRT.  A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 °C.  How many moles of argon are in the cylinder?
 ```java
-Quantity p = new Quantity(18.4, Unit.ATMOSPHERE).convert(Unit.PASCAL);
-Quantity v = new Quantity(50d, Unit.LITRE).convert(Unit.CUBIC_METRE);
-Quantity t = new Quantity(127d, Unit.CELSIUS).convert(Unit.KELVIN);
-Quantity n = p.multiply(v).divide(sys.getQuantity(Constant.GAS_CONSTANT).multiply(t));
+p = Quantity(18.4, msys.getUOM(Unit.ATMOSPHERE)).convert(msys.getUOM(Unit.PASCAL))
+v = Quantity(50, msys.getUOM(Unit.LITRE)).convert(msys.getUOM(Unit.CUBIC_METRE))
+t = Quantity(127, msys.getUOM(Unit.CELSIUS)).convert(msys.getUOM(Unit.KELVIN))
+n = p.multiply(v).divide(msys.getQuantity(Constant.GAS_CONSTANT).multiply(t))
 ```
 
 Photon energy using Planck's constant:
 ```java
-// energy of red light photon = Planck's constant times the frequency
-Quantity frequency = new Quantity(400d, sys.getUOM(Prefix.TERA, Unit.HERTZ));
-Quantity ev = sys.getQuantity(Constant.PLANCK_CONSTANT).multiply(frequency).convert(Unit.ELECTRON_VOLT);
+# energy of red light photon = Planck's constant times the frequency
+frequency = Quantity(400, msys.createPrefixedUOM(Prefix.tera(), msys.getUOM(Unit.HERTZ)))
+ev = msys.getQuantity(Constant.PLANCK_CONSTANT).multiply(frequency).convert(msys.getUOM(Unit.ELECTRON_VOLT))
 
-// and wavelength of red light in nanometres (approx 749.48)
-Quantity wavelength = sys.getQuantity(Constant.LIGHT_VELOCITY).divide(frequency).convert(sys.getUOM(Prefix.NANO, Unit.METRE));
+# and wavelength of red light in nanometres (approx 749.48)
+wavelength = msys.getQuantity(Constant.LIGHT_VELOCITY).divide(frequency).convert(msys.createPrefixedUOM(Prefix.nano(), msys.getUOM(Unit.METRE)))
 ```
 
 Newton's second law of motion (F = ma). Weight of 1 kg in lbf:
 ```java
-Quantity mkg = new Quantity(1d, Unit.KILOGRAM);
-Quantity f = mkg.multiply(sys.getQuantity(Constant.GRAVITY)).convert(Unit.POUND_FORCE);
+mkg = Quantity(1, msys.getUOM(Unit.KILOGRAM))
+f = mkg.multiply(msys.getQuantity(Constant.GRAVITY)).convert(msys.getUOM(Unit.POUND_FORCE))
 ```
 Units per volume of solution, C = A x (m/V)
 ```java
 // create the "A" unit of measure
-UnitOfMeasure activityUnit = sys.createQuotientUOM(UnitType.UNCLASSIFIED, "activity", "act",
-	"activity of material", sys.getUOM(Unit.UNIT), sys.getUOM(Prefix.MILLI, Unit.GRAM));
+activityUnit = sys.createQuotientUOM(UnitType.UNCLASSIFIED, "activity", "act",
+	"activity of material", sys.getUOM(Unit.UNIT), sys.getUOM(Prefix.MILLI, Unit.GRAM))
 
 // calculate concentration
-Quantity activity = new Quantity(1d, activityUnit);
-Quantity grams = new Quantity(1d, Unit.GRAM).convert(Prefix.MILLI, Unit.GRAM);
-Quantity volume = new Quantity(1d, sys.getUOM(Prefix.MILLI, Unit.LITRE));
-Quantity concentration = activity.multiply(grams.divide(volume));
-Quantity katals = concentration.multiply(new Quantity(1d, Unit.LITRE)).convert(Unit.KATAL);
+Quantity activity = new Quantity(1d, activityUnit)
+Quantity grams = new Quantity(1d, Unit.GRAM).convert(Prefix.MILLI, Unit.GRAM)
+Quantity volume = new Quantity(1d, sys.getUOM(Prefix.MILLI, Unit.LITRE))
+Quantity concentration = activity.multiply(grams.divide(volume))
+Quantity katals = concentration.multiply(new Quantity(1d, Unit.LITRE)).convert(Unit.KATAL)
 ```
 Black body radiation:
 
@@ -322,17 +326,17 @@ Black body radiation:
 // of the surface of a black body is directly proportional to the fourth
 // power of its absolute temperature: sigma * T^4
 // calculate at 1000 Kelvin
-Quantity temp = new Quantity(1000.0, Unit.KELVIN);
-Quantity intensity = sys.getQuantity(Constant.STEFAN_BOLTZMANN).multiply(temp.power(4));
+Quantity temp = new Quantity(1000.0, Unit.KELVIN)
+Quantity intensity = sys.getQuantity(Constant.STEFAN_BOLTZMANN).multiply(temp.power(4))
 ```
 
 Expansion of the universe:
 
 ```java
 // Hubble's law, v = H0 x D. Let D = 10 Mpc
-Quantity d = new Quantity(10d, sys.getUOM(Prefix.MEGA, sys.getUOM(Unit.PARSEC)));
-Quantity h0 = sys.getQuantity(Constant.HUBBLE_CONSTANT);
-Quantity velocity = h0.multiply(d);
+Quantity d = new Quantity(10d, sys.getUOM(Prefix.MEGA, sys.getUOM(Unit.PARSEC)))
+Quantity h0 = sys.getQuantity(Constant.HUBBLE_CONSTANT)
+Quantity velocity = h0.multiply(d)
 ```
 
 Device Characteristic Life
@@ -344,22 +348,22 @@ Device Characteristic Life
 // 85 degrees Celsius.
 
 // Convert the Boltzman constant from J/K to eV/K for the Arrhenius equation
-Quantity j = new Quantity(1d, Unit.JOULE);
-Quantity eV = j.convert(Unit.ELECTRON_VOLT);
+Quantity j = new Quantity(1d, Unit.JOULE)
+Quantity eV = j.convert(Unit.ELECTRON_VOLT)
 // Boltzmann constant
-Quantity Kb = sys.getQuantity(Constant.BOLTZMANN_CONSTANT).multiply(eV.getAmount());
+Quantity Kb = sys.getQuantity(Constant.BOLTZMANN_CONSTANT).multiply(eV.getAmount())
 // accelerated temperature
-Quantity Ta = new Quantity(150d, Unit.CELSIUS);
+Quantity Ta = new Quantity(150d, Unit.CELSIUS)
 // expected use temperature
-Quantity Tu = new Quantity(85d, Unit.CELSIUS);
+Quantity Tu = new Quantity(85d, Unit.CELSIUS)
 // calculate the acceleration factor
-Quantity factor1 = Tu.convert(Unit.KELVIN).invert().subtract(Ta.convert(Unit.KELVIN).invert());
-Quantity factor2 = Kb.invert().multiply(0.5);
-Quantity factor3 = factor1.multiply(factor2);
-double AF = Math.exp(factor3.getAmount());
+Quantity factor1 = Tu.convert(Unit.KELVIN).invert().subtract(Ta.convert(Unit.KELVIN).invert())
+Quantity factor2 = Kb.invert().multiply(0.5)
+Quantity factor3 = factor1.multiply(factor2)
+double AF = Math.exp(factor3.getAmount())
 // calculate longer life at expected use temperature
-Quantity life85 = new Quantity(2750d, Unit.HOUR);
-Quantity life150 = life85.multiply(AF);
+Quantity life85 = new Quantity(2750d, Unit.HOUR)
+Quantity life150 = life85.multiply(AF)
 ```
 
 ## Financial Examples
@@ -370,55 +374,55 @@ Value of a stock portfolio:
 // John has 100 shares of Alphabet Class A stock. How much is his
 // portfolio worth in euros when the last trade was $838.96 and a US
 // dollar is worth 0.94 euros?
-UnitOfMeasure euro = sys.getUOM(Unit.EURO);
-UnitOfMeasure usd = sys.getUOM(Unit.US_DOLLAR);
-usd.setConversion(0.94, euro);
+euro = sys.getUOM(Unit.EURO)
+usd = sys.getUOM(Unit.US_DOLLAR)
+usd.setConversion(0.94, euro)
 
-UnitOfMeasure googl = sys.createScalarUOM(UnitType.CURRENCY, "Alphabet A", "GOOGL",
-	"Alphabet (formerly Google) Class A shares");
-googl.setConversion(838.96, usd);
-Quantity portfolio = new Quantity(100, googl);
-Quantity value = portfolio.convert(euro);
+googl = sys.createScalarUOM(UnitType.CURRENCY, "Alphabet A", "GOOGL",
+	"Alphabet (formerly Google) Class A shares")
+googl.setConversion(838.96, usd)
+Quantity portfolio = new Quantity(100, googl)
+Quantity value = portfolio.convert(euro)
 ```
 
 ## Medical Examples
 
 ```java
 // convert Unit to nanokatal
-UnitOfMeasure u = sys.getUOM(Unit.UNIT);
-UnitOfMeasure katal = sys.getUOM(Unit.KATAL);
-Quantity q1 = new Quantity(1.0, u);
-Quantity q2 = q1.convert(sys.getUOM(Prefix.NANO, katal));
+u = sys.getUOM(Unit.UNIT)
+katal = sys.getUOM(Unit.KATAL)
+Quantity q1 = new Quantity(1.0, u)
+Quantity q2 = q1.convert(sys.getUOM(Prefix.NANO, katal))
 
 // test result Equivalent
-UnitOfMeasure eq = sys.getUOM(Unit.EQUIVALENT);
-UnitOfMeasure litre = sys.getUOM(Unit.LITRE);
-UnitOfMeasure mEqPerL = sys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, "milliNormal", "mEq/L",
-	"solute per litre of solvent ", sys.getUOM(Prefix.MILLI, eq), litre);
-Quantity testResult = new Quantity(5.0, mEqPerL);
+eq = sys.getUOM(Unit.EQUIVALENT)
+litre = sys.getUOM(Unit.LITRE)
+mEqPerL = sys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, "milliNormal", "mEq/L",
+	"solute per litre of solvent ", sys.getUOM(Prefix.MILLI, eq), litre)
+Quantity testResult = new Quantity(5.0, mEqPerL)
 
 // blood cell count test results
-UnitOfMeasure k = sys.getUOM(Prefix.KILO, sys.getOne());
-UnitOfMeasure uL = sys.getUOM(Prefix.MICRO, Unit.LITRE);
-UnitOfMeasure kul = sys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, "K/uL", "K/uL",
-	"thousands per microlitre", k, uL);
-testResult = new Quantity(7.0, kul);
+k = sys.getUOM(Prefix.KILO, sys.getOne())
+uL = sys.getUOM(Prefix.MICRO, Unit.LITRE)
+kul = sys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, "K/uL", "K/uL",
+	"thousands per microlitre", k, uL)
+testResult = new Quantity(7.0, kul)
 
-UnitOfMeasure fL = sys.getUOM(Prefix.FEMTO, Unit.LITRE);
-testResult = new Quantity(90d, fL);
+fL = sys.getUOM(Prefix.FEMTO, Unit.LITRE)
+testResult = new Quantity(90d, fL)
 
 // TSH test result
-UnitOfMeasure uIU = sys.getUOM(Prefix.MICRO, Unit.INTERNATIONAL_UNIT);
-UnitOfMeasure mL = sys.getUOM(Prefix.MILLI, Unit.LITRE);
-UnitOfMeasure uiuPerml = sys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, "uIU/mL", "uIU/mL",
-	"micro IU per millilitre", uIU, mL);
-testResult = new Quantity(2.0, uiuPerml);
+uIU = sys.getUOM(Prefix.MICRO, Unit.INTERNATIONAL_UNIT)
+mL = sys.getUOM(Prefix.MILLI, Unit.LITRE)
+uiuPerml = sys.createQuotientUOM(UnitType.MOLAR_CONCENTRATION, "uIU/mL", "uIU/mL",
+	"micro IU per millilitre", uIU, mL)
+testResult = new Quantity(2.0, uiuPerml)
 ```
 
 ### Caching
 A unit of measure once created is registered in two hashmaps, one by its base symbol key and the second one by its enumeration key.  Caching greatly increases performance since the unit of measure is created only once.  Methods are provided to clear the cache of all instances as well as to unregister a particular instance.
 
-The double value of a unit of measure conversion is also cached.  This performance optimization eliminates the need to calculate the conversion multiple times if many quantities are being converted at once; for example, operations upon a vector or matrix of quantities all with the same unit of measure.
+The double value of a unit of measure conversion is also cached.  This performance optimization eliminates the need to calculate the conversion multiple times if many quantities are being converted at once for example, operations upon a vector or matrix of quantities all with the same unit of measure.
 
 ## Localization
 All externally visible text is defined in two resource bundle .properties files.  The Unit.properties file has the name (.name), symbol (.symbol) and description (.desc) for a unit of measure as well as toString() method text.  The Message.properties file has the text for an exception.  A default English file for each is included in the project.  The files can be translated to another language by following the Java locale naming conventions for the properties file, or the English version can be edited, e.g. to change "metre" to "meter".  For example, a metre's text is:
@@ -458,7 +462,7 @@ The screen capture below shows the unit of measure editor:
 To create a unit of measure, click the "New" button and follow these steps:
 *  Enter a name, symbol, category (or choose one already defined) and description.
 *  Choose the type from the drop-down.  For custom units, choose "UNCLASSIFIED".  Only units of the same type can be converted.
-*  If the unit of measure is related to another unit of measure via a conversion, enter the scaling factor (a), abscissa (x) and offset (b).  A prefix (e.g. kilo) may be chosen for the scaling factor.  The conversion will default to the unit of measure itself.
+*  If the unit of measure is related to another unit of measure via a conversion, enter the scaling factor (a), abscissa (x) and offset (b).  A prefix (e.g. kilo) may be chosen for the scaling factor.  The conversion will default to the unit of measure itmsys.
 *  For a simple scalar unit, no additional properties are required.
 *  For a product or quotient unit of measure, the multiplier/multiplicand or dividend/divisor properties must be entered.  First select the respective unit type (e.g. VOLUME) then the unit of measure.  Click the respective radio button to indicate whether this is product or quotient.
 *  For a power unit, the base unit of measure and exponent must be entered.  First select the unit type, then the base unit of measure.  Enter the exponent.
