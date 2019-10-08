@@ -1,6 +1,9 @@
 import locale
 import gettext
 
+##
+# The Localizer class provides localization services for unit of measure names, symbols and descriptions as well as error messages.
+#
 class Localizer:  
     # root folder 
     localePath = "locales"
@@ -25,7 +28,12 @@ class Localizer:
         thisLocale = locale.getdefaultlocale("LANGUAGE")
         langCC = thisLocale[0]
         return langCC
-        
+    
+    ##
+    # Get the translated error message text for the default locale and country code 
+    # 
+    # @param msgId Message identifier
+    # @return translated text    
     def messageStr(self, msgId):
         if (self.messages is None):
             # translated text with error messages for this locale and country code
@@ -35,6 +43,11 @@ class Localizer:
         # Get an error message by its id
         return self.messages.gettext(msgId)
     
+    ##
+    # Get the translated user-visible text for the default locale and country code 
+    # 
+    # @param msgId Message identifier
+    # @return translated text  
     def langStr(self, msgId):        
         if (self.units is None):
             # translated user-visible text for this locale  and country code

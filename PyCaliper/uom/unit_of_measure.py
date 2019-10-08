@@ -8,7 +8,8 @@ from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.enums import Unit
 
 ##
-# Reduce a unit of measure to its most basic scalar units of measure.
+# This class reduces a unit of measure to its most basic scalar units of measure.
+#
 class Reducer:
     # operators    
     MULT = '\xB7'
@@ -185,7 +186,8 @@ class Reducer:
         return str(self.mapScalingFactor) + str(self.terms)
     
 ##
-# UOM, scaling factor and power cumulative along a conversion path
+# This class holds the unit of measure and cumulative scaling factor along a conversion path
+#
 class PathParameters:
     # UOM, scaling factor and power cumulative along a conversion path
     def __init__(self, pathUOM, pathFactor):
@@ -193,6 +195,7 @@ class PathParameters:
         self.pathFactor = pathFactor
 
 ##
+# The UnitOfMeasure class represents a unit of measure.
 # <p>
 # A UnitOfMeasure can have a linear conversion (y = ax + b) to another unit of
 # measure in the same internationally recognized measurement system of

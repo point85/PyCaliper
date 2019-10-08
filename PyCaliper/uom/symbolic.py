@@ -2,7 +2,7 @@ from abc import ABC
 
 ##
 # This class represents an object that is identified by a name and symbol with
-# an optional description. Units of measure are such objects.
+# a description. Units of measure are such objects.
 #
 class Symbolic(ABC):
     def __init__(self, name, symbol, description):

@@ -2,6 +2,7 @@ from PyCaliper.uom.enums import UnitType
 
 ##
 # This class manages the various caches for units of measure to improve performance.
+#
 class CacheManager:
     # single instance
     manager = None

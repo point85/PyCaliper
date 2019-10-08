@@ -1439,7 +1439,7 @@ class MeasurementSystem:
             description = str(prefix.factor) + " " + uom.name
 
             # scaling factor
-            scalingFactor = uom.scalingFactor# prefix.factor
+            scalingFactor = uom.scalingFactor * prefix.factor
 
             # create the unit of measure and set conversion
             scaled = self.createScalarUOM(uom.unitType, None, name, symbol, description)

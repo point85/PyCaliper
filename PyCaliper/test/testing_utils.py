@@ -2,6 +2,7 @@ from PyCaliper.uom.cache_manager import CacheManager
 from builtins import staticmethod
 
 class TestingUtils():
+    # deltas for almost equal check on floating point numbers
     DELTA6 = 0.000001
     DELTA5 = 0.00001
     DELTA4 = 0.0001

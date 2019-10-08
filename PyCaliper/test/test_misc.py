@@ -5,7 +5,7 @@ from PyCaliper.uom.enums import Unit
 from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.enums import Constant
 from PyCaliper.uom.quantity import Quantity
-from PyCaliper.test.test_utils import TestingUtils
+from PyCaliper.test.testing_utils import TestingUtils
 
 
 class TestFinancial(unittest.TestCase): 

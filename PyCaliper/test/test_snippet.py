@@ -9,5 +9,11 @@ from PyCaliper.uom.prefix import Prefix
 
 class TestSnippet(unittest.TestCase):
     def testOne(self):
-        pass
+        msys = MeasurementSystem.instance()
+
+        second = msys.getSecond()
+        msec = msys.createPrefixedUOM(Prefix.milli(), second)
+
+        factor = second.getConversionFactor(msec)
+        self.assertAlmostEqual(factor, 1000.0, None, None, TestingUtils.DELTA6)
         

@@ -4,7 +4,7 @@ from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.localizer import Localizer
 
 ##
-# The Quantity class represents an amount and {@link UnitOfMeasure}. A constant
+# The Quantity class represents an amount and UnitOfMeasure. A constant
 # quantity can be named and given a symbol, e.g. the speed of light.
 # 
 class Quantity(Symbolic):
