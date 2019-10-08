@@ -1460,47 +1460,39 @@ class MeasurementSystem:
         uom = MeasurementSystem.instance().getUOM(unit)
         return Quantity(amount, uom)
 
-    /**
-     * Convert this quantity to the target unit
-     * 
-     * @param quantity
-     *            {@link Quantity}
-     * @param unit
-     *            {@link Unit}
-     * @return {@link Quantity}
-     * @throws Exception
-     *             Exception
-     */    
+    ##
+    # Convert this quantity to the target unit
+    # 
+    # @param quantity
+    #            {@link Quantity}
+    # @param unit
+    #            {@link Unit}
+    # @return {@link Quantity}   
     def convertQuantityToUnit(self, quantity, unit):
         return quantity.convert(MeasurementSystem.instance().getUOM(unit))
     
-    /**
-     * Convert this quantity to the target unit with the specified prefix
-     * 
-     * @param quantity
-     *            {@link Quantity}
-     * @param prefix
-     *            {@link Prefix}
-     * @param unit
-     *            {@link Unit}
-     * @return {@link Quantity}
-     * @throws Exception
-     *             Exception
-     */    
+    ##
+    # Convert this quantity to the target unit with the specified prefix
+    # 
+    # @param quantity
+    #            {@link Quantity}
+    # @param prefix
+    #            {@link Prefix}
+    # @param unit
+    #            {@link Unit}
+    # @return {@link Quantity}  
     def convertQuantityToPrefixUnit(self, quantity, prefix, unit):
         return quantity.convert(MeasurementSystem.instance().createPrefixedUOM(prefix, unit))
 
-    /**
-     * Raise this quantity to the specified power
-     * 
-     * @param quantity
-     *            Quantity
-     * @param exponent
-     *            Exponent
-     * @return new Quantity
-     * @throws Exception
-     *             Exception
-     */    
+    ##
+    # Raise this quantity to the specified power
+    # 
+    # @param quantity
+    #            Quantity
+    # @param exponent
+    #            Exponent
+    # @return new Quantity
+    #    
     def quantityToPower(self, quantity, exponent):
         amount = math.pow(quantity.amount, exponent)
         uom = MeasurementSystem.instance().createUnclassifiedPowerUOM(quantity.uom, exponent)

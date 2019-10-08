@@ -7,7 +7,8 @@ from PyCaliper.uom.localizer import Localizer
 from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.enums import Unit
 
-
+##
+# Reduce a unit of measure to its most basic scalar units of measure.
 class Reducer:
     # operators    
     MULT = '\xB7'
@@ -183,14 +184,59 @@ class Reducer:
     def __str__(self):
         return str(self.mapScalingFactor) + str(self.terms)
     
-
+##
+# UOM, scaling factor and power cumulative along a conversion path
 class PathParameters:
     # UOM, scaling factor and power cumulative along a conversion path
     def __init__(self, pathUOM, pathFactor):
         self.pathUOM = pathUOM
         self.pathFactor = pathFactor
 
-          
+##
+# <p>
+# A UnitOfMeasure can have a linear conversion (y = ax + b) to another unit of
+# measure in the same internationally recognized measurement system of
+# International Customary, SI, US or British Imperial. Or, the unit of measure
+# can have a conversion to another custom unit of measure. It is owned by the
+# unified {@link MeasurementSystem} defined by this project.
+# </p>
+# 
+# <p>
+# A unit of measure is categorized by scalar (simple unit), quotient (divisor
+# and dividend units), product (multiplier and multiplicand units) or power
+# (unit with an integral exponent). More than one representation of a unit of
+# measure is possible. For example, a unit of "per second" could be a quotient
+# of "1/s" (e.g. an inverted second) or a power of s^-1.
+# </p>
+# 
+# <p>
+# A unit of measure also has an enumerated {@link UnitType} (for example LENGTH
+# or MASS) and a unique {@link Unit} discriminator (for example METRE). <br>
+# A basic unit (a.k.a fundamental unit in the SI system) can have a bridge
+# conversion to another basic unit in another recognized measurement system.
+# This conversion is defined unidirectionally. For example, an International
+# Customary foot is 0.3048 SI metres. The conversion from metre to foot is just
+# the inverse of this relationship.
+# </p>
+# 
+# <p>
+# A unit of measure has a base symbol, for example 'm' for metre. A base symbol
+# is one that consists only of the symbols for the base units of measure. In
+# the SI system, the base units are well-defined. The derived units such as
+# Newton all have base symbols expressed in the fundamental units of length
+# (metre), mass (kilogram), time (second), temperature (Kelvin), plane angle
+# (radian), electric charge (Coulomb) and luminous intensity (candela). In the
+# US and British systems, base units are not defined. Caliper uses foot for
+# length, pound mass for mass and Rankine for temperature. This base symbol is
+# used in unit of measure conversions to uniquely identify the target unit.
+# </p>
+# <p>
+# The SI system has defined prefixes (e.g. "centi") for 1/100th of another unit
+# (e.g. metre). Instead of defining all the possible unit of measure
+# combinations, the {@link MeasurementSystem} is able to create units by
+# specifying the {@link Prefix} and target unit of measure. Similarly, computer
+# science has defined prefixes for bytes (e.g. "mega").
+#        
 class UnitOfMeasure(Symbolic):  
     MAX_SYMBOL_LENGTH = 16
              
@@ -213,7 +259,13 @@ class UnitOfMeasure(Symbolic):
         self.bridgeAbscissaUnit = None
         self.unitType = unitType
         self.baseSymbol = None
-        
+
+    ##
+    # Check to see if the exponent is valid
+    # 
+    # @param exponent
+    #            Power exponent
+    # @return True if it is a valid exponent  
     @staticmethod
     def isValidExponent(exponent):
         return False if exponent is None else True
@@ -290,7 +342,14 @@ class UnitOfMeasure(Symbolic):
         self.exponent1 = exponent1
         self.uom2 = uom2
         self.exponent2 = exponent2
-        
+     
+    ##
+    # Set the multiplier and multiplicand
+    # 
+    # @param multiplier
+    #            Multiplier
+    # @param multiplicand
+    #            Multiplicand  
     def setProductUnits(self, multiplier, multiplicand):
         if (multiplier is None):
             msg = Localizer.instance().messageStr("multiplier.cannot.be.null").format(self.symbol)
@@ -301,7 +360,14 @@ class UnitOfMeasure(Symbolic):
             raise Exception(msg)            
 
         self.setPowerProduct(multiplier, 1, multiplicand, 1)
-        
+
+    ##
+    # Set the dividend and divisor
+    # 
+    # @param dividend
+    #            Dividend
+    # @param divisor
+    #            Divisor  
     def setQuotientUnits(self, dividend, divisor):
         if (dividend is None):
             msg = Localizer.instance().messageStr("dividend.cannot.be.null").format(self.symbol)
@@ -312,7 +378,11 @@ class UnitOfMeasure(Symbolic):
             raise Exception(msg)
 
         self.setPowerProduct(dividend, 1, divisor, -1)
-        
+
+    ##
+    # Get the measurement type
+    # 
+    # @return {@link MeasurementType} 
     def getMeasurementType(self):
         measurementType = MeasurementType.SCALAR
         
@@ -329,10 +399,19 @@ class UnitOfMeasure(Symbolic):
         reducer = Reducer()
         reducer.explode(self)
         return reducer
-    
+
+    ##
+    # Get the most reduced units of measure
+    # 
+    # @return Map of {@link UnitOfMeasure} and exponent
     def getBaseUnitsOfMeasure(self):
         return self.getReducer().terms
-    
+
+    ##
+    # Check to see if this unit of measure has a conversion to another unit of
+    # measure other than itself.
+    # 
+    # @return True if it does not
     def isTerminal(self):
         return True if self == self.abscissaUnit else False
     
@@ -341,6 +420,16 @@ class UnitOfMeasure(Symbolic):
         self.bridgeAbscissaUnit = abscissaUnit
         self.bridgeOffset = offset
 
+    ##
+    # Define a conversion with the specified scaling factor, abscissa unit of
+    # measure and scaling factor.
+    # 
+    # @param scalingFactor
+    #            Factor
+    # @param abscissaUnit
+    #            {@link UnitOfMeasure}
+    # @param offset
+    #            Offset
     def setConversion(self, scalingFactor, abscissaUnit, offset=0.0):
         if (abscissaUnit is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
@@ -362,22 +451,50 @@ class UnitOfMeasure(Symbolic):
 
         # re-cache
         CacheManager.instance().registerUOM(self)
-        
+
+    ##
+    # Get the exponent of a power unit
+    # 
+    # @return Exponent
     def getPowerExponent(self):
         return self.exponent1
-    
+
+    ##
+    # Get the dividend unit of measure
+    # 
+    # @return {@link UnitOfMeasure}
     def getDividend(self):
         return self.uom1
     
+    ##
+    # Get the divisor unit of measure
+    # 
+    # @return {@link UnitOfMeasure}
     def getDivisor(self):
         return self.uom2 
-    
+
+    ##
+    # Get the multiplier
+    # 
+    # @return {@link UnitOfMeasure}
     def getMultiplier(self):
         return self.uom1 
     
+    ##
+    # Get the multiplicand
+    # 
+    # @return {@link UnitOfMeasure}
     def getMultiplicand(self):
         return self.uom2 
-    
+
+    ##
+    # Set the base unit of measure and exponent
+    # 
+    # @param base
+    #            Base unit of measure
+    # @param exponent
+    #            Exponent
+    #
     def setPowerUnit(self, base, exponent):
         if (base is None):
             msg = Localizer.instance().messageStr("base.cannot.be.null").format(self.symbol)
@@ -391,6 +508,9 @@ class UnitOfMeasure(Symbolic):
     
     @staticmethod    
     def generateIntermediateSymbol():
+        # generate a symbol for units of measure created as the result of
+        # intermediate multiplication and division operations. These symbols are
+        # not cached.
         ns = str(time.time_ns())
         return ns[:UnitOfMeasure.MAX_SYMBOL_LENGTH]
 
@@ -434,6 +554,12 @@ class UnitOfMeasure(Symbolic):
 
         return newUOM
    
+    ##
+    # If the unit of measure is unclassified, from its base unit map find a
+    # matching unit type.
+    # 
+    # @return {@link UnitOfMeasure}
+    #
     def classify(self):        
         if (self.unitType is not None and self.unitType != UnitType.UNCLASSIFIED):
             # already classified
@@ -484,7 +610,13 @@ class UnitOfMeasure(Symbolic):
         if (thisType != UnitType.UNCLASSIFIED and targetType != UnitType.UNCLASSIFIED and thisType != UnitType.UNITY and targetType != UnitType.UNITY and thisType != targetType):
             msg = Localizer.instance().messageStr("must.be.same.as").format(uom1, thisType, uom2, targetType)
             raise Exception(msg)
-    
+
+    ##
+    # Get the unit of measure symbol in the fundamental units for that system.
+    # For example a Newton is a kg.m/s2.
+    # 
+    # @return Base symbol
+    #
     def getBaseSymbol(self):
         if (self.baseSymbol is None):
             powerMap = self.getReducer()
@@ -657,7 +789,13 @@ class UnitOfMeasure(Symbolic):
                     factor = 1.0 / uom.bridgeScalingFactor
         
         return factor
-    
+    ##
+    # Divide two units of measure to create a third one.
+    # 
+    # @param divisor
+    #            {@link UnitOfMeasure}
+    # @return {@link UnitOfMeasure}
+    #
     def divide(self, divisor):
         return self.multiplyOrDivide(divisor, True)
     
@@ -686,7 +824,14 @@ class UnitOfMeasure(Symbolic):
         scalingFactor = thisPathFactor / targetPathFactor
 
         return scalingFactor
-    
+
+    ##
+    # Get the factor to convert to the unit of measure
+    # 
+    # @param targetUOM
+    #            Target {@link UnitOfMeasure}
+    # @return conversion factor
+    #
     def getConversionFactor(self, targetUOM):
         if (targetUOM is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
@@ -748,9 +893,18 @@ class UnitOfMeasure(Symbolic):
 
         return cachedFactor
     
+    ##
+    # Get the base unit of measure for the power
+    # 
+    # @return {@link UnitOfMeasure}
     def getPowerBase(self):
         return self.uom1
 
+    ##
+    # Invert a unit of measure to create a new one
+    # 
+    # @return {@link UnitOfMeasure}
+    #
     def invert(self):
         inverted = None
 
@@ -760,6 +914,13 @@ class UnitOfMeasure(Symbolic):
             inverted = CacheManager.instance().getUOMByUnit(Unit.ONE).divide(self)
 
         return inverted
-    
+
+    ##
+    # Multiply two units of measure to create a third one.
+    # 
+    # @param multiplicand
+    #            {@link UnitOfMeasure}
+    # @return {@link UnitOfMeasure}
+    #
     def multiply(self, multiplicand):
         return self.multiplyOrDivide(multiplicand, False)

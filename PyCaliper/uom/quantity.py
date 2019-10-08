@@ -109,8 +109,6 @@ class Quantity(Symbolic):
     # @param other
     #            quantity
     # @return New quantity
-    # @throws Exception
-    #             Exception
     #        
     def subtract(self, other):
         toSubtract = other.convert(self.uom)
