@@ -950,7 +950,7 @@ class MeasurementSystem:
         elif (constant == Constant.MAGNETIC_PERMEABILITY):
             # mu0
             hm = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.HENRY), self.getUOM(Unit.METRE))
-            fourPi = 4.0# math.pi# 1.0E-07
+            fourPi = 4.0 * math.pi * 1.0E-07
             named = Quantity(fourPi, hm)
             named.name = Localizer.instance().langStr("mu0.name")
             named.symbol = Localizer.instance().langStr("mu0.symbol")
@@ -1145,7 +1145,7 @@ class MeasurementSystem:
     # @return List of {@link UnitOfMeasure}
     def getRegisteredUOMs(self):
         units = CacheManager.instance().getCachedUOMs()
-        return sorted(units, key = MeasurementSystem.getUOMKey)
+        return sorted(units, key=MeasurementSystem.getUOMKey)
 
     ##
     # Get all the units of measure of the specified type

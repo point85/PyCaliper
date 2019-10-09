@@ -1,5 +1,5 @@
 # PyCaliper
-The PyCaliper library project manages units of measure and conversions between them.  PyCaliper is designed to be lightweight and simple to use, yet comprehensive.  It includes a large number of pre-defined units of measure commonly found in science, engineering, technology, finance and the household.  These recognized systems of measurement include the International System of Units (SI), International Customary, United States and British Imperial.  Custom units of measure can also be created in the PyCaliper unified measurement system.  Custom units are specific to a trade or industry such as industrial packaging where units of can, bottle, case and pallet are typical.  Custom units can be added to the unified system for units that are not pre-defined.  The PyCaliper library is also available in Java at https://github.com/point85/Caliper and in C# at https://github.com/point85/PyCaliperSharp.
+The PyCaliper library project manages units of measure and conversions between them.  PyCaliper is designed to be lightweight and simple to use, yet comprehensive.  It includes a large number of pre-defined units of measure commonly found in science, engineering, technology, finance and the household.  These recognized systems of measurement include the International System of Units (SI), International Customary, United States and British Imperial.  Custom units of measure can also be created in the PyCaliper unified measurement system.  Custom units are specific to a trade or industry such as industrial packaging where units of can, bottle, case and pallet are typical.  Custom units can be added to the unified system for units that are not pre-defined.  The PyCaliper library is also available in Java at https://github.com/point85/Caliper and in C# at https://github.com/point85/CaliperSharp.
 
 A PyCaliper measurement system is a collection of units of measure where each pair has a linear relationship, i.e. y = ax + b where 'x' is the abscissa unit to be converted, 'y' (the ordinate) is the converted unit, 'a' is the scaling factor and 'b' is the offset.  In the absence of a defined conversion, a unit will always have a conversion to itself.  A bridge unit conversion is defined to convert between the fundamental SI and International customary units of mass (i.e. kilogram to pound mass), length (i.e. metre to foot) and temperature (i.e. Kelvin to Rankine).  These three bridge conversions permit unit of measure conversions between the two systems.  A custom unit can define any bridge conversion such as a bottle to US fluid ounces or litres.
  
@@ -275,8 +275,8 @@ e = m.multiply(c).multiply(c)
 ```
 
 ```python
-// A Tesla Model S battery has a capacity of 100 KwH.  
-// When fully charged, how many electrons are in the battery?
+# A Tesla Model S battery has a capacity of 100 KwH.  
+# When fully charged, how many electrons are in the battery?
 c = msys.getQuantity(Constant.LIGHT_VELOCITY)
 me = msys.getQuantity(Constant.ELECTRON_MASS)    
 kwh = Quantity(100, msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.WATT_HOUR)))
@@ -454,8 +454,8 @@ msgstr "The unit of measure {0} of type {1} must be the same as {2} of type {3}.
 The PyCaliper library depends on version 3.7+.
 
 The PyCaliper library has the following structure:
- * `/PyCaliper` - docs.zip (HTML API documentation, setup.py)
- * `/PyCaliper/uom` - python library source files
+ * `/PyCaliper` - docs.zip (HTML API documentation), setup.py
+ * `/PyCaliper/uom` - python library source files, pycaliper.doxygen (Doxygen documentor configuration)
  * `/PyCaliper/uom/locales` - localizable messages.po file to define error messages and localizable units.po file to define the unit's name, symbol and description.
  * `/PyCaliper/test` - unittest source files for the library
  * `/PyCaliper/scripts` - scripts to convert .po to .mo file

@@ -10,7 +10,7 @@ class MeasurementType(Enum):
     POWER = auto()
     
 ##
-#This enumeration contains the values for fundamental constants commonly used in science, technology, engineering and math.
+# This enumeration contains the values for fundamental constants commonly used in science, technology, engineering and math.
 #   
 class Constant(Enum):
     LIGHT_VELOCITY = auto()

@@ -243,7 +243,7 @@ class PathParameters:
 class UnitOfMeasure(Symbolic):  
     MAX_SYMBOL_LENGTH = 16
              
-    def __init__(self, unitType = UnitType.UNCLASSIFIED, name = None, symbol = None, description = None):
+    def __init__(self, unitType=UnitType.UNCLASSIFIED, name=None, symbol=None, description=None):
         super().__init__(name, symbol, description)
         
         self.conversionRegistry = {}
@@ -792,6 +792,7 @@ class UnitOfMeasure(Symbolic):
                     factor = 1.0 / uom.bridgeScalingFactor
         
         return factor
+    
     ##
     # Divide two units of measure to create a third one.
     # 
