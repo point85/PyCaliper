@@ -50,7 +50,7 @@ From the two power products, a unit of measure can then be recursively reduced t
  
 ## Code Examples
 The singleton unified MeasurementSystem is obtained by calling:
-```java
+```python
 msys = MeasurementSystem.instance()
 ```
 
@@ -308,35 +308,40 @@ f = mkg.multiply(msys.getQuantity(Constant.GRAVITY)).convert(msys.getUOM(Unit.PO
 ```
 Units per volume of solution, C = A x (m/V)
 ```java
-// create the "A" unit of measure
-activityUnit = sys.createQuotientUOM(UnitType.UNCLASSIFIED, "activity", "act",
-	"activity of material", sys.getUOM(Unit.UNIT), sys.getUOM(Prefix.MILLI, Unit.GRAM))
+mg = msys.createPrefixedUOM(Prefix.milli(), msys.getUOM(Unit.GRAM))
 
-// calculate concentration
-Quantity activity = new Quantity(1d, activityUnit)
-Quantity grams = new Quantity(1d, Unit.GRAM).convert(Prefix.MILLI, Unit.GRAM)
-Quantity volume = new Quantity(1d, sys.getUOM(Prefix.MILLI, Unit.LITRE))
-Quantity concentration = activity.multiply(grams.divide(volume))
-Quantity katals = concentration.multiply(new Quantity(1d, Unit.LITRE)).convert(Unit.KATAL)
+# create the "A" unit of measure
+activityUnit = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "activity", "act",
+    "activity of material", msys.getUOM(Unit.UNIT), mg)
+
+# calculate concentration
+activity = Quantity(1, activityUnit)
+grams = Quantity(1000, mg)
+mL = msys.createPrefixedUOM(Prefix.milli(), msys.getUOM(Unit.LITRE))
+volume = Quantity(1, mL)
+concentration = activity.multiply(grams.divide(volume))
+qL = Quantity(1, msys.getUOM(Unit.LITRE))
+katals = concentration.multiply(qL).convert(msys.getUOM(Unit.KATAL))
 ```
 Black body radiation:
 
 ```java
-// The Stefan-Boltzmann law states that the power emitted per unit area
-// of the surface of a black body is directly proportional to the fourth
-// power of its absolute temperature: sigma * T^4
-// calculate at 1000 Kelvin
-Quantity temp = new Quantity(1000.0, Unit.KELVIN)
-Quantity intensity = sys.getQuantity(Constant.STEFAN_BOLTZMANN).multiply(temp.power(4))
+# The Stefan-Boltzmann law states that the power emitted per unit area
+# of the surface of a black body is directly proportional to the fourth
+# power of its absolute temperature: sigma * T^4
+# calculate at 1000 Kelvin
+qtemp = Quantity(1000, msys.getUOM(Unit.KELVIN))
+qk4 = msys.quantityToPower(qtemp, 4)
+intensity = msys.getQuantity(Constant.STEFAN_BOLTZMANN).multiply(qk4)
 ```
 
 Expansion of the universe:
 
 ```java
-// Hubble's law, v = H0 x D. Let D = 10 Mpc
-Quantity d = new Quantity(10d, sys.getUOM(Prefix.MEGA, sys.getUOM(Unit.PARSEC)))
-Quantity h0 = sys.getQuantity(Constant.HUBBLE_CONSTANT)
-Quantity velocity = h0.multiply(d)
+# Hubble's law, v = H0 x D. Let D = 10 Mpc
+d = Quantity(10, msys.createPrefixedUOM(Prefix.mega(), msys.getUOM(Unit.PARSEC)))
+h0 = msys.getQuantity(Constant.HUBBLE_CONSTANT)
+velocity = h0.multiply(d)
 ```
 
 Device Characteristic Life
