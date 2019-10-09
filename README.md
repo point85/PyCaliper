@@ -455,7 +455,7 @@ The PyCaliper library depends on version 3.7+.
 
 The PyCaliper library has the following structure:
  * `/PyCaliper` - docs.zip (HTML API documentation), setup.py
- * `/PyCaliper/uom` - python library source files, pycaliper.doxygen (Doxygen documentor configuration)
+ * `/PyCaliper/uom` - Python library source files, pycaliper.doxygen (Doxygen documentor configuration)
  * `/PyCaliper/uom/locales` - localizable messages.po file to define error messages and localizable units.po file to define the unit's name, symbol and description.
  * `/PyCaliper/test` - unittest source files for the library
  * `/PyCaliper/scripts` - scripts to convert .po to .mo file
