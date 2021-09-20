@@ -454,6 +454,10 @@ class UnitOfMeasure(Symbolic):
 
         # re-cache
         CacheManager.instance().registerUOM(self)
+        
+        # remove from conversion registry
+        if abscissaUnit in self.conversionRegistry:
+            self.conversionRegistry.pop(abscissaUnit)
 
     ##
     # Get the exponent of a power unit

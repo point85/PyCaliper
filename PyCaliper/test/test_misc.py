@@ -36,4 +36,20 @@ class TestFinancial(unittest.TestCase):
             self.assertTrue(q.uom is not None)
             self.assertTrue(str(q) is not None)
 
+    def testCurrencyConversion(self):
+        msys = MeasurementSystem.instance()
         
+        usd_uom = msys.createScalarUOM(UnitType.CURRENCY, None, "US-Dollar", "USD", "US paper dollar")
+        usdt_uom = msys.createScalarUOM(UnitType.CURRENCY, None, "Tether", "USDT", "USD stable coin")
+
+        # Initial conversion rate
+        usdt_uom.setConversion(0.9, usd_uom)
+
+        portfolio = Quantity(200, usdt_uom)
+        portfolio_usd = portfolio.convert(usd_uom)
+        self.assertAlmostEqual(portfolio_usd.amount, 180.0, None, None, TestingUtils.DELTA6)
+
+        # change conversion rate
+        usdt_uom.setConversion(1.0, usd_uom)
+        portfolio_usd = portfolio.convert(usd_uom)
+        self.assertAlmostEqual(portfolio_usd.amount, 200.0, None, None, TestingUtils.DELTA6)
