@@ -53,6 +53,7 @@ class TestPerformance(unittest.TestCase):
                     rowQty.convert(colUOM)
                     
                     if (rowQty == colQty):
+                        # expected
                         pass
                     
                     _ = rowQty.amount

@@ -1,0 +1,12 @@
+PyCaliper Release Notes
+
+v1.0.1 Sept. 11, 2021
+- Cleared conversion cache when setting a UOM conversion factor
+
+v1.0.2 Sept. 19, 2021
+- Upgraded to Python 3.9
+- General code cleanup
+
+v1.0.3 Nov. 19, 2021
+- Changed to a specific PyCaliperException vs. generic Exception
+- General code cleanup

@@ -7,8 +7,7 @@ from PyCaliper.uom.enums import Constant
 from PyCaliper.uom.quantity import Quantity
 from PyCaliper.test.testing_utils import TestingUtils
 
-
-class TestFinancial(unittest.TestCase): 
+class TestFinancial(unittest.TestCase):         
     def testStocks(self):
         msys = MeasurementSystem.instance()
         
@@ -34,7 +33,6 @@ class TestFinancial(unittest.TestCase):
             self.assertTrue(q.symbol is not None)
             self.assertTrue(q.description is not None)
             self.assertTrue(q.uom is not None)
-            self.assertTrue(str(q) is not None)
 
     def testCurrencyConversion(self):
         msys = MeasurementSystem.instance()

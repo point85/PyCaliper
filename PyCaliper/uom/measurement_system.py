@@ -11,6 +11,7 @@ from PyCaliper.uom.enums import Unit
 from PyCaliper.uom.unit_of_measure import UnitOfMeasure
 from PyCaliper.uom.enums import UnitType
 from PyCaliper.uom.localizer import Localizer
+from PyCaliper.uom.caliper_exception import PyCaliperException
 
 ##
 # A MeasurementSystem is a collection of units of measure that have a linear
@@ -1028,7 +1029,7 @@ class MeasurementSystem:
     def createUnclassifiedPowerUOM(self, base, exponent): 
         if (base is None):          
             msg = Localizer.instance().messageStr("base.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
     
         # create symbol
         symbol = UnitOfMeasure.generatePowerSymbol(base, exponent)
@@ -1060,11 +1061,11 @@ class MeasurementSystem:
     def createUnclassifiedProductUOM(self, multiplier, multiplicand):
         if (multiplier is None):          
             msg = Localizer.instance().messageStr("multiplier.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         if (multiplicand is None):          
             msg = Localizer.instance().messageStr("multiplicand.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         symbol = UnitOfMeasure.generateProductSymbol(multiplier, multiplicand)
         return self.createProductUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, multiplier, multiplicand)
@@ -1078,11 +1079,11 @@ class MeasurementSystem:
     def createUnclassifiedQuotientUOM(self, dividend, divisor):
         if (dividend is None):
             msg = Localizer.instance().messageStr("dividend.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         if (divisor is None):
             msg = Localizer.instance().messageStr("divisor.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         symbol = UnitOfMeasure.generateQuotientSymbol(dividend, divisor)
         return self.createQuotientUOM(UnitType.UNCLASSIFIED, None, None, symbol, None, dividend, divisor)
@@ -1107,11 +1108,11 @@ class MeasurementSystem:
     def createUOM(self, unitType, unit, name, symbol, description):
         if (symbol is None or len(symbol) == 0):
             msg = Localizer.instance().messageStr("symbol.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         if (unitType is None):
             msg = Localizer.instance().messageStr("unit.type.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         uom = CacheManager.instance().getUOMBySymbol(symbol)
         

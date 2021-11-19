@@ -294,6 +294,7 @@ class CacheManager:
             cachedMap[UnitType.TIME] = -3
                             
         else:
+            # add new case here
             pass
         
         return cachedMap

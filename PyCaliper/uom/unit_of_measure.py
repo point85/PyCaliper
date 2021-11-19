@@ -6,6 +6,7 @@ from PyCaliper.uom.enums import MeasurementType
 from PyCaliper.uom.localizer import Localizer
 from PyCaliper.uom.cache_manager import CacheManager
 from PyCaliper.uom.enums import Unit
+from PyCaliper.uom.caliper_exception import PyCaliperException
 
 ##
 # This class reduces a unit of measure to its most basic scalar units of measure.
@@ -36,7 +37,7 @@ class Reducer:
         self.counter = self.counter + 1
         if (self.counter > self.MAX_RECURSIONS):
             msg = Localizer.instance().messageStr("circular.references").format(uom.symbol)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         # down a level
         level = level + 1
@@ -356,11 +357,11 @@ class UnitOfMeasure(Symbolic):
     def setProductUnits(self, multiplier, multiplicand):
         if (multiplier is None):
             msg = Localizer.instance().messageStr("multiplier.cannot.be.null").format(self.symbol)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         if (multiplicand is None):
             msg = Localizer.instance().messageStr("multiplicand.cannot.be.null").format(self.symbol)
-            raise Exception(msg)            
+            raise PyCaliperException(msg)            
 
         self.setPowerProduct(multiplier, 1, multiplicand, 1)
 
@@ -374,11 +375,11 @@ class UnitOfMeasure(Symbolic):
     def setQuotientUnits(self, dividend, divisor):
         if (dividend is None):
             msg = Localizer.instance().messageStr("dividend.cannot.be.null").format(self.symbol)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         if (divisor is None):
             msg = Localizer.instance().messageStr("divisor.cannot.be.null").format(self.symbol)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         self.setPowerProduct(dividend, 1, divisor, -1)
 
@@ -436,13 +437,13 @@ class UnitOfMeasure(Symbolic):
     def setConversion(self, scalingFactor, abscissaUnit, offset=0.0):
         if (abscissaUnit is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         # self conversion is special
         if (self == abscissaUnit):
             if (scalingFactor != 1.0 or offset != 0.0):
                 msg = Localizer.instance().messageStr("conversion.not.allowed")
-                raise Exception(msg)
+                raise PyCaliperException(msg)
 
         # unit has been previously cached, so first remove it, then cache again
         CacheManager.instance().unregisterUOM(self)
@@ -505,7 +506,7 @@ class UnitOfMeasure(Symbolic):
     def setPowerUnit(self, base, exponent):
         if (base is None):
             msg = Localizer.instance().messageStr("base.cannot.be.null").format(self.symbol)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         # special cases
         if (exponent == -1):
@@ -616,7 +617,7 @@ class UnitOfMeasure(Symbolic):
 
         if (thisType != UnitType.UNCLASSIFIED and targetType != UnitType.UNCLASSIFIED and thisType != UnitType.UNITY and targetType != UnitType.UNITY and thisType != targetType):
             msg = Localizer.instance().messageStr("must.be.same.as").format(uom1, thisType, uom2, targetType)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
     ##
     # Get the unit of measure symbol in the fundamental units for that system.
@@ -652,7 +653,7 @@ class UnitOfMeasure(Symbolic):
     def checkOffset(self, other):
         if (not math.isclose(other.offset, 0.0)):
             msg = Localizer.instance().messageStr("offset.not.supported").format(str(other))
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
     def clearCache(self):
         self.conversionRegistry.clear()
@@ -665,13 +666,13 @@ class UnitOfMeasure(Symbolic):
         if (self.getMeasurementType() == MeasurementType.QUOTIENT):
             if (uom2 == one): 
                 msg = Localizer.instance().messageStr("incompatible.units").format(self, one)
-                raise Exception(msg)
+                raise PyCaliperException(msg)
             
             invert = True
         else: 
             if (uom1 == one or uom2 == one): 
                 msg = Localizer.instance().messageStr("incompatible.units").format(self, one)
-                raise Exception(msg)
+                raise PyCaliperException(msg)
 
         newUOM = uom1.multiplyOrDivide(uom2, invert)
         newUOM.unitType = self.unitType
@@ -681,7 +682,7 @@ class UnitOfMeasure(Symbolic):
     def multiplyOrDivide(self, other, invert): 
         if (other is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         self.checkOffset(self)
         self.checkOffset(other)
@@ -843,7 +844,7 @@ class UnitOfMeasure(Symbolic):
     def getConversionFactor(self, targetUOM):
         if (targetUOM is None):
             msg = Localizer.instance().messageStr("unit.cannot.be.null")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         # first check the cache
         cachedFactor = None
@@ -863,7 +864,7 @@ class UnitOfMeasure(Symbolic):
 
         if (len(fromMap) != len(toMap)):
             msg = Localizer.instance().messageStr("incompatible.units").format(self, targetUOM)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
         
         fromFactor = fromReducer.mapScalingFactor
         toFactor = toReducer.mapScalingFactor
@@ -891,7 +892,7 @@ class UnitOfMeasure(Symbolic):
 
         if (matchCount != len(fromMap)):
             msg = Localizer.instance().messageStr("incompatible.units").format(self, targetUOM)
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         scaling = fromFactor / toFactor
         cachedFactor = factor * scaling

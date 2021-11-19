@@ -13,7 +13,7 @@ class TestQuantity(unittest.TestCase):
         msys = MeasurementSystem.instance()
         
         q = Quantity(10.0, Unit.CELSIUS)
-        self.assertTrue(str(q) is not None)
+        self.assertEqual(q.amount, 10.0, None)
 
         # faraday
         f = msys.getQuantity(Constant.FARADAY_CONSTANT)
@@ -372,8 +372,6 @@ class TestQuantity(unittest.TestCase):
         q2 = q2.convert(m.invert())
         self.assertAlmostEqual(q2.amount, 10.0, None, None, TestingUtils.DELTA6)
         self.assertTrue(q2.uom == oneOverM)
-
-        self.assertTrue(str(q2) != None)
 
         # Newton-metres divided by metres
         q1 = Quantity(10.0, msys.getUOM(Unit.NEWTON_METRE))

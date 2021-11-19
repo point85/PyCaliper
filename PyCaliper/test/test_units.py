@@ -441,7 +441,7 @@ class TestUnits(unittest.TestCase):
         self.assertTrue(cde.getBaseSymbol().index(s) != -1)
 
         u = msys.createScalarUOM(UnitType.UNCLASSIFIED, None, None, "not None", None)
-        self.assertTrue(str(u) is not None)
+        self.assertTrue(u.unitType is not None)
 
     def testUSUnits(self):
         msys = MeasurementSystem.instance()

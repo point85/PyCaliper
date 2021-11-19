@@ -2,6 +2,7 @@ import math
 from builtins import staticmethod
 from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.localizer import Localizer
+from PyCaliper.uom.caliper_exception import PyCaliperException
 
 ##
 # The Quantity class represents an amount and UnitOfMeasure. A constant
@@ -49,7 +50,7 @@ class Quantity(Symbolic):
     def createAmountFromString(value):
         if (value is None):
             msg = Localizer.instance().messageStr("amount.cannot.be.null")
-            raise Exception(msg) 
+            raise PyCaliperException(msg) 
 
         return float(value)
 
@@ -137,7 +138,7 @@ class Quantity(Symbolic):
     def divide(self, other):
         if (other.amount == 0.0):
             msg = Localizer.instance().messageStr("divisor.cannot.be.zero")
-            raise Exception(msg)
+            raise PyCaliperException(msg)
 
         amount = self.amount / other.amount
         newUOM = self.uom.divide(other.uom)

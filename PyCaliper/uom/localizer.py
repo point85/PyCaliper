@@ -9,23 +9,23 @@ class Localizer:
     localePath = "locales"
      
     # single instance
-    localizer = None
+    localizerInstance = None
     
     def __init__(self):
-        Localizer.localizer = self
+        Localizer.localizerInstance = self
         self.messages = None
         self.units = None
                     
     @staticmethod
     def instance():
-        if (Localizer.localizer is None):
+        if (Localizer.localizerInstance is None):
             Localizer()
-        return Localizer.localizer 
+        return Localizer.localizerInstance 
     
     @staticmethod
     def getLC():
         # get the default locale and the language code
-        thisLocale = locale.getdefaultlocale("LANGUAGE")
+        thisLocale = locale.getdefaultlocale()
         langCC = thisLocale[0]
         return langCC
     
