@@ -933,3 +933,54 @@ class TestUnits2(unittest.TestCase):
         sf = minsq.getConversionFactor(p2)
         self.assertTrue(sf == 1.0)
 
+    def testPerm(self):
+        msys = MeasurementSystem.instance()
+        
+        inHg = msys.getUOM(Unit.IN_HG)
+        hr = msys.getUOM(Unit.HOUR)
+        ft2 = msys.getUOM(Unit.SQUARE_FOOT)
+        s = msys.getUOM(Unit.SECOND)
+        day = msys.getUOM(Unit.DAY)
+        msq = msys.getUOM(Unit.SQUARE_METRE)
+        Pa = msys.getUOM(Unit.PASCAL)
+        ng = msys.createPrefixedUOM(Prefix.nano(), msys.getUOM(Unit.GRAM))
+        g = msys.getUOM(Unit.GRAM)
+        grain = msys.getUOM(Unit.GRAIN)
+
+        mmHg = msys.createScalarUOM(UnitType.PRESSURE, None, "mmHg", "mmHg", "")
+        mmHg.setConversion(133.3223684, Pa)
+
+        # US perm
+        us1 = msys.createUnclassifiedQuotientUOM(grain, inHg)      
+        us2 = msys.createUnclassifiedQuotientUOM(us1, ft2)
+        perm = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "perm", "perm", "gn/hr/ft2/inHg", us2, hr)
+    
+        # metric perm
+        m1 = msys.createUnclassifiedQuotientUOM(g, day)
+        m2 = msys.createUnclassifiedQuotientUOM(m1, msq)
+        mperm = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "mperm", "mperm", "g/day/m2/mmHg", m2, mmHg)        
+        
+        # Equivalent SI unit
+        si1 = msys.createUnclassifiedQuotientUOM(ng, s)
+        si2 = msys.createUnclassifiedQuotientUOM(si1, msq)
+        eqSI = msys.createUnclassifiedQuotientUOM(si2, Pa)
+        eqSI = msys.createQuotientUOM(UnitType.UNCLASSIFIED, None, "eqSI", "eqSI", "equivalent SI", si2, Pa)  
+
+        # US perm to equivalent SI
+        f = perm.getConversionFactor(eqSI)
+        self.assertAlmostEqual(f, 57.214184, None, None, TestingUtils.DELTA6)
+        f = eqSI.getConversionFactor(perm)
+        self.assertAlmostEqual(f, 0.0174781, None, None, TestingUtils.DELTA6)    
+        
+        # metric perm to US perm
+        f = perm.getConversionFactor(mperm)
+        self.assertAlmostEqual(f, 0.659053, None, None, TestingUtils.DELTA6)
+        f = mperm.getConversionFactor(perm)
+        self.assertAlmostEqual(f, 1.517328, None, None, TestingUtils.DELTA6)        
+        
+        # metric perm to equivalent SI
+        f = mperm.getConversionFactor(eqSI)
+        self.assertAlmostEqual(f, 86.812694, None, None, TestingUtils.DELTA6)
+        f = eqSI.getConversionFactor(mperm)
+        self.assertAlmostEqual(f, 0.0115190, None, None, TestingUtils.DELTA6)        
+    

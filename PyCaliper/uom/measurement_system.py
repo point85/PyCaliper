@@ -615,7 +615,9 @@ class MeasurementSystem:
         elif (unit == Unit.IN_HG):
             uom = self.createScalarUOM(UnitType.PRESSURE, unit, Localizer.instance().langStr("inhg.name"),
                 Localizer.instance().langStr("inhg.symbol"), Localizer.instance().langStr("inhg.desc"))
-            uom.setConversion(0.4911531047, self.getUOM(Unit.PSI)) 
+            u1 = self.createUnclassifiedProductUOM(self.getUOM(Unit.FOOT), self.getUOM(Unit.SQUARE_SECOND))
+            u2 = self.createUnclassifiedQuotientUOM(self.getUOM(Unit.POUND_MASS), u1)
+            uom.setConversion(2275.520677, u2)
     
         elif (unit == Unit.SQUARE_INCH):
             uom = self.createPowerUOM(UnitType.AREA, unit, Localizer.instance().langStr("in2.name"),
