@@ -10,3 +10,9 @@ v1.0.2 Sept. 19, 2021
 v1.0.3 Nov. 19, 2021
 - Changed to a specific PyCaliperException vs. generic Exception
 - General code cleanup
+
+v1.0.4 Mar. 17, 2023
+- Changed inches of Mercury pressure to pound mass based.
+
+v1.0.5 Oct. 14, 2023
+- Verified on Python 3.12
