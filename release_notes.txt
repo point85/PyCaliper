@@ -16,3 +16,6 @@ v1.0.4 Mar. 17, 2023
 
 v1.0.5 Oct. 14, 2023
 - Verified on Python 3.12
+
+v1.0.6 Jan. 11, 2024
+- Created a PyPI distribution 

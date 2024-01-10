@@ -4,9 +4,6 @@ The PyCaliper library project manages units of measure and conversions between t
 A PyCaliper measurement system is a collection of units of measure where each pair has a linear relationship, i.e. y = ax + b where 'x' is the abscissa unit to be converted, 'y' (the ordinate) is the converted unit, 'a' is the scaling factor and 'b' is the offset.  In the absence of a defined conversion, a unit will always have a conversion to itself.  A bridge unit conversion is defined to convert between the fundamental SI and International customary units of mass (i.e. kilogram to pound mass), length (i.e. metre to foot) and temperature (i.e. Kelvin to Rankine).  These three bridge conversions permit unit of measure conversions between the two systems.  A custom unit can define any bridge conversion such as a bottle to US fluid ounces or litres.
  
 ## Concepts
-
-The diagram below illustrates these concepts.
-![Caliper Diagram](https://github.com/point85/caliper/blob/master/doc/CaliperDiagram.png)
  
 All units are owned by the unified measurement system. Units 'x' and 'y' belong to a relational system (such as SI or International Customary).  Units 'w' and 'z' belong to a second relational system.  Unit 'y' has a linear conversion to unit 'x'; therefore 'x' must be defined before 'y' can be defined.  Unit 'x' is also related to 'y' by x = (y - b)/a.  Unit 'w' has a conversion to unit 'z'.  Unit 'z' is related to itself by z = z + 0. Unit 'x' has a bridge conversion defined to unit 'z' (for example a foot to a metre).  Note that a bridge conversion from 'z' to 'x' is not necessary since it is the inverse of the conversion from 'x' to 'z'.
  
@@ -16,7 +13,7 @@ A simple unit, for example a metre, is defined as a scalar UOM.  A special scala
 
 *Product Unit*
 
-A unit of measure that is the product of two other units is defined as a product UOM.  An example is a Joule which is a Newton·metre.  
+A unit of measure that is the product of two other units is defined as a product UOM.  An example is a Joule which is a NewtonÂ·metre.  
 
 *Quotient Unit*  
 
@@ -32,7 +29,7 @@ Units are classified by type, e.g. length, mass, time and temperature.  Only uni
 
 *Base Symbol*
  
-All units have a base symbol that is the most reduced form of the unit.  For example, a Newton is kilogram·metre/second^2.  The base symbol is used in the measurement system to register each unit and to discern the result of arithmetic operations on quantities.  For example, dividing a quantity of Newton·metres by a quantity of metres results in a quantity of Newtons. 
+All units have a base symbol that is the most reduced form of the unit.  For example, a Newton is kilogramÂ·metre/second^2.  The base symbol is used in the measurement system to register each unit and to discern the result of arithmetic operations on quantities.  For example, dividing a quantity of NewtonÂ·metres by a quantity of metres results in a quantity of Newtons. 
 
 *Quantity*
 
@@ -40,11 +37,7 @@ A quantity is an amount (implemented as a double precision number) together with
 
 *Product of Powers*
 
-A unit of measure is represented internally as a product of two other power units of measure:
-
-![PyCaliper Diagram](https://github.com/point85/caliper/blob/master/doc/PowerProduct.png)
-
-For a simple scalar UOM (e.g. kilogram), both of the UOMs are null with the exponents defaulted to 0.  For a product UOM (e.g. Newton), the first UOM is the multiplier and the second is the multiplicand with both exponents set to 1.  For a quotient UOM (e.g. kilograms/hour), the first UOM is the dividend and the second is the divisor.  The dividend has an exponent of 1 and the divisor an exponent of -1.  For a power UOM (e.g. square metres), the first UOM is the base and the exponent is the power.  In this case, the second UOM is null with the exponent defaulted to 0.
+A unit of measure is represented internally as a product of two other power units of measure.  For a simple scalar UOM (e.g. kilogram), both of the UOMs are null with the exponents defaulted to 0.  For a product UOM (e.g. Newton), the first UOM is the multiplier and the second is the multiplicand with both exponents set to 1.  For a quotient UOM (e.g. kilograms/hour), the first UOM is the dividend and the second is the divisor.  The dividend has an exponent of 1 and the divisor an exponent of -1.  For a power UOM (e.g. square metres), the first UOM is the base and the exponent is the power.  In this case, the second UOM is null with the exponent defaulted to 0.
 
 From the two power products, a unit of measure can then be recursively reduced to a map of base units of measure and corresponding exponents along with a scaling factor.  For example, a Newton reduces to (kg, 1), (m, 1), (s, -2) in the SI system.  Multiplying, dividing and converting a unit of measure is accomplished by merging the two maps (i.e. "cancelling out" units) and then computing the overall scaling factor.  The base symbol is obtained directly from the final map.
  
@@ -283,7 +276,7 @@ kwh = Quantity(100, msys.createPrefixedUOM(Prefix.kilo(), msys.getUOM(Unit.WATT_
 electrons = kwh.divide(c).divide(c).divide(me)
 ```
 
-Ideal Gas Law, PV = nRT.  A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 °C.  How many moles of argon are in the cylinder?
+Ideal Gas Law, PV = nRT.  A cylinder of argon gas contains 50.0 L of Ar at 18.4 atm and 127 Â°C.  How many moles of argon are in the cylinder?
 ```python
 p = Quantity(18.4, msys.getUOM(Unit.ATMOSPHERE)).convert(msys.getUOM(Unit.PASCAL))
 v = Quantity(50, msys.getUOM(Unit.LITRE)).convert(msys.getUOM(Unit.CUBIC_METRE))
@@ -459,7 +452,3 @@ The PyCaliper library has the following structure:
  * `/PyCaliper/uom/locales` - localizable messages.po file to define error messages and localizable units.po file to define the unit's name, symbol and description.
  * `/PyCaliper/test` - unittest source files for the library
  * `/PyCaliper/scripts` - scripts to convert .po to .mo file
-
-
-
-
