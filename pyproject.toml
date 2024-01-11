@@ -10,7 +10,8 @@ exclude = [".settings", ".vscode", ".project", ".pydevproject", "README.md"]
 
 [project]
 name = "PyCaliper"
-version = "1.0.6"
+version = "1.0.7"
+keywords = ["units of measure", "units", "measurement units", "uom", "units of measurement", "measure-conversion"]
 authors = [
   { name="Kent Randall", email="point85.llc@gmail.com" },
 ]
