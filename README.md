@@ -450,8 +450,11 @@ msgid "must.be.same.as"
 msgstr "The unit of measure {0} of type {1} must be the same as {2} of type {3}."
 ```
 
+## PyPI
+The latest PyCaliper distribution is available for download at https://pypi.org/project/PyCaliper/.
+
 ## Project Structure
-The PyCaliper library depends on version 3.1+.
+The PyCaliper library depends on Python version 3.1+.
 
 The PyCaliper library has the following structure:
  * `/PyCaliper` - docs.zip (HTML API documentation), setup.py
