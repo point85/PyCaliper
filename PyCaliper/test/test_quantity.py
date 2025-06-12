@@ -891,7 +891,21 @@ class TestQuantity(unittest.TestCase):
 
         # OK
         q1.divide(q2)
-
+        
+        # divide by zero
+        try:
+            q1.divideByAmount(0.0)
+            self.fail("divide by zero")
+        except Exception as e:
+            print(f"divide: {e}")    
+            
+        q1.amount = 0.0
+        try:
+            q1.divideByAmount(0.0)
+            self.fail("divide by zero")
+        except:
+            pass   
+              
     def testEquality(self):
         msys = MeasurementSystem.instance()
 
