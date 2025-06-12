@@ -2,6 +2,9 @@
 # The Prefix class defines SI unit of measure prefixes as well as those found in computer science.
 #
 class Prefix:  
+    # floating point precision equality
+    EPSILON = 1e-10
+    
     # list of cached prefixes  
     prefixes = []
         
@@ -115,11 +118,11 @@ class Prefix:
     
     @classmethod
     def mebi(cls):
-        return cls("mebi", "Mi", 1.048576E+06) 
+        return cls("mebi", "Mi", 1024**2) 
     
     @classmethod
     def gibi(cls):
-        return cls("gibi", "Gi", 1.073741824E+09)       
+        return cls("gibi", "Gi", 1024**3)       
 
     ##
     # Construct a prefix
@@ -150,10 +153,9 @@ class Prefix:
     def fromName(cls, name):
         for p in cls.prefixes:
             if p.name == name:
-                prefix = p
-                break
+                return p
 
-        return prefix
+        return None
     
     ##
     # Find the prefix with the specified scaling factor
@@ -164,13 +166,11 @@ class Prefix:
     #    
     @classmethod
     def fromFactor(cls, factor):
-        
         for p in cls.prefixes:
-            if p.factor == factor:
-                prefix = p
-                break
+            if abs(p.factor - factor) < cls.EPSILON:
+                return p
 
-        return prefix
+        return None
     
     def __str__(self):
         return self.name + ", " + self.symbol + ", " + str(self.factor)
@@ -185,10 +185,13 @@ class Prefix:
             return False
 
         # same factor
-        if (self.factor != other.factor):
+        if (abs(self.factor - other.factor) > Prefix.EPSILON):
             return False
         
         return True
     
     def __ne__(self, other):
         return not self.__eq__(other)
+    
+    def __hash__(self):
+        return hash((self.name, self.symbol, self.factor))    

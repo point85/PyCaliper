@@ -275,8 +275,22 @@ class UnitOfMeasure(Symbolic):
         return False if exponent is None else True
  
     def __hash__(self):
-        return hash(str(self.unitType) + self.symbol)
+        # Convert floats to integers for hashing (since we use math.isclose in __eq__)
+        scaling_factor_int = int(self.scalingFactor * 1e10)  # 10 decimal places precision
+        offset_int = int(self.offset * 1e10)
         
+        # Include unit enumeration if it exists
+        unit_hash = hash(self.unit) if self.unit is not None else 0
+        
+        return hash((
+            self.unitType,
+            self.symbol,
+            unit_hash,
+            self.abscissaUnit.symbol if self.abscissaUnit else None,
+            scaling_factor_int,
+            offset_int
+        ))
+    
     def __eq__(self, other):
         # same type
         if (other is None or self.unitType != other.unitType):

@@ -19,3 +19,12 @@ v1.0.5 Oct. 14, 2023
 
 v1.0.6 Jan. 11, 2024
 - Created a PyPI distribution 
+
+v1.0.8, June 11, 2025: 	
+	- Constant: fixed AVOGADRO typo
+	- Prefix: used EPSILON in fromFactor() comparison
+	- Quantity: checked for division by 0 in divide(double)
+	- Localizer: enhanced class
+	- Symbolic: defined __eq__ and __hash__
+	- Unit of Measure: made __hash__ consistent with __eq__
+	

@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name = "PyCaliper",
     packages = ["PyCaliper"],
-    version = "1.0.5",
+    version = "1.0.8",
     description = "Units of measure library for Python",
     author = "Kent Randall",
     author_email = "point85.llc@gmail.com",

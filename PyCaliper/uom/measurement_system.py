@@ -913,7 +913,7 @@ class MeasurementSystem:
             named.symbol = Localizer.instance().langStr("boltzmann.symbol")
             named.description = Localizer.instance().langStr("boltzmann.desc")    
 
-        elif (constant == Constant.AVAGADRO_CONSTANT):
+        elif (constant == Constant.AVOGADRO_CONSTANT):
             # NA
             named = Quantity(6.02214076E+23, self.getOne())
             named.name = Localizer.instance().langStr("avo.name")
@@ -922,7 +922,7 @@ class MeasurementSystem:
             
         elif (constant == Constant.GAS_CONSTANT):
             # R
-            named = self.getQuantity(Constant.BOLTZMANN_CONSTANT).multiply(self.getQuantity(Constant.AVAGADRO_CONSTANT))
+            named = self.getQuantity(Constant.BOLTZMANN_CONSTANT).multiply(self.getQuantity(Constant.AVOGADRO_CONSTANT))
             named.name = Localizer.instance().langStr("gas.name")
             named.symbol = Localizer.instance().langStr("gas.symbol")
             named.description = Localizer.instance().langStr("gas.desc")
@@ -937,7 +937,7 @@ class MeasurementSystem:
         elif (constant == Constant.FARADAY_CONSTANT):
             # F = e.NA
             qe = self.getQuantity(Constant.ELEMENTARY_CHARGE)
-            named = qe.multiply(self.getQuantity(Constant.AVAGADRO_CONSTANT))
+            named = qe.multiply(self.getQuantity(Constant.AVOGADRO_CONSTANT))
             named.name = Localizer.instance().langStr("faraday.name")
             named.symbol = Localizer.instance().langStr("faraday.symbol")
             named.description = Localizer.instance().langStr("faraday.desc")

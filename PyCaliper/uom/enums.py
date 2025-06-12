@@ -18,7 +18,7 @@ class Constant(Enum):
     GRAVITY = auto() 
     PLANCK_CONSTANT = auto() 
     BOLTZMANN_CONSTANT = auto() 
-    AVAGADRO_CONSTANT = auto() 
+    AVOGADRO_CONSTANT = auto() 
     GAS_CONSTANT = auto() 
     ELEMENTARY_CHARGE = auto() 
     ELECTRIC_PERMITTIVITY = auto() 

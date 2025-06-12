@@ -1,58 +1,89 @@
-import locale
-import gettext
-
 ##
 # The Localizer class provides localization services for unit of measure names, symbols and descriptions as well as error messages.
 #
-class Localizer:  
-    # root folder 
-    localePath = "locales"
-     
-    # single instance
-    localizerInstance = None
+import locale
+import gettext
+import threading
+import os
+from pathlib import Path
+
+class Localizer:
+    """Thread-safe singleton for handling localization."""
+    
+    _instance = None
+    _lock = threading.Lock()
+    
+    def __new__(cls):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
     
     def __init__(self):
-        Localizer.localizerInstance = self
+        if getattr(self, '_initialized', False):
+            return
+        self._initialized = True
         self.messages = None
         self.units = None
-                    
+        self.localePath = Path(__file__).parent / "locales"
+    
     @staticmethod
     def instance():
-        if (Localizer.localizerInstance is None):
-            Localizer()
-        return Localizer.localizerInstance 
+        return Localizer()
     
     @staticmethod
     def getLC():
-        # get the default locale and the language code
-        thisLocale = locale.getdefaultlocale()
-        langCC = thisLocale[0]
-        return langCC
-    
-    ##
-    # Get the translated error message text for the default locale and country code 
-    # 
-    # @param msgId Message identifier
-    # @return translated text    
-    def messageStr(self, msgId):
-        if (self.messages is None):
-            # translated text with error messages for this locale and country code
-            self.messages = gettext.translation("messages", localedir=Localizer.localePath, languages=[Localizer.getLC()])
-            self.messages.install()
-            
-        # Get an error message by its id
-        return self.messages.gettext(msgId)
-    
-    ##
-    # Get the translated user-visible text for the default locale and country code 
-    # 
-    # @param msgId Message identifier
-    # @return translated text  
-    def langStr(self, msgId):        
-        if (self.units is None):
-            # translated user-visible text for this locale  and country code
-            self.units = gettext.translation("units", localedir=Localizer.localePath, languages=[Localizer.getLC()])
-            self.units.install()
+        """Get language code with robust fallback."""
+        try:
+            current_locale = locale.getlocale()[0]
+            if current_locale:
+                return current_locale
+        except (locale.Error, ValueError):
+            pass
         
-        # Get a unit name, symbol or description by its id
-        return self.units.gettext(msgId)
+        # Check environment variables
+        for var in ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG'):
+            if var in os.environ and os.environ[var]:
+                return os.environ[var].split(':')[0]
+        
+        return 'en_US'
+    
+    def messageStr(self, msgId):
+        """Get translated error message."""
+        if self.messages is None:
+            try:
+                self.messages = gettext.translation(
+                    "messages",
+                    localedir=str(self.localePath),
+                    languages=[self.getLC(), 'en_US'],
+                    fallback=True
+                )
+            except Exception as e:
+                print(f"Warning: Could not load message translations: {e}")
+                self.messages = gettext.NullTranslations()
+        
+        try:
+            return self.messages.gettext(msgId)
+        except Exception:
+            return msgId
+    
+    def langStr(self, msgId):
+        """Get translated unit text."""
+        if self.units is None:
+            try:
+                self.units = gettext.translation(
+                    "units",
+                    localedir=str(self.localePath),
+                    languages=[self.getLC(), 'en_US'],
+                    fallback=True
+                )
+            except Exception as e:
+                print(f"Warning: Could not load unit translations: {e}")
+                self.units = gettext.NullTranslations()
+        
+        try:
+            return self.units.gettext(msgId)
+        except Exception:
+            return msgId

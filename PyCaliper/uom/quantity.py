@@ -1,5 +1,4 @@
 import math
-from builtins import staticmethod
 from PyCaliper.uom.symbolic import Symbolic
 from PyCaliper.uom.localizer import Localizer
 from PyCaliper.uom.caliper_exception import PyCaliperException
@@ -24,7 +23,7 @@ class Quantity(Symbolic):
         self.uom = uom
         
     def __hash__(self):
-        return hash(str(self.amount) + self.uom.symbol)
+        return hash((round(self.amount, 10), self.uom.symbol))
         
     def __eq__(self, other):
         answer = False
@@ -152,6 +151,9 @@ class Quantity(Symbolic):
     # @return Quantity {@link Quantity}
     #    
     def divideByAmount(self, divisor):
+        if (divisor == 0.0):
+            msg = Localizer.instance().messageStr("divisor.cannot.be.zero")
+            raise PyCaliperException(msg)
         return Quantity(self.amount / divisor, self.uom)
 
     ##
@@ -183,9 +185,12 @@ class Quantity(Symbolic):
     # @return {@link Quantity}
     #    
     def invert(self):
+        if self.amount == 0.0:
+            msg = Localizer.instance().messageStr("divisor.cannot.be.zero")
+            raise PyCaliperException(msg)
         amount = 1.0 / self.amount
         uom = self.uom.invert()
-        return Quantity(amount, uom)  
+        return Quantity(amount, uom)
 
     ##
     # Compare this quantity to the other quantity

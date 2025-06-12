@@ -18,7 +18,7 @@ class TestQuantity(unittest.TestCase):
         # faraday
         f = msys.getQuantity(Constant.FARADAY_CONSTANT)
         qe = msys.getQuantity(Constant.ELEMENTARY_CHARGE)
-        na = msys.getQuantity(Constant.AVAGADRO_CONSTANT)
+        na = msys.getQuantity(Constant.AVOGADRO_CONSTANT)
         
         s = msys.getUOM(Unit.SECOND)
         w = msys.getUOM(Unit.WATT)
@@ -325,6 +325,7 @@ class TestQuantity(unittest.TestCase):
 
         q4 = q3.divide(q3)
         self.assertAlmostEqual(q4.amount, 1.0, None, None, TestingUtils.DELTA6)
+        print(q4.uom)
         self.assertTrue(q4.uom == msys.getOne())
 
         q4 = q3.divide(q1)
@@ -406,7 +407,7 @@ class TestQuantity(unittest.TestCase):
 
         # Boltzmann and Avogadro
         boltzmann = msys.getQuantity(Constant.BOLTZMANN_CONSTANT)
-        avogadro = msys.getQuantity(Constant.AVAGADRO_CONSTANT)
+        avogadro = msys.getQuantity(Constant.AVOGADRO_CONSTANT)
         gas = msys.getQuantity(Constant.GAS_CONSTANT)
         qR = boltzmann.multiply(avogadro)
         self.assertAlmostEqual(qR.uom.scalingFactor, gas.uom.scalingFactor, None, None, TestingUtils.DELTA6)
@@ -664,7 +665,7 @@ class TestQuantity(unittest.TestCase):
         katals = concentration.multiply(Quantity(1.0, litre)).convert(katal)
         self.assertAlmostEqual(katals.amount, 0.01666667, None, None, TestingUtils.DELTA6)
         
-        # The Stefan–Boltzmann law states that the power emitted per unit area
+        # The Stefanï¿½Boltzmann law states that the power emitted per unit area
         # of the surface of a black body is directly proportional to the 4.0th
         # power of its absolute temperature: sigma * T^4
 
