@@ -7,106 +7,149 @@ class Prefix:
     
     # list of cached prefixes  
     prefixes = []
+    
+    # Cached prefix instances
+    _cached_prefixes = {}
         
     @classmethod
     def yotta(cls):
         # SI prefix 10^24
-        return cls("yotta", "Y", 1.0E+24)
+        if 'yotta' not in cls._cached_prefixes:
+            cls._cached_prefixes['yotta'] = cls("yotta", "Y", 1.0E+24)
+        return cls._cached_prefixes['yotta']
     
     @classmethod
     def zetta(cls):
         # SI prefix 10^21
-        return cls("zetta", "Z", 1.0E+21)
+        if 'zetta' not in cls._cached_prefixes:
+            cls._cached_prefixes['zetta'] = cls("zetta", "Z", 1.0E+21)
+        return cls._cached_prefixes['zetta']
     
     @classmethod
     def exa(cls):
         # SI prefix 10^18
-        return cls("exa", "E", 1.0E+18)
+        if 'exa' not in cls._cached_prefixes:
+            cls._cached_prefixes['exa'] = cls("exa", "E", 1.0E+18)
+        return cls._cached_prefixes['exa']
     
     @classmethod
     def peta(cls):
         # SI prefix 10^15
-        return cls("peta", "P", 1.0E+15)
+        if 'peta' not in cls._cached_prefixes:
+            cls._cached_prefixes['peta'] = cls("peta", "P", 1.0E+15)
+        return cls._cached_prefixes['peta']
     
     @classmethod
     def tera(cls):
         # SI prefix 10^12
-        return cls("tera", "T", 1.0E+12)
+        if 'tera' not in cls._cached_prefixes:
+            cls._cached_prefixes['tera'] = cls("tera", "T", 1.0E+12)
+        return cls._cached_prefixes['tera']
     
     @classmethod
     def giga(cls):
         # SI prefix 10^9
-        return cls("giga", "G", 1.0E+09)  
+        if 'giga' not in cls._cached_prefixes:
+            cls._cached_prefixes['giga'] = cls("giga", "G", 1.0E+09)
+        return cls._cached_prefixes['giga']
     
     @classmethod
     def mega(cls):
         # SI prefix 10^6
-        return cls("mega", "M", 1.0E+06)   
+        if 'mega' not in cls._cached_prefixes:
+            cls._cached_prefixes['mega'] = cls("mega", "M", 1.0E+06)
+        return cls._cached_prefixes['mega']
     
     @classmethod
     def kilo(cls):
         # SI prefix 10^3
-        return cls("kilo", "k", 1.0E+03)   
+        if 'kilo' not in cls._cached_prefixes:
+            cls._cached_prefixes['kilo'] = cls("kilo", "k", 1.0E+03)
+        return cls._cached_prefixes['kilo']
     
     @classmethod
     def hecto(cls):
         # SI prefix 10^2
-        return cls("hecto", "h", 1.0E+02)  
+        if 'hecto' not in cls._cached_prefixes:
+            cls._cached_prefixes['hecto'] = cls("hecto", "h", 1.0E+02)
+        return cls._cached_prefixes['hecto']
     
     @classmethod
     def deka(cls):
         # SI prefix 10^1
-        return cls("deka", "da", 1.0E+01)    
+        if 'deka' not in cls._cached_prefixes:
+            cls._cached_prefixes['deka'] = cls("deka", "da", 1.0E+01)
+        return cls._cached_prefixes['deka']
     
     @classmethod
     def deci(cls):
         # SI prefix 10^-1
-        return cls("deci", "d", 1.0E-01)  
+        if 'deci' not in cls._cached_prefixes:
+            cls._cached_prefixes['deci'] = cls("deci", "d", 1.0E-01)
+        return cls._cached_prefixes['deci']
     
     @classmethod
     def centi(cls):
         # SI prefix 10^-2
-        return cls("centi", "c", 1.0E-02) 
+        if 'centi' not in cls._cached_prefixes:
+            cls._cached_prefixes['centi'] = cls("centi", "c", 1.0E-02)
+        return cls._cached_prefixes['centi']
     
     @classmethod
     def milli(cls):
         # SI prefix 10^-3
-        return cls("milli", "m", 1.0E-03)  
+        if 'milli' not in cls._cached_prefixes:
+            cls._cached_prefixes['milli'] = cls("milli", "m", 1.0E-03)
+        return cls._cached_prefixes['milli']
     
     @classmethod
     def micro(cls):
         # SI prefix 10^-6
-        return cls("micro", "\u03BC", 1.0E-06)   
+        if 'micro' not in cls._cached_prefixes:
+            cls._cached_prefixes['micro'] = cls("micro", "\u03BC", 1.0E-06)
+        return cls._cached_prefixes['micro']
     
     @classmethod
     def nano(cls):
         # SI prefix 10^-9
-        return cls("nano", "n", 1.0E-09)     
+        if 'nano' not in cls._cached_prefixes:
+            cls._cached_prefixes['nano'] = cls("nano", "n", 1.0E-09)
+        return cls._cached_prefixes['nano']
     
     @classmethod
     def pico(cls):
         # SI prefix 10^-12
-        return cls("pico", "p", 1.0E-12)                         
+        if 'pico' not in cls._cached_prefixes:
+            cls._cached_prefixes['pico'] = cls("pico", "p", 1.0E-12)
+        return cls._cached_prefixes['pico']
 
     @classmethod
     def femto(cls):
         # SI prefix 10^-15
-        return cls("femto", "f", 1.0E-15)
+        if 'femto' not in cls._cached_prefixes:
+            cls._cached_prefixes['femto'] = cls("femto", "f", 1.0E-15)
+        return cls._cached_prefixes['femto']
 
     @classmethod
     def atto(cls):
         # SI prefix 10^-18
-        return cls("atto", "a", 1.0E-18)
+        if 'atto' not in cls._cached_prefixes:
+            cls._cached_prefixes['atto'] = cls("atto", "a", 1.0E-18)
+        return cls._cached_prefixes['atto']
             
     @classmethod
     def zepto(cls):
         # SI prefix 10^-21
-        return cls("zepto", "z", 1.0E-21)
+        if 'zepto' not in cls._cached_prefixes:
+            cls._cached_prefixes['zepto'] = cls("zepto", "z", 1.0E-21)
+        return cls._cached_prefixes['zepto']
     
     @classmethod
     def yocto(cls):
         # SI prefix 10^-24
-        return cls("yocto", "y", 1.0E-24)
+        if 'yocto' not in cls._cached_prefixes:
+            cls._cached_prefixes['yocto'] = cls("yocto", "y", 1.0E-24)
+        return cls._cached_prefixes['yocto']
     
     """
     Digital information prefixes for bytes established by the International
@@ -114,15 +157,21 @@ class Prefix:
     """    
     @classmethod
     def kibi(cls):
-        return cls("kibi", "Ki", 1024)
+        if 'kibi' not in cls._cached_prefixes:
+            cls._cached_prefixes['kibi'] = cls("kibi", "Ki", 1024)
+        return cls._cached_prefixes['kibi']
     
     @classmethod
     def mebi(cls):
-        return cls("mebi", "Mi", 1024**2) 
+        if 'mebi' not in cls._cached_prefixes:
+            cls._cached_prefixes['mebi'] = cls("mebi", "Mi", 1024**2)
+        return cls._cached_prefixes['mebi']
     
     @classmethod
     def gibi(cls):
-        return cls("gibi", "Gi", 1024**3)       
+        if 'gibi' not in cls._cached_prefixes:
+            cls._cached_prefixes['gibi'] = cls("gibi", "Gi", 1024**3)
+        return cls._cached_prefixes['gibi']       
 
     ##
     # Construct a prefix

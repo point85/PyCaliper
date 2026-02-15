@@ -10,10 +10,10 @@ exclude = [".settings", ".vscode", ".project", ".pydevproject", "README.md"]
 
 [project]
 name = "PyCaliper"
-version = "1.0.8"
+version = "1.1.0"
 keywords = ["units of measure", "units", "measurement units", "uom", "units of measurement", "measure-conversion"]
 authors = [
-  { name="Kent Randall", email="point85.llc@gmail.com" },
+  { name="Kent Randall", email="point85.apps@gmail.com" },
 ]
 description = "A unit of measure project."
 readme = "README_PyPI.md"

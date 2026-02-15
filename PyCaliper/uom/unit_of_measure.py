@@ -44,13 +44,10 @@ class Reducer:
         
         # scaling
         if (len(self.pathExponents) > 0):
-            lastExponent = self.pathExponents[len(self.pathExponents) - 1]
+            lastExponent = self.pathExponents[-1]
 
-            # compute the overall scaling factor
-            factor = 1.0
-            
-            for _ in range(abs(lastExponent)):
-                factor = factor * uom.scalingFactor
+            # compute the overall scaling factor using power
+            factor = math.pow(uom.scalingFactor, abs(lastExponent))
 
             if (lastExponent < 0):
                 self.mapScalingFactor = self.mapScalingFactor / factor
@@ -73,8 +70,9 @@ class Reducer:
                 for exp in self.pathExponents:
                     pathExponent = pathExponent * exp
                 
-                invert = True if pathExponent < 0 else False
+                invert = pathExponent < 0
                 
+                # Add the term with the absolute value of pathExponent
                 for _ in range(abs(pathExponent)):
                     self.addTerm(uom.abscissaUnit, invert)
         else:
@@ -99,7 +97,7 @@ class Reducer:
 
         if (not invert):
             # get existing power
-            if (uom not in self.terms.keys()):
+            if (uom not in self.terms):
                 # add first time
                 power = unitPower
             else:
@@ -108,7 +106,7 @@ class Reducer:
                     power = self.terms[uom] + unitPower
         else:
             # denominator with negative powers
-            if (uom not in self.terms.keys()):
+            if (uom not in self.terms):
                 # add first time
                 power = -unitPower
             else:
@@ -130,7 +128,7 @@ class Reducer:
         denominatorCount = 0
         
         # sort units by symbol (ascending)
-        sortedTerms = sorted(self.terms.keys())
+        sortedTerms = sorted(self.terms)
         for uom in sortedTerms:
             power = self.terms[uom]
         
@@ -528,13 +526,15 @@ class UnitOfMeasure(Symbolic):
         else:
             self.setPowerProduct(base, exponent, None, None)
     
+    _intermediate_counter = 0
+    
     @staticmethod    
     def generateIntermediateSymbol():
         # generate a symbol for units of measure created as the result of
         # intermediate multiplication and division operations. These symbols are
         # not cached.
-        ns = str(time.time_ns())
-        return ns[:UnitOfMeasure.MAX_SYMBOL_LENGTH]
+        UnitOfMeasure._intermediate_counter += 1
+        return f"_UOM_{UnitOfMeasure._intermediate_counter}"
 
     @staticmethod 
     def generatePowerSymbol(base, exponent):
@@ -603,14 +603,12 @@ class UnitOfMeasure(Symbolic):
             match = True
 
             # same size, now check base unit types and exponents
-            for uomBaseEntry in uomBaseMap.items():
-                uomBaseType = uomBaseEntry[0].unitType
+            for uomBase, uomPower in uomBaseMap.items():
+                uomBaseType = uomBase.unitType
                 
-                unitValue = None
-                if (uomBaseType in unitTypeMap):
-                    unitValue = unitTypeMap[uomBaseType]
+                unitValue = unitTypeMap.get(uomBaseType)
 
-                if (unitValue is None or unitValue != uomBaseEntry[1]):
+                if (unitValue is None or unitValue != uomPower):
                     # not a match
                     match = False
                     break
@@ -713,14 +711,8 @@ class UnitOfMeasure(Symbolic):
         resultMap = {}
         
         # iterate over the multiplier's unit map
-        for thisEntry in thisMap.items():
-            thisUOM = thisEntry[0]
-            thisPower = thisEntry[1]
-            
-            otherPower = None
-            
-            if (thisUOM in otherMap):
-                otherPower = otherMap[thisUOM]
+        for thisUOM, thisPower in thisMap.items():
+            otherPower = otherMap.get(thisUOM)
             
             if (otherPower is not None):
                 if (not invert):
@@ -737,10 +729,7 @@ class UnitOfMeasure(Symbolic):
                 resultMap[thisUOM] = thisPower
     
         # add any remaining multiplicand terms and invert any remaining divisor terms
-        for otherEntry in otherMap.items():
-            otherUOM = otherEntry[0]
-            otherPower = otherEntry[1]
-
+        for otherUOM, otherPower in otherMap.items():
             if (not invert):
                 resultMap[otherUOM] = otherPower
             else:
@@ -885,24 +874,19 @@ class UnitOfMeasure(Symbolic):
 
         factor = 1.0
 
-        # compute map factor
+        # compute map factor - create lookup dict for toMap for O(1) access
+        toMapByType = {toUOM.unitType: (toUOM, toPower) for toUOM, toPower in toMap.items()}
         matchCount = 0
         
-        for fromEntry in fromMap.items():
-            fromUOM = fromEntry[0]
+        for fromUOM, fromPower in fromMap.items():
             fromType = fromUOM.unitType
-            fromPower = fromEntry[1]
-
-            for toEntry in toMap.items():
-                toType = toEntry[0].unitType
-
-                if (fromType == toType):
-                    matchCount = matchCount + 1
-                    toUOM = toEntry[0]
-                    bd = fromUOM.convertScalarToScalar(toUOM)
-                    bd = math.pow(bd, fromPower)
-                    factor = factor * bd
-                    break
+            
+            if fromType in toMapByType:
+                matchCount += 1
+                toUOM, _toPower = toMapByType[fromType]
+                bd = fromUOM.convertScalarToScalar(toUOM)
+                bd = math.pow(bd, fromPower)
+                factor = factor * bd
 
         if (matchCount != len(fromMap)):
             msg = Localizer.instance().messageStr("incompatible.units").format(self, targetUOM)

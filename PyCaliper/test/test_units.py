@@ -519,7 +519,6 @@ class TestUnits(unittest.TestCase):
 
     def testOperations(self):
         msys = MeasurementSystem.instance()
-        _allCached = CacheManager.instance().getCachedUOMs()
 
         hour = msys.getHour()
         metre = msys.getUOM(Unit.METRE)

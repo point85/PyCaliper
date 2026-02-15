@@ -27,4 +27,36 @@ v1.0.8, June 11, 2025:
 	- Localizer: enhanced class
 	- Symbolic: defined __eq__ and __hash__
 	- Unit of Measure: made __hash__ consistent with __eq__
+
+v1.1.0, February 15, 2026:	
+- Claude Sonnet 4.5
+Bug - Test Import Failure (test/init.py)
+Fixed os.chdir("../uom") that was breaking tests when run from different locations
+
+Performance Enhancements:
+Dictionary Operations Optimization (unit_of_measure.py)
+Removed unnecessary .keys() calls when checking membership (2 locations)
+Optimized dict iteration in buildBaseString() - sort dict directly instead of keys
+Improved multiplyOrDivide() - use tuple unpacking in for loops and .get() method
+Optimized classify() - use .get() instead of checking membership then accessing
+Major optimization in getConversionFactor() - replaced nested O(n²) loop with O(n) lookup using dict comprehension
+Prefix Class Caching (prefix.py)
+
+Implemented instance caching for all 22 prefix methods (milli, kilo, mega, etc.)
+Previously created new objects on every call; now returns cached instances
+Significant performance improvement for measurement system initialization
+
+Symbol Generation Optimization (unit_of_measure.py)
+Replaced expensive time.time_ns() call with simple counter
+Much faster for intermediate unit generation
+
+Power Calculation Optimization (unit_of_measure.py)
+
+Replaced loop-based power calculation with math.pow() in Reducer.explodeRecursively()
+More efficient and clearer code
+Localizer Optimization (localizer.py)
+
+Added @lru_cache decorator to getLC() method for language code lookup
+Fixed __init__ to properly check _initialized attribute
+Prevents repeated locale lookups	
 	

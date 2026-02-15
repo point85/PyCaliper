@@ -6,6 +6,7 @@ import gettext
 import threading
 import os
 from pathlib import Path
+from functools import lru_cache
 
 class Localizer:
     """Thread-safe singleton for handling localization."""
@@ -22,20 +23,22 @@ class Localizer:
         return cls._instance
     
     def __init__(self):
-        if getattr(self, '_initialized', False):
+        if self._initialized:
             return
         self._initialized = True
         self.messages = None
         self.units = None
         self.localePath = Path(__file__).parent / "locales"
+        self._language_code = None  # Cache the language code
     
     @staticmethod
     def instance():
         return Localizer()
     
     @staticmethod
+    @lru_cache(maxsize=1)
     def getLC():
-        """Get language code with robust fallback."""
+        """Get language code with robust fallback (cached)."""
         try:
             current_locale = locale.getlocale()[0]
             if current_locale:
